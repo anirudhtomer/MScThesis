@@ -53,6 +53,7 @@
     <requires type="static">
       <file>blx-compat.def</file>
       <file>biblatex.def</file>
+      <file>blx-natbib.def</file>
       <file>authoryear-comp.bbx</file>
       <file>authoryear.bbx</file>
       <file>standard.bbx</file>
@@ -83,7 +84,7 @@
       <file>thesis-blx.bib</file>
     </requires>
     <requires type="editable">
-      <file>Bibliography/Bibliography.bib</file>
+      <file>references.bib</file>
     </requires>
     <requires type="static">
       <file>biblatex.bst</file>

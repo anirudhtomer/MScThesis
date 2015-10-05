@@ -1,0 +1,55 @@
+% $ biblatex auxiliary file $
+% $ biblatex version 2.5 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\entry{lesaffre_bayesian_2012}{book}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Lesaffre}{L.}%
+     {Emmanuel}{E.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Lawson}{L.}%
+     {Andrew~B.}{A.~B.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{language}{1}{%
+    {English}%
+  }
+  \list{publisher}{1}{%
+    {Wiley}%
+  }
+  \strng{namehash}{LELAB1}
+  \strng{fullhash}{LELAB1}
+  \field{labelyear}{2012}
+  \field{sortinit}{L}
+  \field{edition}{1 edition}
+  \field{isbn}{978-0-470-01823-1}
+  \field{title}{Bayesian {Biostatistics}}
+  \list{location}{1}{%
+    {Chichester, West Sussex}%
+  }
+  \field{month}{08}
+  \field{year}{2012}
+\endentry
+
+\lossort
+\endlossort
+
+\endinput

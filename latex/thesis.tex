@@ -40,8 +40,8 @@
 \usepackage{subcaption}
 
 % package to manage citations
-\usepackage[backend=bibtex,style=authoryear-comp,sorting=nyt,isbn=false,url=false]{biblatex}
-\addbibresource{Bibliography/Bibliography.bib}
+\usepackage[backend=bibtex,style=authoryear-comp,sorting=nyt,isbn=false,url=false, natbib=true]{biblatex}
+\addbibresource{references.bib}
 
 % Kill the auto-indent
 \setlength\parindent{0pt}
@@ -60,32 +60,36 @@
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 
-
 % start of the document
 \begin{document}
 
 % include cover page + copyright statement + no pagenumbers
 \pagenumbering{gobble}
 \includepdf[pages={1}]{coverpages/titlepage/titlepage.pdf}
+%an empty page to make sure copyright gets printed on a new page
 \clearpage \null \clearpage
 \include{coverpages/copyright/copyright}
 
 % frontmatter + roman page numbers
 \frontmatter
 
-%%%%\include{Chapters/Preface/Preface}\cleardoublepage
-%%%%\include{Chapters/Summary/Summary}
+\include{frontmatter/preface/preface}\cleardoublepage
+\include{frontmatter/summary/summary}
 %\printglossary[type=\acronymtype,style=list,title={List of abbreviations}]
 \cleardoublepage
 \tableofcontents
 
 % main matter (chapters + appendices
 \mainmatter
-
+\include{mainmatter/chapter_1_introduction/introduction}
+\include{mainmatter/chapter_2_bayesian_methodologies/bayesian_methodologies}
+\include{mainmatter/chapter_3_mixture_models/mixture_models}
+\include{mainmatter/chapter_4_data_set/data_set}
+\include{mainmatter/chapter_5_analysis_of_data/analysis_of_data}
+\include{mainmatter/chapter_6_conclusion/conclusion}
 
 % Appendices should go here
 \appendix
-\chapter{Essential code}
 
 % backmater => mainly references
 \backmatter
