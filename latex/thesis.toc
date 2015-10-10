@@ -18,7 +18,9 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {1.2}Goal of master thesis}{2}{section.1.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}Bayesian methodologies}{5}{chapter.2}
+\contentsline {chapter}{\numberline {2}Bayesian paradigm}{5}{chapter.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.1}The bayesian motivation: A toy example}{5}{section.2.1}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {3}Mixture models}{7}{chapter.3}
 \defcounter {refsection}{0}\relax 
