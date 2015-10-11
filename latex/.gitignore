@@ -1,0 +1,8 @@
+*.aux
+*.toc
+*.out
+*.bbl
+*.blg
+*.log
+*.xml
+thesis-blx.bib
