@@ -16,7 +16,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {subsection}{\numberline {1.1.3}Applications of mixture distribution}{2}{subsection.1.1.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.2}Goal of master thesis}{2}{section.1.2}
+\contentsline {section}{\numberline {1.2}Goal of master thesis}{3}{section.1.2}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {2}Bayesian paradigm}{5}{chapter.2}
 \defcounter {refsection}{0}\relax 
