@@ -16,6 +16,15 @@
   {}
 \endgroup
 
+\entry{_bayesian_????}{misc}{}
+  \field{sortinit}{B}
+  \field{title}{Bayesian {Analysis} {Using} {SAS}/{STAT} {Software}}
+  \verb{url}
+  \verb http://support.sas.com/rnd/app/Bayesian/index.html
+  \endverb
+  \field{type}{{SAS} support}
+\endentry
+
 \entry{fruhwirth-schnatter_finite_2013}{book}{}
   \name{author}{1}{}{%
     {{}%
@@ -38,6 +47,39 @@
   \field{title}{Finite {Mixture} and {Markov} {Switching} {Models}}
   \field{month}{04}
   \field{year}{2013}
+\endentry
+
+\entry{lesaffre_bayesian_2012}{book}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Lesaffre}{L.}%
+     {Emmanuel}{E.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Lawson}{L.}%
+     {Andrew~B.}{A.~B.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{language}{1}{%
+    {English}%
+  }
+  \list{publisher}{1}{%
+    {Wiley}%
+  }
+  \strng{namehash}{LELAB1}
+  \strng{fullhash}{LELAB1}
+  \field{labelyear}{2012}
+  \field{sortinit}{L}
+  \field{edition}{1 edition}
+  \field{isbn}{978-0-470-01823-1}
+  \field{title}{Bayesian {Biostatistics}}
+  \list{location}{1}{%
+    {Chichester, West Sussex}%
+  }
+  \field{month}{08}
+  \field{year}{2012}
 \endentry
 
 \entry{verbeke_linear_1996}{article}{}

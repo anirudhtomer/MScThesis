@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.9.25)  11 OCT 2015 01:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.9.25)  11 OCT 2015 13:11
 entering extended mode
 **thesis.tex
 (thesis.tex
@@ -1503,7 +1503,7 @@ Package biblatex Info: ... file 'thesis.bbl' found.
 Package biblatex Info: Reference section=0 on input line 66.
 Package biblatex Info: Reference segment=0 on input line 66.
 
-<coverpages/titlepage/titlepage.pdf, id=62, 597.50829pt x 845.0471pt>
+<coverpages/titlepage/titlepage.pdf, id=70, 597.50829pt x 845.0471pt>
 File: coverpages/titlepage/titlepage.pdf Graphic file (type pdf)
 
 <use coverpages/titlepage/titlepage.pdf>
@@ -1517,7 +1517,7 @@ Package pdftex.def Info: coverpages/titlepage/titlepage.pdf used on input line
 70.
 (pdftex.def)             Requested size: 597.50682pt x 845.04504pt.
 
-<coverpages/titlepage/titlepage.pdf, id=65, page=1, 597.50829pt x 845.0471pt>
+<coverpages/titlepage/titlepage.pdf, id=73, page=1, 597.50829pt x 845.0471pt>
 File: coverpages/titlepage/titlepage.pdf Graphic file (type pdf)
 
 <use coverpages/titlepage/titlepage.pdf, page 1>
@@ -1687,7 +1687,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 10--11
  []
 
 
-<mainmatter/chapter_1_introduction/mixture_density.png, id=139, 642.4pt x 481.8
+<mainmatter/chapter_1_introduction/mixture_density.png, id=149, 642.4pt x 481.8
 pt>
 File: mainmatter/chapter_1_introduction/mixture_density.png Graphic file (type 
 png)
@@ -1728,7 +1728,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 7--8
  []
 
 
-<mainmatter/chapter_2_bayesian_paradigm/toy_problem_pdf.png, id=177, 642.4pt x 
+<mainmatter/chapter_2_bayesian_paradigm/toy_problem_pdf.png, id=187, 642.4pt x 
 481.8pt>
 File: mainmatter/chapter_2_bayesian_paradigm/toy_problem_pdf.png Graphic file (
 type png)
@@ -1736,8 +1736,24 @@ type png)
 Package pdftex.def Info: mainmatter/chapter_2_bayesian_paradigm/toy_problem_pdf
 .png used on input line 11.
 (pdftex.def)             Requested size: 321.19922pt x 240.8994pt.
-)
-[5] [6 <./mainmatter/chapter_2_bayesian_paradigm/toy_problem_pdf.png>]
+
+Underfull \hbox (badness 10000) in paragraph at lines 21--22
+
+ []
+
+[5]
+Underfull \hbox (badness 10000) in paragraph at lines 32--33
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--36
+
+ []
+
+LaTeX Font Info:    Font shape `T1/phv/m/it' in size <10.95> not available
+(Font)              Font shape `T1/phv/m/sl' tried instead on input line 37.
+) [6 <./mainmatter/chapter_2_bayesian_paradigm/toy_problem_pdf.png>]
 (mainmatter/chapter_3_mixture_models/mixture_models.tex
 Chapter 3.
 ) [7
@@ -1765,15 +1781,12 @@ Chapter 6.
 ) [13] [14
 
 
-]
-LaTeX Font Info:    Font shape `T1/phv/m/it' in size <10.95> not available
-(Font)              Font shape `T1/phv/m/sl' tried instead on input line 98.
- [15
+] [15
 
 ] [16
 
 ]
-<coverpages/backpage/backpage.pdf, id=238, 597.50829pt x 845.0471pt>
+<coverpages/backpage/backpage.pdf, id=256, 597.50829pt x 845.0471pt>
 File: coverpages/backpage/backpage.pdf Graphic file (type pdf)
 
 <use coverpages/backpage/backpage.pdf>
@@ -1786,7 +1799,7 @@ Package pdftex.def Info: coverpages/backpage/backpage.pdf used on input line 10
 1.
 (pdftex.def)             Requested size: 597.50682pt x 845.04504pt.
 
-<coverpages/backpage/backpage.pdf, id=241, page=1, 597.50829pt x 845.0471pt>
+<coverpages/backpage/backpage.pdf, id=259, page=1, 597.50829pt x 845.0471pt>
 File: coverpages/backpage/backpage.pdf Graphic file (type pdf)
 
 <use coverpages/backpage/backpage.pdf, page 1>
@@ -1831,15 +1844,15 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 102.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 102.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 102.
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 20A8623F49C1F9D94C8F491C6D3B7FBE;859.
+(rerunfilecheck)             Checksum: BB583CA435A1FDF0753D69C8163E6ADA;985.
 Package logreq Info: Writing requests to 'thesis.run.xml'.
  ) 
 Here is how much of TeX's memory you used:
- 27413 strings out of 493673
- 491588 string characters out of 3143957
- 950516 words of memory out of 3000000
- 30013 multiletter control sequences out of 15000+200000
- 59481 words of font info for 121 fonts, out of 3000000 for 9000
+ 27444 strings out of 493673
+ 492034 string characters out of 3143957
+ 950517 words of memory out of 3000000
+ 30028 multiletter control sequences out of 15000+200000
+ 60023 words of font info for 127 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
  62i,18n,92p,1240b,1637s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}{C:/Program File
@@ -1855,9 +1868,9 @@ type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsf
 onts/symbols/msbm10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/helvetic/u
 hvb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/
 Program Files/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on thesis.pdf (27 pages, 268407 bytes).
+Output written on thesis.pdf (27 pages, 279616 bytes).
 PDF statistics:
- 309 PDF objects out of 1000 (max. 8388607)
- 55 named destinations out of 1000 (max. 500000)
- 19631 words of extra memory for PDF output out of 20736 (max. 10000000)
+ 328 PDF objects out of 1000 (max. 8388607)
+ 61 named destinations out of 1000 (max. 500000)
+ 19647 words of extra memory for PDF output out of 20736 (max. 10000000)
 

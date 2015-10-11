@@ -8,7 +8,9 @@
 \BOOKMARK [1][-]{section.1.2}{Goal of master thesis}{chapter.1}% 8
 \BOOKMARK [0][-]{chapter.2}{Bayesian paradigm}{}% 9
 \BOOKMARK [1][-]{section.2.1}{The bayesian motivation: A toy example}{chapter.2}% 10
-\BOOKMARK [0][-]{chapter.3}{Mixture models}{}% 11
-\BOOKMARK [0][-]{chapter.4}{Data set}{}% 12
-\BOOKMARK [0][-]{chapter.5}{Analysis of data}{}% 13
-\BOOKMARK [0][-]{chapter.6}{Conclusion}{}% 14
+\BOOKMARK [1][-]{section.2.2}{Bayes theorem}{chapter.2}% 11
+\BOOKMARK [1][-]{section.2.3}{Bayesian software}{chapter.2}% 12
+\BOOKMARK [0][-]{chapter.3}{Mixture models}{}% 13
+\BOOKMARK [0][-]{chapter.4}{Data set}{}% 14
+\BOOKMARK [0][-]{chapter.5}{Analysis of data}{}% 15
+\BOOKMARK [0][-]{chapter.6}{Conclusion}{}% 16
