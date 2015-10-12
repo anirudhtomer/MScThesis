@@ -1,0 +1,15 @@
+% !TEX root =  ../../thesis.tex
+
+\chapter{Bayesian linear mixed effects model}
+\label{ch : blmm}
+
+\section{Introduction to linear mixed model}
+\label{sec : lmm}
+A linear mixed effects model, also known as linear mixed model(LMM) is a statistical model for data which is hierarchical in structure. The specialty of the models is that apart from the fixed effects, they also model the correlation between the observations falling in the same group at a certain level in the hierarchy. The correlation is modeled with the help of random effects and the response is modeled as a linear function of both fixed and random effects. While there are many synonymous terminologies for data sets which are hierarchical in nature, in this thesis our focus will be on Longitudinal data sets. A longitudinal data set is the one where multiple observations are collected from subjects at different points in time. For e.g. measurement of Hemoglobin of 20 patients with observations taken every month for a period of 24 months. Since the observations collected from a subject will be correlated a linear model will not be useful because of the restrictions it imposes on the covariance structure. \citet{verbeke_linear_2009} have covered a LMM in detail in their book and following model definition is based on it.
+
+\todo[inline]{Add the definition}
+
+However one of issues with the frequentist LMM is that, while the parameters of covariance matrix are estimated using ML/REML only a point estimate is further used in estimation of fixed effects. Hence the uncertainty in estimation of random effects is ignored. Although frequentist inference approaches try to mitigate this issue by modifying the distributional assumptions of the test statistic \citep[pg. 56]{verbeke_linear_2009}, a bayesian approach considers the variability in parameter estimates in the first place.
+
+\section{Bayesian linear mixed model}
+\label{sec : blmm}
