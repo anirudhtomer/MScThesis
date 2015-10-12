@@ -5,11 +5,32 @@
 
 \section{Introduction to linear mixed model}
 \label{sec : lmm}
-A linear mixed effects model, also known as linear mixed model(LMM) is a statistical model for data which is hierarchical in structure. The specialty of the models is that apart from the fixed effects, they also model the correlation between the observations falling in the same group at a certain level in the hierarchy. The correlation is modeled with the help of random effects and the response is modeled as a linear function of both fixed and random effects. While there are many synonymous terminologies for data sets which are hierarchical in nature, in this thesis our focus will be on Longitudinal data sets. A longitudinal data set is the one where multiple observations are collected from subjects at different points in time. For e.g. measurement of Hemoglobin of 20 patients with observations taken every month for a period of 24 months. Since the observations collected from a subject will be correlated a linear model will not be useful because of the restrictions it imposes on the covariance structure. \citet{verbeke_linear_2009} have covered a LMM in detail in their book and following model definition is based on it.
+A linear mixed effects model, also known as linear mixed model(LMM) is a statistical model for data which is hierarchical in structure. The specialty of the models is that apart from the fixed effects, they also model the correlation between the observations falling in the same group at a certain level in the hierarchy. The correlation is modeled with the help of random effects and the response is modeled as a linear function of both fixed and random effects.\\
 
-\todo[inline]{Add the definition}
+There are many synonymous terminologies for data sets which are hierarchical in nature albeit with subtle nuances differentiating them. In this thesis our focus will be on Longitudinal data sets. A longitudinal data set is the one where multiple observations are collected from subjects at different points in time. For e.g. measurement of Hemoglobin of 20 patients with observations taken every month for a period of 24 months. Since the observations collected from a subject will be correlated a linear model will not be useful because of the restrictions it imposes on the covariance structure.\\
 
-However one of issues with the frequentist LMM is that, while the parameters of covariance matrix are estimated using ML/REML only a point estimate is further used in estimation of fixed effects. Hence the uncertainty in estimation of random effects is ignored. Although frequentist inference approaches try to mitigate this issue by modifying the distributional assumptions of the test statistic \citep[pg. 56]{verbeke_linear_2009}, a bayesian approach considers the variability in parameter estimates in the first place.
+\subsection{LMM definition}
+\label{subsec : lmm_definition}
+Following the notations from \citet{lesaffre_bayesian_2012}, the LMM for the observations of the $i^{th}$ subject among the $n$ subjects is given by\\
+
+$\boldsymbol{y_i} = \boldsymbol{X}_{i}\boldsymbol{\beta} + \boldsymbol{Z}_{i}\boldsymbol{b}_{i} + \boldsymbol{\varepsilon}_{i}$, where\\
+
+$1 \le i \le n$,\\
+$\boldsymbol{y_i} = {(y_{i1}, y_{i2}, \ldots, y_{im_i})}^T$ is a vector of observations for the $i^{th}$ subject taken at $m_i$ time points,\\
+$\boldsymbol{X}_{i} = {(\boldsymbol{x}_{i1}^T, \boldsymbol{x}_{i2}^T, \ldots, \boldsymbol{x}_{im_i}^T)}^T$ is the $m_i \times (d+1)$ design matrix for the $i^{th}$ subject,\\
+$\boldsymbol{\beta} = {(\beta_0, \beta_1, \ldots, \beta_d)}^T$ is a $(d+1) \times 1$ vector of fixed effects with $\beta_0$ being the intercept,\\
+$\boldsymbol{Z}_{i} = {(\boldsymbol{z}_{i1}^T, \boldsymbol{z}_{i2}^T, \ldots, \boldsymbol{z}_{im_i}^T)}^T$ is the $m_i \times q$ design matrix of covariates varying for a subject at each observation,\\
+$\boldsymbol{b_i} = {(b_{0i}, b_{1i}, \ldots, b_{(q-1)i})}^T$ is a $q \times 1$ vector of random effects with $b_{0i}$ being the random intercept. The random effects $\boldsymbol{b_i} \sim N_q(\boldsymbol{0}, G)$ with $G$ being the $q \times q$ covariance matrix,\\ 
+$\boldsymbol{\varepsilon}_{i} = {(\varepsilon_{i1}, \varepsilon_{i2}, \ldots, \varepsilon_{im_i})}^T$ is a $m_i \times 1$ vector of measurement errors. The errors $\boldsymbol{\varepsilon}_{i} \sim N_{m_i}(\boldsymbol{0}, R_i)$ with $R_i$ being the $(m_i \times m_i)$ covariance matrix of errors,\\
+
+The errors $\boldsymbol{\varepsilon}_{i}$ and the random effects $\boldsymbol{b_i}$ are assumed to be independent. $R_i$ is usually a diagonal matrix of the form $\sigma^2I_{m_i}$. While one might only model the correlation between the observations of a subject using random effects, it is also possible to model the serial correlation component. For this and an in depth coverage of LMM we refer the reader to \citet{verbeke_linear_2009}.\\
 
 \section{Bayesian linear mixed model}
 \label{sec : blmm}
+One of issues with the frequentist LMM is that while the parameters in matrices $G$ and $R_i$ are estimated using ML/REML only a point estimate is further used in estimation of fixed effects(see \cite[chap. 5]{verbeke_linear_2009}). Hence the uncertainty in estimation of random effects is ignored. Although frequentist inference approaches try to mitigate this issue by modifying the distributional assumptions of the test statistic \citep[pg. 56]{verbeke_linear_2009}, a bayesian approach considers the variability in parameter estimates in the first place. The Bayesian linear mixed model or BLMM can be obtained by assigning a distribution to all the parameters involved in a LMM. This means that for the model presented in section \ref{subsec : lmm_definition} we will have a prior distribution for the following:\\
+
+\begin{itemize}
+\item $\sigma^2 \sim p(\sigma^2)$
+\item $\boldsymbol{\beta} \sim p(\boldsymbol{\beta})$
+\item $G \sim p(G)$
+\end{itemize}
