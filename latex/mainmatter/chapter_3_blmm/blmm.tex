@@ -101,9 +101,21 @@ where $\boldsymbol{\bar{\theta}} = E(\boldsymbol{\theta}_{post}|\boldsymbol{y})$
 $p_{DIC} = -2(E(log(p(\boldsymbol{y}|\boldsymbol{\theta}_{post}))) - log(p(\boldsymbol{y}|\boldsymbol{\bar{\theta}})))$ is the penalty for model complexity.
 \end{itemize}
 
-It is interesting to mention that the hierarchical nature of the mixture model implies a marginal model as well. \citet{verbeke_linear_1996} in their paper on heterogeneity model estimate the fixed effects and all covariance components using this 
-marginal model. In our case the marginal model will be given by\\
+It is interesting to mention that the hierarchical nature of the mixture model implies a marginal model as well, which can be found by integrating out the random effects. \citet{verbeke_linear_1996} in their paper on heterogeneity model estimate the fixed effects and all covariance components using this marginal model. In our case y has a marginal model given by:\\
 
-$$\boldsymbol{y_i} = \boldsymbol{X}_{i}\boldsymbol{\beta} + \boldsymbol{Z}_{i}\boldsymbol{b}_{S_i}^C + \boldsymbol{\tilde{\varepsilon}}_{i}$$\\
+$$\boldsymbol{y_i} \sim \sum_{k=1}^{K} \eta_k N(\boldsymbol{X}_{i}\boldsymbol{\beta} + \boldsymbol{Z}_{i}\boldsymbol{b}_k^C,\boldsymbol{Z}_{i}G_{\boldsymbol{S}_i}\boldsymbol{Z}_{i}^T + R_i)$$\\
 
-If our likelihood function is based on the marginal model then DIC could be used to select models which have good predictive power for an observation which is not necessarily from a subject who is in the current study. ---------calculate p-----------. On the other hand if we stick to the hierarchical interpretation, then DIC could be used to select models which have good predictive power for an observation which has to be from the current set of subjects. -------calculate p----------. We are interested.\\
+If our likelihood function is based on the marginal model then DIC could be used to select models which have good predictive power for an observation which is not necessarily from a subject who is in the current study. The total number of terms which will be penalized by AIC is equal to $dim(\boldsymbol{\eta}) + dim(\boldsymbol{\beta}) + dim(\boldsymbol{b}_{1}^C) + \ldots + dim(\boldsymbol{b}_{K}^C) + dim(G_1) + \ldots + dim(G_K) + 1(for \sigma^2)$, where dim is the total number of elements in the vector or matrix. On the other hand if we stick to the hierarchical interpretation, then DIC could be used to select models which have good predictive power for an observation which has to be from the current set of subjects. The total number of terms which will be penalized by AIC is equal to $dim(\boldsymbol{\beta}) + dim(\boldsymbol{b}_1) + \ldots + dim(\boldsymbol{b}_n) + 1(for \sigma^2)$. A model.
+
+\subsection{Trans Dimensional Bayesian inference}
+To compare a set of competing models $\mathcal{M}_1, \mathcal{M}_2, \ldots, \mathcal{M}_{K_{max}}$ each with their own set of parameters $\boldsymbol{\nu}_1, \boldsymbol{\nu}_2, \ldots, \boldsymbol{\nu}_{K_{max}}$ trans dimensional MCMC methods can be used. For e.g. Product space MCMC methods try to simultaneously sample the posterior probability $p(\mathcal{M}_{k}, \boldsymbol{\nu}_1, \boldsymbol{\nu}_2, \ldots, \boldsymbol{\nu}_{K_{max}}, \boldsymbol{y}$ for all $K_{max}$ models. The idea is that during each run a model indicator $\mathcal{M}$ which could follow for e.g. a multinomial distribution, is sampled. Suppose the model indicator is $M=2$ then all the parameters $\boldsymbol{\nu_{2}}$ are sampled whereas parameters for other models are kept what they were. The marginal posterior probability $p(\mathcal{M}_k|\boldsymbol{y}$ of the $k^{th}$ model is found by integrating out the parameters from the joint posterior. These could be further compared to select one of the K models.\\
+
+\subsubsection{Marginal likelihood}
+The ratio of marginal posterior could also be expressed as a Bayes Factor (assuming the prior probabilities for both models are equal) which is a ratio of Marginal likelihoods $\dfrac{p(\boldsymbol{y}|\mathcal{M}_i}{p(\boldsymbol{y}|\mathcal{M}_j}$ for the models. 
+However \citet{johannes_berkhof_bayesian_2003} also suggest to use goodness of fit measures to be used along with Bayes factor. This because bayes factor is a relative measure. Relying on it completely could lead to selection of a model which is relatively better but overall does not provide a good fit.
+
+\subsection{Posterior predictive checks}
+
+
+\subsection{Other methods}
+We will also explore other graphical methods or informal methods like method of moments in this thesis. For further reading on them we refer the reader to \citet[pg. 107-114]{fruhwirth-schnatter_finite_2013}
