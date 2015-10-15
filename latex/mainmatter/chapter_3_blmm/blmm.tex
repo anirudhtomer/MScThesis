@@ -112,10 +112,12 @@ To compare a set of competing models $\mathcal{M}_1, \mathcal{M}_2, \ldots, \mat
 
 \subsubsection{Marginal likelihood}
 The ratio of marginal posterior could also be expressed as a Bayes Factor (assuming the prior probabilities for both models are equal) which is a ratio of Marginal likelihoods $\dfrac{p(\boldsymbol{y}|\mathcal{M}_i}{p(\boldsymbol{y}|\mathcal{M}_j}$ for the models. 
-However \citet{johannes_berkhof_bayesian_2003} also suggest to use goodness of fit measures to be used along with Bayes factor. This because bayes factor is a relative measure. Relying on it completely could lead to selection of a model which is relatively better but overall does not provide a good fit.
+However \citet{johannes_berkhof_bayesian_2003} also suggest to use goodness of fit measures to be used along with Bayes factor. This because bayes factor is a relative measure. Relying on it completely could lead to selection of a model which is relatively better but overall does not provide a good fit. They also suggest using posterior predictive checks which is our next subsection.
 
 \subsection{Posterior predictive checks}
+The idea of the posterior predictive checks is to evaluate the model fit using simulations from the posterior predictive distribution(PPD) $p(\boldsymbol{\tilde{y}}|\boldsymbol{y}$. As an informal check one could sample 1000 values from the PPD 20 times and make 20 histograms to show the density. If the histograms do not match with the histogram of the original sample one could say that the model did not fit the data well.\\ 
 
+A formal way to do this is using Posterior predictive p-values(PPP) or Bayesian p-values. In the frequentist paradigm after fitting a model based on parameter $\hat{\theta}$ one could test the model using test statistic. Let us represent that test statistic value for original sample to be $T(\boldsymbol{y})$. Now based on the sampling distribution of $T(\boldsymbol{\tilde{y}})$ we could check the probability $P(T(\boldsymbol{\tilde{y}}) > T(\boldsymbol{y})$. In the bayesian paradigm the parameter $\theta$ has a posterior distribution and so we find the same probability like before albeit averaged over the entire posterior $p(\theta|\boldsymbol{y})$. A small PPP value indicates bad fit of model to the data. For a complete interpretation of this p-value we refer the readers to \citet{gelman_understanding_2012}.
 
 \subsection{Other methods}
 We will also explore other graphical methods or informal methods like method of moments in this thesis. For further reading on them we refer the reader to \citet[pg. 107-114]{fruhwirth-schnatter_finite_2013}
