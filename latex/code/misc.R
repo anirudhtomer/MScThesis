@@ -48,4 +48,3 @@ for(i in 1:(subject_count*2)){
   lines(x = c(0:5), y=c(resp$response1[i], resp$response2[i], resp$response3[i], resp$response4[i], resp$response5[i], resp$response6[i]), col=color)
 }
 legend("topleft", lty=1, col=c("blue", "darkgreen"),  legend=c("High risk group", "Low risk group"))
-
