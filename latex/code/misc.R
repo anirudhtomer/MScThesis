@@ -2,10 +2,10 @@ install.packages("ggplot2")
 library(ggplot2)
 
 #mixture density
-mat=rmultinom(1, 10000000, c(1/6,1/2,1/3))
+mat=rmultinom(1, 1000, c(1/6,1/2,1/3))
 first=rnorm(mat[1,1], -10, 3)
 second=rnorm(mat[2,1], 0, 1)
-third=rnorm(mat[3,1], 4, 2)
+third=rnorm(mat[3,1], 10, 3)
 sample = c(first, second, third)
 
 densityplot = ggplot()+ aes(sample) + geom_density()

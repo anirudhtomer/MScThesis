@@ -20,7 +20,6 @@ Figure \ref{fig : mixture_density_1} shows the density function for $Y$. The den
 
 \subsection{Formal definition for finite mixture distribution}
 \label{subsec : formal_def_mixture_dist}
-\todo[inline]{Mention that we follow notation from \citep{fruhwirth-schnatter_finite_2013} ???}
 Given a finite set of probability density functions $p_1(y), p_2(y), \ldots, p_K(y)$ and weights $\eta_1, \eta_2, \ldots, \eta_K$, a random variable $Y$ is said to have a finite mixture distribution if\\
 $$p(y) = \sum_{i=1}^{K} \eta_{i} p_{i}(y)$$\\
 The vector of the weights $\boldsymbol{\eta} = (\eta_1, \eta_2, \ldots, \eta_K)$ is called the weight distribution. The $k^{th}$ weight $\eta_{k}$ corresponds to selection probability of the $k^{th}$ density while sampling for $Y$. It can only take values from the K dimensional positive real coordinate space ${\mathbb{R}^{+}}^K$ with an additional constraint,\\
@@ -33,17 +32,15 @@ One of the biggest challenges while modeling a mixture density for an observed r
 \subsection{Applications of mixture distribution}
 Mixture models have found usage in a variety of domains. Some of the examples are:
 \begin{itemize}
-\item Spike sorting of neural data: Both GMM and mixture of multivariate t-distributions have been used. \citep{lewicki_bayesian_1994,shoham_robust_2003}.
+\item Spike sorting of neural data: Both GMM and mixture of multivariate t-distributions have been used.\citep{lewicki_bayesian_1994,shoham_robust_2003}.
 \item Speaker recognition as well as speech to text conversion algorithms have used mixture models \citep{simancas-acevedo_speaker_2001,xiang_efficient_2003,povey_subspace_2011}.
 \item Image processing: GMM have been used to find features in an image like objects, boundaries etc \citep{fu_color_2012}. For e.g. \citet{ming-hsuan_yang_gaussian_1998} have used GMM to model the distribution of skin color pixels. Many authors have also proposed using GMM for face recognition and use it as a biometric identification mechanism.
 \item Finance: \citet{brigo_lognormal-mixture_2002} propose to use a lognormal mixture distribution for pricing of financial assets.
 \item Biology: Mixture models have found usage in genetics and cell biology.\citep{sim_evaluating_2012,gianola_mixture_2007} 
 \end{itemize}
 
-\todo[inline]{I have personally seen NERF researchers using GMM for spike sorting in their lab at IMEC during a visit}
-
 The example applications we cited involved usage of mixture model to adjust for a hidden attribute in the data which could not be collected. However mixtures have also been used as supplementary methodology in various models, a list of which can be found in \citet[pg. 238]{fruhwirth-schnatter_finite_2013}. One such usage in linear mixed models has been proposed by \citet{verbeke_linear_1996} and it also forms the theme of this thesis.\\
 
 \section{Goal of master thesis}
 \label{sec : goal}
-\citet*{verbeke_linear_1996} proposed to use a finite mixture distribution of normally distributed components for the prior distribution of random effects in a linear mixed effects model (see section \ref{sec : lmm} for LMM). This particular linear mixed effects model is also known as Heterogeneity model. For the scope of this thesis our focus will be on the bayesian version of the linear mixed effects model(BLMM), where all parameters involved are assigned a probability distribution (see chapter \ref{ch : blmm}). However in both types of models one has to tackle the issues described in section \ref{subsec : challenges_mixture_density}. The aim of this master thesis is to evaluate existing approaches like Method of moments, graphical evaluations, information criteria, marginal likelihood, posterior predictive checks etc. for selecting the right number of mixture components for random effects distribution. Since we will be following the bayesian paradigm, we will use MCMC methods instead of the frequentist point estimation methods. While we will use the longitudinal data set \textcolor{red}{[name of the data set here]} to fit bayesian linear mixed effect model. We will also simulate data sets to compare various approaches for choosing the number of components.
+\citet*{verbeke_linear_1996} proposed to use a finite mixture distribution of normally distributed components for the prior distribution of random effects in a linear mixed effects model (see section \ref{sec : lmm} for LMM). This particular linear mixed effects model is also known as Heterogeneity model. For the scope of this thesis our focus will be on the Bayesian version of the linear mixed effects model(BLMM), where all parameters involved are assigned a probability distribution (see chapter \ref{ch : blmm}). However in both types of models one has to tackle the issues described in section \ref{subsec : challenges_mixture_density}. The aim of this master thesis is to evaluate existing Bayesian approaches such as deviance information criterion (DIC) , marginal likelihood, posterior predictive checks etc. for selecting the right number of mixture components for random effects distribution. Since we will be following the Bayesian paradigm, we will use MCMC methods instead of the frequentist point estimation methods. While we will use the longitudinal data set \textcolor{red}{[name of the data set here]} to fit Bayesian linear mixed effect model. We will also simulate data sets to compare various approaches for choosing the number of components.
