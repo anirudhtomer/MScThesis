@@ -12,13 +12,17 @@ source("generateData.R")
 source("createModel.R")
 source("plotMCMC.R")
 
-numchains = 5
+numchains = 4
 fit = fitModel(niter = 20000, jagsmodel = model, nchains = numchains)
 mcmcfit = as.mcmc(fit)
 ggsobject = ggs(mcmcfit)
-
 dev.off()
 
+########## Graphical analysis of the simulated mixture distribution #######
+densityplot = ggplot()+ aes(extractRandomComp()) + geom_density()
+densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
+
+########## Graphical analysis of MCMC fit #########
 heidel.diag(mcmcfit)
 
 ggs_density(ggsobject, "beta", rug=T)
@@ -50,3 +54,30 @@ ggs_traceplot(ggsobject, "beta")
 ggs_traceplot(ggsobject, "Precision")
 ggs_traceplot(ggsobject, "randmu")
 ggs_traceplot(ggsobject, "Eta")
+
+########## Mode hunting, works only for 2 or 4 chains ##########
+mcmcfitdf = data.frame(y= numeric(0), x= numeric(0), 
+              pairId = character(0), row = character(0), col=character(0))
+rownum = c("1","1","2","2")
+colnum = c("1","2","1","2")
+for(i in 1:numchains){
+  for(j in 1:ncomponents){
+    for(k in 1:ncomponents){
+      if(j!=k){
+        y = as.numeric(mcmcfit[[i]][,paste("randmu[",k,"]", sep = "")])
+        x = as.numeric(mcmcfit[[i]][,paste("randmu[",j,"]", sep = "")])
+        pairId = rep(paste("mu(",sort(c(j,k)),")", sep=""), length(y))
+        row=rep(rownum[i], length(y))
+        col=rep(colnum[i], length(y))
+        
+        temp = data.frame(y,x,pairId,row, col)
+        mcmcfitdf = rbind(mcmcfitdf, temp)
+      }
+    }
+  }
+}
+
+xylims = c(100,200)
+qplot(y=y, x=x, data=mcmcfitdf, color=pairId, facets = row~col, ylim = xylims, xlim=xylims) + 
+  geom_abline(intercept = 0, slope = 1) 
+
