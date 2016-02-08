@@ -7,15 +7,14 @@ model = function(){
         betaTime*dstime[i*nrep+j] +
         randomIntercept[i+1]
     }
-    randomIntercept[i+1]~dnorm(randmu[S[i+1]],randPrecision)
+    randomIntercept[i+1]~dnorm(intercept + randmu[S[i+1]],randPrecision)
     S[i+1]~dcat(Eta[])
   }
   
   for(k in 1:ncomponents){
-    randmu_unordered[k] ~ dnorm(betaMu, betaTau)
+    mue[k]~dnorm(betaMu, betaTau)
   }
-  
-  randmu[1:ncomponents]<-sort(randmu_unordered)
+  randmu<-sort(mue[]-mean(mue[]))
   
   randPrecision~dgamma(varGammaParm, varGammaParm)
   errPrecision~dgamma(varGammaParm,varGammaParm)

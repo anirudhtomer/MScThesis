@@ -1,0 +1,16 @@
+ISSUES:
+High autocorrelation at smaller lags
+autocorrelation decreases slowly like an AR process
+Tiny bit of label switching
+very slow mixing as model gets complex
+
+TODO:
+checking multicollinearity
+label switching issues: stephens paper
+try hierarchical, conditional conjuagate priors in mixture model
+try marginal model
+try sigma (eta. mu) = 0
+
+RECENTLY DONE:
+Better starting values does work at times
+also choosing different priors for eta when the component is empty doesn't always work

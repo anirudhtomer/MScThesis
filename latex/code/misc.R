@@ -48,3 +48,42 @@ for(i in 1:(subject_count*2)){
   lines(x = c(0:5), y=c(resp$response1[i], resp$response2[i], resp$response3[i], resp$response4[i], resp$response5[i], resp$response6[i]), col=color)
 }
 legend("topleft", lty=1, col=c("blue", "darkgreen"),  legend=c("High risk group", "Low risk group"))
+
+
+#######  Constrained jags trial ########
+
+model=function(){
+  for(i in 1:10){
+    y1[i]~dnorm(mu1,1)
+    y2[i]~dnorm(mu2,1)
+  }
+  mu1~dnorm(0,1)
+  z~dinterval(mu2*mu2, cons-mu1*mu1)
+  mu2~dnorm(0,1)
+  
+  #z~dbern(constraint)
+  #constraint <- step(mu1*mu1 + mu2*mu2 - cons)
+}
+
+y1 = rnorm(10, 0, 1)
+y2 = rnorm(10, 0, 1)
+y1 = c(-0.35, -0.46,  1.05, -0.20, -0.70,  0.19,  1.07,  1.10,  0.54, -0.01)
+y2 = c(0.09, 0.25,  0.04, -1.03,  0.53,  1.56,  0.03, -0.13,  0.31,  0.54)
+z=1
+
+cons = 0.2
+ 
+datanodes = list("y1"=y1,"y2"=y2,"z"=z,"cons"=cons)
+initialValues = list(list("mu1"=c(0), "mu2"=c(0)))
+stochasticNodes = c("mu1", "mu2", "z")
+ 
+unload.module("glm")
+fit = jags(data=datanodes, inits=initialValues, 
+           parameters.to.save = stochasticNodes, n.chains=1, 
+           n.iter=20000, n.thin=5, n.burnin=50, model.file=model, 
+           jags.module=NULL)
+mcmcfit = as.mcmc(fit)
+ggs_density(ggs(mcmcfit))
+mcmcdf = data.frame(mcmcfit[[1]])
+mcmcdf$cons = (mcmcdf$mu1^2 + mcmcdf$mu2^2)>cons
+qplot(y=mu1,x=mu2, data=mcmcdf, color=cons)

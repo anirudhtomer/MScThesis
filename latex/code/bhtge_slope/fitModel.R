@@ -12,18 +12,20 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel){
   betaMu = 0
   varGammaParm = 0.0001
   dirichParm = rep(1, ncomponents)
+  wishartParm=matrix(c(1,0,0,1),2,2)
     
   datanodes = c("dsweight","dsby","dsgender","dstime","nsubjects","nrep", 
-                "varGammaParm","betaTau", "betaMu","ncomponents", "dirichParm")
+                "varGammaParm","betaTau", "betaMu","ncomponents", 
+                "dirichParm", "wishartParm")
   initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
                        "errPrecision"=c(1),"intercept"=c(0),
-                       "randPrecision"=rep(1, 1), 
                        "Eta"=rep(1/ncomponents, ncomponents),
-                       "mue"=rep(0, ncomponents), 
-                       "S"=initS(nsubjects, ncomponents))
+                       "S"=initS(nsubjects, ncomponents),
+                       "randMuIntercept_unordered"=rep(0,ncomponents),
+                       "randMuSlope_unordered"=rep(0,ncomponents))
   stochasticNodes = c("intercept","betaGender","betaBy",
-                      "betaTime","errPrecision", "randPrecision", 
-                      "randmu", "Eta")
+                      "betaTime","errPrecision", "randSigma", 
+                      "randMuIntercept","randMuSlope", "Eta")
   
   dsweight = ds$weight
   dstime = ds$time

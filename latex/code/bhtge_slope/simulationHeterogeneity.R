@@ -1,10 +1,9 @@
 ########## BAYESIAN PACKAGES ###########
 install.packages('R2jags')
-install.packages('mcmcse')
 install.packages('ggmcmc')
 library(R2jags)
-library(mcmcse)
 library(ggmcmc)
+library(MASS)
 
 ########## OTHER SOURCE CODE FILES ############
 source("fitModel.R")
@@ -14,8 +13,15 @@ source("createModel.R")
 numchains = 4
 fit = fitModel(niter = 50000, jagsmodel = model, nchains = numchains)
 mcmcfit = as.mcmc(fit)
-ggsobject = ggs(mcmcfit)
+ggsobject = ggs(mcmcfit[-3])
 dev.off()
+
+mean(mcmcfit[[2]][,"randMuSlope[1]"])
+mean(mcmcfit[[2]][,"randMuSlope[2]"])
+mean(mcmcfit[[2]][,"randMuSlope[3]"])
+mean(mcmcfit[[2]][,"randMuIntercept[1]"])
+mean(mcmcfit[[2]][,"randMuIntercept[2]"])
+mean(mcmcfit[[2]][,"randMuIntercept[3]"])
 
 ########## Graphical analysis of the simulated mixture distribution #######
 densityplot = ggplot()+ aes(extractRandomComp()) + geom_density()
@@ -26,7 +32,8 @@ heidel.diag(mcmcfit)
 
 ggs_density(ggsobject, "beta")
 ggs_density(ggsobject, "Precision")
-ggs_density(ggsobject, "randmu")
+ggs_density(ggsobject, "randSigma")
+ggs_density(ggsobject, "randMuIntercept")
 ggs_density(ggsobject, "Eta")
 
 #Compare the whole chainw with the last part...similar to geweke
@@ -34,8 +41,10 @@ ggs_compare_partial(ggsobject, "randmu", rug = T)
 
 ggs_running(ggsobject, "beta")
 ggs_running(ggsobject, "Precision")
-ggs_running(ggsobject, "randmu")
+ggs_running(ggsobject, "randMuIntercept")
+ggs_running(ggsobject, "randMuSlope")
 ggs_running(ggsobject, "Eta")
+ggs_running(ggsobject, "randSigma")
 
 ggs_autocorrelation(ggsobject, "beta")
 ggs_autocorrelation(ggsobject, "Precision")
