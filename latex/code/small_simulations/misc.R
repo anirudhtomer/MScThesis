@@ -74,7 +74,7 @@ z=1
 cons = 0.2
  
 datanodes = list("y1"=y1,"y2"=y2,"z"=z,"cons"=cons)
-initialValues = list(list("mu1"=c(0), "mu2"=c(0)))
+initialValues = list(list("mu1"=c(0.5), "mu2"=c(0.5)))
 stochasticNodes = c("mu1", "mu2", "z")
  
 unload.module("glm")

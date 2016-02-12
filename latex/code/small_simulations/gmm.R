@@ -51,6 +51,8 @@ mcmcfit = as.mcmc(fit)
 
 ggsobject = ggs(mcmcfit)
 ggs_density(ggsobject, "mu")
+ggs_compare_partial(ggsobject,"mu")
+ggs_running(ggsobject, "mu")
 
 ############ MIXTURE WITH INTERCEPT 2nd WAY ###############
 mat=rmultinom(1, 1000, c(1/3,1/3,1/3))

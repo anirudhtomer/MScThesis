@@ -1,9 +1,17 @@
-extractRandomComp = function(){
+extractRandomComp = function(viaReg=F){
   temp = ds$weight
-  temp = temp-150
-  temp = temp-(as.numeric(ds$gender)-1)*40
-  temp = temp-(as.numeric(ds$by)-1)*30
-  temp = temp-ds$time*10
+  if(viaReg==T){
+    reg=lm(weight~gender+by+time,data=ds)
+    temp = temp-reg$coefficients[1]
+    temp = temp-(as.numeric(ds$gender)-1)*reg$coefficients[2]
+    temp = temp-(as.numeric(ds$by)-1)*reg$coefficients[3]
+    temp = temp-ds$time*reg$coefficients[4]
+  }else{
+    temp = temp-150
+    temp = temp-(as.numeric(ds$gender)-1)*40
+    temp = temp-(as.numeric(ds$by)-1)*30
+    temp = temp-ds$time*10
+  }
   temp
 }
 

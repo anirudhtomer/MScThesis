@@ -16,17 +16,16 @@ generateRandomSample = function(p1=-1,p2=-1,p3=-1,mu1,mu2,mu3){
     prob3 = p3
   }
   
-  mat=rmultinom(1, 800, c(prob1,prob2,1-(prob1+prob2)))
-  mat=rmultinom(1, 800, c(prob1,prob2,1-(prob1+prob2)))
-  first=rnorm(mat[1,1], mu1, 2)
-  second=rnorm(mat[2,1], mu2, 2)
-  third=rnorm(mat[3,1], mu3, 2)
+  mat=rmultinom(1, 1000, c(prob1,prob2,1-(prob1+prob2)))
+  first=rnorm(mat[1,1], mu1, 1)
+  second=rnorm(mat[2,1], mu2, 1)
+  third=rnorm(mat[3,1], mu3, 1)
   
   return (list("sample"=c(first, second, third), "eta"=c(prob1,prob2,1-prob1-prob2), "mu"=c(mu1,mu2,mu3)))
 }
 
 ############ MIXTURE WITH INTERCEPT different etas ###############
-randSamp=generateRandomSample()
+randSamp=generateRandomSample(0.6,0.3,0.1,-20, 10, 30)
 sample = randSamp$sample
 densityplot = ggplot()+ aes(sample) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
@@ -48,13 +47,12 @@ model=function(){
     mue[j]~dnorm(0, 0.0001)  
   }
   
-  #for(m in 1:ncomponents){
-  #  muk[m]<-mue[m]-(mue[1]*eta[1] + mue[2]*eta[2] + mue[3]*eta[3])
-  #}
-  mu<-sort(mue[])
+  temp<-(mue[1]*0.6 + mue[2]*0.3 + mue[3]*0.1)
   
+  mu<-intercept + (mue[]-temp)
+  
+  intercept~dnorm(0,0.0001)%_%I(199.9,200.1)
   precision~dgamma(0.0005, 0.0005)
-  intercept~dnorm(0, 0.0001)
   eta~ddirch(dirichParm[])
 }
 
@@ -62,24 +60,24 @@ datanodes = c("sample","nobs","ncomponents", "dirichParm")
 generateInitialValues=function(ncomp){
   list("precision"=c(1), 
        "eta"=rep(1/ncomponents,ncomponents),
-       #"eta"=c(0.36,0.45,0.19),
-       "mue"=rep(0,ncomponents),
+       "mue"=c(180,200,230),
+       #"mue"=quantile(sample-intercept, probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents)),
        "intercept"=c(0))
 }
 initialValues = list(generateInitialValues(ncomponents),
                      generateInitialValues(ncomponents),
                      generateInitialValues(ncomponents),
-                     generateInitialValues(ncomponents),
                      generateInitialValues(ncomponents))
-params = c("precision","mu","eta","intercept")
+                     #,generateInitialValues(ncomponents))
+params = c("precision","mu","eta", "intercept")
 
 unload.module("glm")
 fit = jags(data=datanodes, inits=initialValues, params, 
-           n.chains=length(initialValues), n.iter=7000,n.thin=50, n.burnin=1000, 
+           n.chains=length(initialValues), n.iter=10000,n.thin=50, n.burnin=500, 
            model.file=model, jags.module=NULL)
 mcmcfit = as.mcmc(fit)
 
-ggsobject = ggs(mcmcfit)
+ggsobject = ggs(mcmcfit[[1]])
 
 ggs_density(ggsobject, "mu")
 ggs_density(ggsobject, "intercept")

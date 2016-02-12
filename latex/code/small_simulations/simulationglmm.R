@@ -86,9 +86,10 @@ stochasticNodes = c("intercept","betaGender","betaBy","betaTime","errPrecision",
 
 unload.module("glm")
 fit = jags(data=datanodes, inits=initialValues, stochasticNodes, 
-               n.chains=1, n.iter=100000,n.thin=5, n.burnin=30, 
+               n.chains=1, n.iter=100000,n.thin=50, n.burnin=1000, 
                model.file=model, jags.module=NULL)
 mcmcfit = as.mcmc(fit)
 ggsobj = ggs(mcmcfit)
 
 ggs_density(ggsobj)
+ggs_running(ggsobj, "beta")

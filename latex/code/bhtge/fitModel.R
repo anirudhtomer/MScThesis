@@ -19,7 +19,7 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel){
                        "errPrecision"=c(1),"intercept"=c(0),
                        "randPrecision"=rep(1, 1), 
                        "Eta"=rep(1/ncomponents, ncomponents),
-                       "mue"=rep(0, ncomponents), 
+                       "mue"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents)), 
                        "S"=initS(nsubjects, ncomponents))
   stochasticNodes = c("intercept","betaGender","betaBy",
                       "betaTime","errPrecision", "randPrecision", 

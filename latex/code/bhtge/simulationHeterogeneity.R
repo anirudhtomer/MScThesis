@@ -16,9 +16,9 @@ fit = fitModel(niter = 50000, jagsmodel = model, nchains = numchains)
 mcmcfit = as.mcmc(fit)
 ggsobject = ggs(mcmcfit)
 dev.off()
-
+num
 ########## Graphical analysis of the simulated mixture distribution #######
-densityplot = ggplot()+ aes(extractRandomComp()) + geom_density()
+densityplot = ggplot()+ aes(extractRandomComp(viaReg = T)) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
 
 ########## Graphical analysis of MCMC fit #########
