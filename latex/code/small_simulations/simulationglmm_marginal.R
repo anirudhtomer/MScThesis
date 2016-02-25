@@ -65,37 +65,16 @@ model=function(){
     }
   }
   
-  sigma[1,2]<- rho/randPrecision
-  sigma[1,3]<- sigma[1,2]
-  sigma[1,4]<- sigma[1,2]
-  sigma[1,5]<- sigma[1,2]
-  sigma[2,1]<- sigma[1,2]
-  sigma[2,3]<- sigma[1,2]
-  sigma[2,4]<- sigma[1,2]
-  sigma[2,5]<- sigma[1,2]
-  sigma[3,1]<- sigma[1,2]
-  sigma[3,2]<- sigma[1,2]
-  sigma[3,4]<- sigma[1,2]
-  sigma[3,5]<- sigma[1,2]
-  sigma[4,1]<- sigma[1,2]
-  sigma[4,2]<- sigma[1,2]
-  sigma[4,3]<- sigma[1,2]
-  sigma[4,5]<- sigma[1,2]
-  sigma[5,1]<- sigma[1,2]
-  sigma[5,2]<- sigma[1,2]
-  sigma[5,3]<- sigma[1,2]
-  sigma[5,4]<- sigma[1,2]
+  for(m in 1:(nrep*(nrep-1))){
+    sigma[covMatNonDiagIndices[m*2-1],covMatNonDiagIndices[m*2]] = 1/randPrecision
+  }
   
-  for(m in 1:nrep){
-    sigma[m,m]<-1/randPrecision
+  for(n in 1:nrep){
+    sigma[n,n]<-1/randPrecision + 1/errPrecision
   }
   
   randPrecision~dgamma(0.0005, 0.0005)
-  #randVar<-pow(randPrecision,-1)
   errPrecision~dgamma(0.0005,0.0005)
-  #errVar<-pow(errPrecision,-1)
-  
-  rho~dunif(0,0.9999)
   
   intercept~dnorm(0,betaPrecision)
   betaGender~dnorm(0,betaPrecision)
@@ -103,14 +82,32 @@ model=function(){
   betaTime~dnorm(0,betaPrecision)
 }
 
+generateCovMatrixNonDiagonalIndices=function(ncomp){
+  indices = numeric()
+  k=1;
+  for(i in 1:ncomp){
+    for(j in 1:ncomp){
+      if(i!=j){
+        indices[k] = i
+        indices[k+1] = j
+        k=k+2
+      }
+    }
+  }
+  return(indices)
+}
+
+#use consecutive ones
+covMatrixIndices = generateCovMatrixNonDiagonalIndices(length(time))
+
 datanodes = list("weight"=dswide_y,"dsby"= as.numeric(dswide$by)-1,"dstime"=time,
                  "dsgender"= as.numeric(dswide$gender)-1,"nfolks"=nrow(dswide), 
-                 "nrep"=length(time), "betaPrecision"=0.0001)
+                 "nrep"=length(time), "betaPrecision"=0.0001, "covMatNonDiagIndices"=covMatrixIndices)
 initialValues = list(list("intercept"=c(0),"betaGender"=c(0),"betaBy"=c(0),
-                          "betaTime"=c(0),"errPrecision"=c(1/9), 
-                          "randPrecision"=c(1/100), "rho"=c(0)))
+                          "betaTime"=c(0),"errPrecision"=c(1), 
+                          "randPrecision"=c(1)))
 stochasticNodes = c("intercept","betaGender","betaBy","betaTime",
-                    "randPrecision", "rho", "sigma")
+                    "randPrecision", "errPrecision", "sigma")
 unload.module("glm")
 fit = jags(data=datanodes, inits=initialValues, stochasticNodes, 
                n.chains=1, n.iter=20000,n.thin=50, n.burnin=1000, 

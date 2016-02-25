@@ -3,8 +3,8 @@ install.packages('R2jags')
 install.packages('mcmcse')
 install.packages('ggmcmc')
 library(R2jags)
-library(mcmcse)
 library(ggmcmc)
+library(reshape2)
 
 ########## OTHER SOURCE CODE FILES ############
 source("fitModel.R")
@@ -12,11 +12,10 @@ source("generateData.R")
 source("createModel.R")
 
 numchains = 4
-fit = fitModel(niter = 10000, jagsmodel = model, nchains = numchains)
+fit = fitModel(niter = 3000, jagsmodel = model, nchains = numchains)
 mcmcfit = as.mcmc(fit)
-ggsobject = ggs(mcmcfit)
+ggsobject = ggs(mcmcfit[[2]])
 dev.off()
-num
 ########## Graphical analysis of the simulated mixture distribution #######
 densityplot = ggplot()+ aes(extractRandomComp(viaReg = T)) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))

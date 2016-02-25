@@ -4,14 +4,13 @@ library(R2jags)
 library(ggmcmc)
 
 ############ MIXTURE WITH INTERCEPT 1st way ###############
-mat=rmultinom(1, 1000, c(1/3,1/3,1/3))
+mat=rmultinom(1, 1000, c(1/2,3/8,1/8))
 first=rnorm(mat[1,1], -16, 3)
 second=rnorm(mat[2,1], 0, 3)
 third=rnorm(mat[3,1], 16, 3)
 sample = c(first, second, third)
-
 densityplot = ggplot()+ aes(sample) + geom_density()
-densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
+densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Random effect") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
 
 intercept = 20
 sample = sample + intercept
@@ -54,7 +53,7 @@ ggs_density(ggsobject, "mu")
 ggs_compare_partial(ggsobject,"mu")
 ggs_running(ggsobject, "mu")
 
-############ MIXTURE WITH INTERCEPT 2nd WAY ###############
+############ MIXTURE WITHOUT INTERCEPT ###############
 mat=rmultinom(1, 1000, c(1/3,1/3,1/3))
 first=rnorm(mat[1,1], -16, 3)
 second=rnorm(mat[2,1], 0, 3)
@@ -64,44 +63,39 @@ sample = c(first, second, third)
 densityplot = ggplot()+ aes(sample) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
 
-intercept = 20
-sample = sample + intercept
-
 nobs = length(sample)
-ncomponents=3
-dirichParm = rep(1, ncomponents)
+ncomponents=2
 
 model=function(){
   for(i in 1:nobs){
-    sample[i]~dnorm(intercept + mu[S[i]], precision)
+    sample[i]~dnorm(mu[S[i]], precision)
     S[i]~dcat(eta[])
+    D[i] <- - log(precision) + log(2*pi)  + pow(sample[i]-mu[S[i]],2) * precision
   }
   
   for(j in 1:ncomponents){
     mu[j]~dnorm(0, 0.0001)  
   }
   
-  z~dbern(constraint)
-  constraint <- step(abs(mu[1] + mu[2] + mu[3]) - 0.05)
+  Deviance <- sum(D)
   
   precision~dgamma(0.0005, 0.0005)
-  intercept~dnorm(0, 0.0001)
   eta~ddirch(dirichParm[])
 }
-z = 0
 
-datanodes = c("sample","nobs","ncomponents", "dirichParm", "z")
-initialValues = list(list("precision"=c(1), 
+datanodes = list("sample"=sample,"nobs"=nobs,"ncomponents"=ncomponents, 
+                 "dirichParm"=rep(1, ncomponents), "pi"=pi)
+initialValues = list(list("precision"=c(1),
                           "eta"=rep(1/ncomponents, ncomponents),
-                          "mu"=rep(0, ncomponents),
-                          "intercept"=c(0)))
-params = c("precision","mu","eta","intercept")
+                          "mu"=quantile(sample, probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents))))
+params = c("precision","mu","eta", "Deviance")
 
 unload.module("glm")
 fit = jags(data=datanodes, inits=initialValues, params, 
-           n.chains=1, n.iter=3000,n.thin=5, n.burnin=30, 
+           n.chains=1, n.iter=40000,n.thin=50, n.burnin=300, 
            model.file=model, jags.module=NULL)
 mcmcfit = as.mcmc(fit)
 
 ggsobject = ggs(mcmcfit)
 ggs_density(ggsobject, "mu")
+ggs_running(ggsobject)

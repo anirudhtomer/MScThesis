@@ -1,7 +1,6 @@
-#install.packages("bayesmix")
-#library(bayesmix)
+install.packages("bayesmix")
+library(bayesmix)
 
-#source("BMMmodel.R")
 model <- BMMmodel(sample, k = 3, initialValues = list(S0 = 2),
                   priors = list(kind = "independence",
                   parameter = list("b0"=0, "B0"=10000, "nu0"=0.005, "S0"=1), hierarchical = NULL))  

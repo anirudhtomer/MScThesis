@@ -1,0 +1,7 @@
+
+model{
+for (iter in 1:N){
+X[iter] ~ dnorm(mu,1);
+}
+mu ~ dnorm(0, 0.000001);
+}

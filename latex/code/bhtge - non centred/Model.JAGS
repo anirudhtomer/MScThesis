@@ -1,0 +1,8 @@
+
+model{
+for (iter in 1:N){
+p[iter] <- exp(-(X[iter]-mu)^2/2)/1000;
+J[iter] ~ dbern(p[iter]);
+}
+mu ~ dnorm(0, 0.000001);
+}

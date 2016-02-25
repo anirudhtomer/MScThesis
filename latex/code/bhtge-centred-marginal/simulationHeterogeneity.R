@@ -3,8 +3,8 @@ install.packages('R2jags')
 install.packages('mcmcse')
 install.packages('ggmcmc')
 library(R2jags)
-library(mcmcse)
 library(ggmcmc)
+library(reshape2)
 
 ########## OTHER SOURCE CODE FILES ############
 source("fitModel.R")
@@ -12,7 +12,7 @@ source("generateData.R")
 source("createModel.R")
 
 numchains = 4
-fit = fitModel(niter = 10000, jagsmodel = model, nchains = numchains)
+fit = fitModel(niter = 3000, jagsmodel = model, nchains = numchains)
 mcmcfit = as.mcmc(fit)
 ggsobject = ggs(mcmcfit)
 dev.off()
