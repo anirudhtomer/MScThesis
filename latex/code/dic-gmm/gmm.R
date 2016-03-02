@@ -15,7 +15,7 @@ densityplot = ggplot()+ aes(sample) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
 
 nobs = length(sample)
-ncomponents=2
+ncomponents=3
 
 model=function(){
   for(i in 1:nobs){

@@ -1,40 +1,20 @@
 model = function(){
-  for(i in 1:nsubjects){
-    weight[i,(1:nrep)]~dmnorm(mu[i,(1:nrep)], omega)
+  for(i in 0:(nsubjects-1)){
     for(j in 1:nrep){
-      XBeta[i,j]<-betaGender*dsgender[i]+betaBy*dsby[i]+betaTime*dstime[j]
+      dsweight[i*nrep+j]~dnorm(xbeta[i*nrep+j], errPrecision)
+      xbeta[i*nrep+j]<- betaGender*dsgender[i*nrep+j] +
+        betaBy*dsby[i*nrep+j] +
+        betaTime*dstime[i*nrep+j] +
+        randomIntercept[i+1]
     }
-    
-    mu[i,(1:nrep)]<-XBeta[i,(1:nrep)] + randmu[S[i]]
-    
-    for(a in 1:ncomponents){
-      obsLikelihood[i,a]<-Eta[a]*
-        exp(-0.5 * t(weight[i,(1:nrep)] - XBeta[i,(1:nrep)] - randmu[a])%*%omega%*%(weight[i,(1:nrep)] - XBeta[i,(1:nrep)] - randmu[a]))
-    }
-    
-    S[i]~dcat(Eta[])
-    
-    obsLl[i] <- nrep*log(2*pi) + logdet(sigma) -2*log(sum(obsLikelihood[i,]))
-    obsL[i]<-exp(obsLl[i]/(-2))
-    
-    regLl[i] <- nrep*log(2*pi) + logdet(sigma) + 
-      t(weight[i,(1:nrep)] - mu[i,(1:nrep)])%*%omega%*%(weight[i,(1:nrep)] - mu[i,(1:nrep)])
+    randomIntercept[i+1]~dnorm(randmu[S[i+1]],randPrecision)
+    S[i+1]~dcat(Eta[])
   }
   
-  for(b in 1:ncomponents){
-    mue[b]~dnorm(betaMu, betaTau)
+  for(k in 1:ncomponents){
+    mue[k]~dnorm(betaMu, betaTau)
   }
   randmu<-sort(mue)
-  
-  for(c in 1:(nrep*(nrep-1))){
-    sigma[covMatNonDiagIndices[c*2-1],covMatNonDiagIndices[c*2]] = 1/randPrecision
-  }
-  
-  for(n in 1:nrep){
-    sigma[n,n]<-1/randPrecision + 1/errPrecision
-  }
-  
-  omega<-inverse(sigma)
   
   randPrecision~dgamma(varGammaParm, varGammaParm)
   errPrecision~dgamma(varGammaParm,varGammaParm)
@@ -44,7 +24,28 @@ model = function(){
   betaTime~dnorm(betaMu,betaTau)
   
   Eta~ddirch(dirichParm[])
+}
+
+singleModel = function(){
+  for(i in 0:(nsubjects-1)){
+    for(j in 1:nrep){
+      dsweight[i*nrep+j]~dnorm(xbeta[i*nrep+j], errPrecision)
+      xbeta[i*nrep+j]<- betaGender*dsgender[i*nrep+j] +
+        betaBy*dsby[i*nrep+j] +
+        betaTime*dstime[i*nrep+j] +
+        randomIntercept[i+1]
+    }
+    randomIntercept[i+1]~dnorm(randmu[S[i+1]],randPrecision)
+  }
   
-  regDeviance <- sum(regLl)
-  obsDeviance <- sum(obsLl)
+  randmu[1]~dnorm(betaMu, betaTau)
+  
+  randPrecision~dgamma(varGammaParm, varGammaParm)
+  errPrecision~dgamma(varGammaParm,varGammaParm)
+  
+  betaGender~dnorm(betaMu,betaTau)
+  betaBy~dnorm(betaMu,betaTau)
+  betaTime~dnorm(betaMu,betaTau)
+  
+  Eta[1]~dbeta(100,1)
 }

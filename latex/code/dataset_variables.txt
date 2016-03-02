@@ -1,0 +1,16 @@
+Id: unique id for donor
+Don.Date: Donation date
+Visit: number of visit
+Season: Season of donation, cold=0 , warm=1  
+Hb: Hemoglobin value in this visit
+Volume: amount of blood given
+Donate: 0 means no donation in this visit and 1 means a donation in this visit
+Weight  
+Height  
+Age
+TSFV: Time since first visit
+TSPV: Time since previous visit
+Hb.PV: Hb value at  previous visit
+Rrj.Hb: rejection due to low Hb value
+Hb.PD: Hb value at  previous donation
+TSPD: Time since previous donation

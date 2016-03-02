@@ -7,39 +7,31 @@ initS=function(nfolks, ncomponents){
   return (retval)
 }
 
-generateCovMatrixNonDiagonalIndices=function(nrep){
-  indices = numeric()
-  k=1;
-  for(i in 1:nrep){
-    for(j in 1:nrep){
-      if(i!=j){
-        indices[k] = i
-        indices[k+1] = j
-        k=k+2
-      }
-    }
-  }
-  return(indices)
-}
-
-#use consecutive ones
-fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel){
-  
-  datanodes = list("weight"=dswide_y,"dsby"= as.numeric(dswide$by)-1,"dstime"=time,
-                   "dsgender"= as.numeric(dswide$gender)-1,"nsubjects"=nrow(dswide), 
-                   "nrep"=nrep, "betaMu"=0, "betaTau"=0.0001,"ncomponents"=ncomponents,
-                   "varGammaParm"=0.0001,"dirichParm"=rep(1, ncomponents),"pi"=pi,
-                   "covMatNonDiagIndices"=generateCovMatrixNonDiagonalIndices(nrep))
-    
+fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3){
+  datanodes = list("dsweight"=ds$weight,"dsby"=as.numeric(ds$by)-1,
+                   "dsgender"=as.numeric(ds$gender)-1,"dstime"=ds$time,
+                   "nsubjects"=nsubjects,"nrep"=nrep, 
+                "varGammaParm"=0.0001, "betaTau"=0.0001, "betaMu"=0,
+                "ncomponents"=ncomponents, "dirichParm"=rep(1, ncomp))
   initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
                        "errPrecision"=c(1),
                        "randPrecision"=rep(1, 1),
-                       "Eta"=rep(1/ncomponents, ncomponents),
-                       "mue"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents)), 
-                       "S"=initS(nsubjects, ncomponents))
-  stochasticNodes = c("betaGender","betaBy","betaTime","errPrecision", 
-                      "randPrecision", "randmu", "Eta","sigma","omega", "XBeta","obsL",
-                      "regDeviance", "obsDeviance")
+                       "Eta"=rep(1/ncomp, ncomp),
+                       "mue"=quantile(extractRandomComp(viaReg = T, nointercept = T), probs = seq(1/(ncomp+1),ncomp/(ncomp+1), length.out = ncomp)), 
+                       "S"=initS(nsubjects, ncomp))
+  stochasticNodes = c("betaGender","betaBy","betaTime", "errPrecision", 
+                      "randPrecision", "randmu", "Eta", "S", "randomIntercept")
+  
+  if(ncomponents==1){
+    #The following line removes the element Eta from initial values
+    initialValues$Eta = NULL
+    datanodes$dirichParm = NULL
+    datanodes$S = initialValues$S
+    initialValues$S=NULL
+    datanodes$Eta=c(1)
+    datanodes$ncomponents = NULL
+    initialValues$mue=NULL
+  }
   
   unload.module("glm")
   chainInits = list(initialValues)

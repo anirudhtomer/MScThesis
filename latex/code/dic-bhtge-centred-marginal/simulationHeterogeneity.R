@@ -1,37 +1,34 @@
 ########## BAYESIAN PACKAGES ###########
 install.packages('R2jags')
+install.packages('mcmcse')
 install.packages('ggmcmc')
 library(R2jags)
 library(ggmcmc)
+library(reshape2)
 library(doParallel)
-
 registerDoParallel(cores=8)
 
 ########## OTHER SOURCE CODE FILES ############
 source("fitModel.R")
 source("generateData.R")
 source("createModel.R")
-
-niter = 200000
-nburnin = 5000
-nthin = 250
-(niter-nburnin)/nthin
+source("DIC_functions.R")
 
 numchains = 1
-if(ncomponents==1){
-  fit = fitModel(niter, nthin, nburnin, jagsmodel = singleModel, nchains = numchains, ncomponents)
-  mcmcfit = as.mcmc(fit)
-  colnames(mcmcfit[[1]])[6]="Eta[1]"
-  colnames(mcmcfit[[1]])[7]="randmu[1]"
-}else{
-  fit = fitModel(niter, nthin, nburnin, jagsmodel = model, nchains = numchains, ncomponents)
-  mcmcfit = as.mcmc(fit)
-}
+niter = 500
+nthin=50
+nburnin=200
 
+fit = fitModel(niter, nthin, nburnin, jagsmodel = model, nchains = numchains)
+mcmcfit = as.mcmc(fit)
+calculateObsDIC1(mcmcfit, "obsDeviance")
+calculateObsDIC2(mcmcfit, "obsDeviance")
+calculateObsDIC3(mcmcfit, "obsDeviance","obsL")
 ggsobject = ggs(mcmcfit)
+
 dev.off()
 ########## Graphical analysis of the simulated mixture distribution #######
-densityplot = ggplot()+ aes(extractRandomComp(viaReg = T, nointercept = T)) + geom_density()
+densityplot = ggplot()+ aes(extractRandomComp(viaReg = T)) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
 
 ########## Graphical analysis of MCMC fit #########

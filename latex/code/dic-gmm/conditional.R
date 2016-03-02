@@ -1,10 +1,11 @@
 install.packages("doParallel")
 library(doParallel)
+registerDoParallel(cores=8)
 
 ############## Conditional deviance again ############
-dev = 0
 mcmcLen = ((niter-nburnin)/nthin)
-for(i in 1:mcmcLen){
+totalDev=foreach(i=1:mcmcLen, .combine = c) %dopar%{
+  dev = 0
   precision = mcmcfit[[1]][i, "precision"]
   for(j in 1:nobs){
     clusterNum = round(mcmcfit[[1]][i,paste("S[",j,"]", sep="")])
@@ -12,8 +13,9 @@ for(i in 1:mcmcLen){
     dev = dev + log(2*pi) - log(precision)
     dev = dev + precision * ((sample[j]-mcmcfit[[1]][i,paste("mu[",clusterNum,"]",sep="")])^2)
   }
+  dev
 }
-dev=dev/mcmcLen
+sum(totalDev)/mcmcLen
 
 allocation = matrix(nrow=mcmcLen, ncol=length(sample))
 for(i in 1:mcmcLen){
@@ -39,11 +41,8 @@ conditionalModel=function(){
   eta~ddirch(dirichParm[])
 }
 
-registerDoParallel(cores=8)
-
 res=foreach(i=1:mcmcLen) %dopar% {
   library(R2jags)
-  library(ggmcmc)
   datanodes = list("sample"=sample,"nobs"=nobs,"ncomponents"=ncomponents, 
                    "dirichParm"=rep(1, ncomponents), "S" = allocation[1,])
   initialValues = list(list("precision"=c(1),
