@@ -8,6 +8,7 @@ library(reshape2)
 library(beepr)
 library(doParallel)
 library(MASS)
+library(mvtnorm)
 
 registerDoParallel(cores = 8)
 
@@ -17,8 +18,8 @@ source("generateData.R")
 source("createModel.R")
 
 numchains = 1
-niter = 15000
-nburnin = 5000
+niter = 10000
+nburnin = 2000
 nthin = 50
 mcmcLen=(niter-nburnin)/nthin
 
@@ -28,8 +29,8 @@ if(ncomponents==1){
   colnames(mcmcfit[[1]])[6]="Eta[1]"
   colnames(mcmcfit[[1]])[7]="randmu[1]"
 }else{
-  fit = fitModel(niter, nthin, nburnin, jagsmodel = model, nchains = numchains, ncomponents)
-  mcmcfit = as.mcmc(fit)
+  modelFit = fitModel(niter, nthin, nburnin, jagsmodel = model, nchains = numchains, ncomponents)
+  mcmcfit = modelFit$mcmcfit
 }
 
 beep(sound=8)
@@ -98,4 +99,3 @@ for(i in 1:numchains){
 xylims = c(100,200)
 qplot(y=y, x=x, data=mcmcfitdf, color=pairId, facets = row~col, ylim = xylims, xlim=xylims) + 
   geom_abline(intercept = 0, slope = 1) 
-

@@ -26,22 +26,29 @@ getDirichParam = function(ncomp){
   rep(1, ncomp)
 }
 
+betaMu=0
+betaTau=0.0001
+gammaShapeRate = 0.0001
+
 #use consecutive ones
 fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3){
   
-  datanodes = list("weight"=dswide_y,"dsby"= as.numeric(dswide$by)-1,"dstime"=time,
-                   "dsgender"= as.numeric(dswide$gender)-1,"nsubjects"=nrow(dswide), 
-                   "nrep"=nrep, "betaMu"=0, "betaTau"=0.0001,"ncomponents"=ncomp,
-                   "varGammaParm"=0.0001,"dirichParm"=getDirichParam(ncomp),
-                   "covMatNonDiagIndices"=generateCovMatrixNonDiagonalIndices(nrep))
+  datanodes = list("dsweight"=ds$weight,"dsby"= as.numeric(ds$by)-1,"dstime"=ds$time,
+                   "dsgender"= as.numeric(ds$gender)-1,"nsubjects"=nrow(dswide), 
+                   "nrep"=nrep, "betaMu"=betaMu, "betaTau"=betaTau,"ncomponents"=ncomp,
+                   "gammaShape"=gammaShapeRate, "gammaRate"=gammaShapeRate,
+                   "dirichParm"=getDirichParam(ncomp))
     
   initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
                        "errPrecision"=c(1),
                        "randPrecision"=rep(1, 1),
                        "Eta"=rep(1/ncomp, ncomp),
-                       "randmu"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomp+1),ncomp/(ncomp+1), length.out = ncomp)), 
+                       "randmue"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomp+1),ncomp/(ncomp+1), length.out = ncomp)), 
                        "S"=initS(nsubjects, ncomp))
-  stochasticNodes = c("XBeta","sigma", "omega", "randmu", "Eta", "S")
+  
+  stochasticNodes = c("XBeta", "randmu", "Eta", "S", 
+                      "betaGender", "betaBy", "betaTime", "errPrecision",
+                      "randomIntercept", "randPrecision")
   
   unload.module("glm")
   chainInits = list(initialValues)
@@ -53,7 +60,154 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
   }
   
   fit = jags(data=datanodes, inits=chainInits, stochasticNodes,
-             n.chains=nchains, n.iter=niter, n.thin=nthin, n.burnin=nburnin,
+             n.chains=nchains, n.iter=niter, n.thin=nthin, n.burnin=0,
              model.file=jagsmodel, jags.module=NULL)
-  return(fit)
+  mcmcfit = as.mcmc(fit)
+  mcmcfit[[1]] = mcmcfit[[1]][(nburnin/nthin+1):(niter/nthin),]
+  
+  return(list("fit" = fit, "mcmcfit" = mcmcfit))
 }
+
+fitModel_randmu = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, rPrecision){
+  
+  datanodes = list("dsweight"=ds$weight,"dsby"= as.numeric(ds$by)-1,"dstime"=ds$time,
+                   "dsgender"= as.numeric(ds$gender)-1,"nsubjects"=nrow(dswide), 
+                   "nrep"=nrep, "betaMu"=betaMu, "betaTau"=betaTau,"ncomponents"=ncomp,
+                   "gammaShape"=gammaShapeRate, "gammaRate"=gammaShapeRate,
+                   "dirichParm"=getDirichParam(ncomp), "randPrecision"=rPrecision)
+  
+  initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
+                       "errPrecision"=c(1),
+                       "Eta"=rep(1/ncomp, ncomp),
+                       "randmue"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomp+1),ncomp/(ncomp+1), length.out = ncomp)), 
+                       "S"=initS(nsubjects, ncomp))
+  
+  stochasticNodes = c("XBeta", "randmu", "Eta", "S", 
+                      "betaGender", "betaBy", "betaTime", "errPrecision",
+                      "randomIntercept")
+  
+  unload.module("glm")
+  chainInits = list(initialValues)
+  nchainsleft = nchains-1
+  
+  while(nchainsleft > 0){
+    chainInits[[nchains - nchainsleft + 1]] = initialValues
+    nchainsleft = nchainsleft - 1
+  }
+  
+  fit = jags(data=datanodes, inits=chainInits, stochasticNodes,
+             n.chains=nchains, n.iter=niter, n.thin=nthin, n.burnin=0,
+             model.file=jagsmodel, jags.module=NULL)
+  mcmcfit = as.mcmc(fit)
+  mcmcfit[[1]] = mcmcfit[[1]][(nburnin/nthin+1):(niter/nthin),]
+  
+  return(list("fit" = fit, "mcmcfit" = mcmcfit))
+}
+
+fitModel_errPrecision = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, 
+                                 rMu,rPrecision){
+  
+  datanodes = list("dsweight"=ds$weight,"dsby"= as.numeric(ds$by)-1,"dstime"=ds$time,
+                   "dsgender"= as.numeric(ds$gender)-1,"nsubjects"=nrow(dswide), 
+                   "nrep"=nrep, "betaMu"=betaMu, "betaTau"=betaTau,"ncomponents"=ncomp,
+                   "gammaShape"=gammaShapeRate, "gammaRate"=gammaShapeRate,
+                   "dirichParm"=getDirichParam(ncomp), 
+                   "randPrecision"=rPrecision, "randmu"=rMu)
+  
+  initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
+                       "errPrecision"=c(1),
+                       "Eta"=rep(1/ncomp, ncomp),
+                       "S"=initS(nsubjects, ncomp))
+  
+  stochasticNodes = c("XBeta", "Eta", "S", 
+                      "betaGender", "betaBy", "betaTime", "errPrecision",
+                      "randomIntercept")
+  
+  unload.module("glm")
+  chainInits = list(initialValues)
+  nchainsleft = nchains-1
+  
+  while(nchainsleft > 0){
+    chainInits[[nchains - nchainsleft + 1]] = initialValues
+    nchainsleft = nchainsleft - 1
+  }
+  
+  fit = jags(data=datanodes, inits=chainInits, stochasticNodes,
+             n.chains=nchains, n.iter=niter, n.thin=nthin, n.burnin=0,
+             model.file=jagsmodel, jags.module=NULL)
+  mcmcfit = as.mcmc(fit)
+  mcmcfit[[1]] = mcmcfit[[1]][(nburnin/nthin+1):(niter/nthin),]
+  
+  return(list("fit" = fit, "mcmcfit" = mcmcfit))
+}
+
+fitModel_beta = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, 
+                                 rMu,rPrecision, ePrecision){
+  
+  datanodes = list("dsweight"=ds$weight,"dsby"= as.numeric(ds$by)-1,"dstime"=ds$time,
+                   "dsgender"= as.numeric(ds$gender)-1,"nsubjects"=nrow(dswide), 
+                   "nrep"=nrep, "betaMu"=betaMu, "betaTau"=betaTau,"ncomponents"=ncomp,
+                   "dirichParm"=getDirichParam(ncomp),"errPrecision"=ePrecision,
+                   "randPrecision"=rPrecision, "randmu"=rMu)
+  
+  initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
+                       "Eta"=rep(1/ncomp, ncomp),
+                       "S"=initS(nsubjects, ncomp))
+  
+  stochasticNodes = c("XBeta", "Eta", "S", 
+                      "betaGender", "betaBy", "betaTime",
+                      "randomIntercept")
+  
+  unload.module("glm")
+  chainInits = list(initialValues)
+  nchainsleft = nchains-1
+  
+  while(nchainsleft > 0){
+    chainInits[[nchains - nchainsleft + 1]] = initialValues
+    nchainsleft = nchainsleft - 1
+  }
+  
+  fit = jags(data=datanodes, inits=chainInits, stochasticNodes,
+             n.chains=nchains, n.iter=niter, n.thin=nthin, n.burnin=0,
+             model.file=jagsmodel, jags.module=NULL)
+  mcmcfit = as.mcmc(fit)
+  mcmcfit[[1]] = mcmcfit[[1]][(nburnin/nthin+1):(niter/nthin),]
+  
+  return(list("fit" = fit, "mcmcfit" = mcmcfit))
+}
+
+
+
+fitModel_eta = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, 
+                         rMu,rPrecision, ePrecision, bGender, bBy, bTime){
+  
+  datanodes = list("dsweight"=ds$weight,"dsby"= as.numeric(ds$by)-1,"dstime"=ds$time,
+                   "dsgender"= as.numeric(ds$gender)-1,"nsubjects"=nrow(dswide), 
+                   "nrep"=nrep, "betaMu"=betaMu, "betaTau"=betaTau,"ncomponents"=ncomp,
+                   "dirichParm"=getDirichParam(ncomp),"errPrecision"=ePrecision,
+                   "randPrecision"=rPrecision, "randmu"=rMu, "betaGender"=bGender,
+                   "betaBy"=bBy, "betaTime"=bTime)
+  
+  initialValues = list("Eta"=rep(1/ncomp, ncomp),
+                       "S"=initS(nsubjects, ncomp))
+  
+  stochasticNodes = c("XBeta", "Eta", "S",  "randomIntercept")
+  
+  unload.module("glm")
+  chainInits = list(initialValues)
+  nchainsleft = nchains-1
+  
+  while(nchainsleft > 0){
+    chainInits[[nchains - nchainsleft + 1]] = initialValues
+    nchainsleft = nchainsleft - 1
+  }
+  
+  fit = jags(data=datanodes, inits=chainInits, stochasticNodes,
+             n.chains=nchains, n.iter=niter, n.thin=nthin, n.burnin=0,
+             model.file=jagsmodel, jags.module=NULL)
+  mcmcfit = as.mcmc(fit)
+  mcmcfit[[1]] = mcmcfit[[1]][(nburnin/nthin+1):(niter/nthin),]
+  
+  return(list("fit" = fit, "mcmcfit" = mcmcfit))
+}
+
