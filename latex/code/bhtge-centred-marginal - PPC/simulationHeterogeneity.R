@@ -17,8 +17,8 @@ source("generateData.R")
 source("createModel.R")
 
 numchains = 1
-niter = 15000
-nburnin = 5000
+niter = 30000
+nburnin = 0
 nthin = 50
 mcmcLen=(niter-nburnin)/nthin
 

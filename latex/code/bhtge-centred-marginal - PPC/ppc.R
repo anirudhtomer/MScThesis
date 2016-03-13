@@ -98,36 +98,36 @@ mahalaDist=foreach(i=1:mcmcLen, .combine='rbind') %do%{
   xBeta = getXBeta(mcmcfit, mcmcIterNum = i)
   
   obsMahal = rep(0, nsubjects)
-  for(j in 1:nsubjects){
-    alloc = mcmcfit[[1]][i, paste("S[",j, "]", sep="")]
-    randomPart = dswide_y[j,]-xBeta[j,]
-    for(m in 1:ncomponents){
-      if(alloc!=m){
-        obsMahal[j] = obsMahal[j] + mahalanobis(randomPart, rep(randmu[m], nrep), 
-                                                sigmaEst)
-      }
-    }
-    obsMahal[j] = obsMahal[j]/(ncomponents-1)
-  }
-  
-  #newMahal = numeric(0)
-  #newObsCount = 0
-  #for(alloc in 1:ncomponents){
-  #  newObs=mvrnorm(n=round(eta[alloc]*1000), rep(randmu[alloc], nrep), sigmaEst)
-   # for(f in 1:nrow(newObs)){
-   #   newObsCount = newObsCount + 1
-    #  newMahal[newObsCount] = 0
-     # for(g in 1:ncomponents){
-      #  if(g!=alloc){
-       #   newMahal[newObsCount] = newMahal[newObsCount] + 
-        #    mahalanobis(newObs[f,], rep(randmu[g], nrep), sigmaEst)
-        #}
+  #for(j in 1:nsubjects){
+   # alloc = mcmcfit[[1]][i, paste("S[",j, "]", sep="")]
+    #randomPart = dswide_y[j,]-xBeta[j,]
+    #for(m in 1:ncomponents){
+    #  if(alloc!=m){
+     #   obsMahal[j] = obsMahal[j] + mahalanobis(randomPart, rep(randmu[m], nrep), 
+                                               # sigmaEst)
     #  }
-    #  newMahal[newObsCount] = newMahal[newObsCount]/(ncomponents-1)
     #}
+    #obsMahal[j] = obsMahal[j]/(ncomponents-1)
   #}
+  
+  newMahal = numeric(0)
+  newObsCount = 0
+  for(alloc in 1:ncomponents){
+    newObs=mvrnorm(n=round(eta[alloc]*1000), rep(randmu[alloc], nrep), sigmaEst)
+    for(f in 1:nrow(newObs)){
+      newObsCount = newObsCount + 1
+      newMahal[newObsCount] = 0
+      for(g in 1:ncomponents){
+        if(g!=alloc){
+          newMahal[newObsCount] = newMahal[newObsCount] + 
+            mahalanobis(newObs[f,], rep(randmu[g], nrep), sigmaEst)
+        }
+      }
+      newMahal[newObsCount] = newMahal[newObsCount]/(ncomponents-1)
+    }
+  }
 
-    return(mean(obsMahal))
+  return(mean(newMahal))
 }
 beep(sound=8)
 HPDinterval(mcmc(mahalaDist))

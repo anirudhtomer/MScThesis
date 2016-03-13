@@ -75,12 +75,18 @@ getAllocations=function(mcmcfit, mcmcIterNum){
 }
 
 #Step 1: logL
-logL = function(weights_wide, eta, sigma, xBeta, randmu){
+logL = function(datawide, eta, sigma, bGender, bBy, bTime, randmu){
+  weights_wide=as.matrix(dswide[,c(-1,-2,-3)])
+  gender_wide = as.numeric(datawide$gender)-1
+  birthyear_wide = as.numeric(datawide$by)-1
+  nrep = ncol(datawide)-3
+  
   logLikelihood = 0
   for(i in 1:nsubjects){
     temp = 0
     for(j in 1:ncomponents){
-      temp = temp + eta[j] * dmvnorm(weights_wide[i,], mean=xBeta[i,] + randmu[j], sigma=sigma,log = F)
+      tempmean = bTime*(1:nrep) + bGender*gender_wide[i]+bBy*birthyear_wide[i] + randmu[j]
+      temp = temp + eta[j] * dmvnorm(weights_wide[i,], mean=tempmean, sigma=sigma,log = F)
     }
     logLikelihood = logLikelihood + log(temp)
   }
@@ -96,8 +102,10 @@ log_prior=function(eta, randmu, betaGender, betaBy, betaTime, errPrecision, rand
 }
 
 maxValueIter = which.max(foreach(i=1:mcmcLen, .combine = c, .packages = c('mvtnorm')) %dopar%{
-    logL(dswide_y, getEta(mcmcfit, mcmcIterNum = i), getSigma(mcmcfit, mcmcIterNum = i), 
-        getXBeta(mcmcfit, mcmcIterNum = i), getRandMu(mcmcfit, mcmcIterNum = i))
+    logL(dswide, getEta(mcmcfit, mcmcIterNum = i), getSigma(mcmcfit, mcmcIterNum = i), 
+         mcmcfit[[1]][i, "betaGender"],
+         mcmcfit[[1]][i, "betaBy"],
+         mcmcfit[[1]][i, "betaTime"], getRandMu(mcmcfit, mcmcIterNum = i))
   })
 
 randmu_max = getRandMu(mcmcfit, mcmcIterNum = maxValueIter)
@@ -109,11 +117,11 @@ randPrecision_max = mcmcfit[[1]][maxValueIter, "randPrecision"]
 sigma_max = getSigma(mcmcfit, mcmcIterNum = maxValueIter)
 allocations_max = getAllocations(mcmcfit, mcmcIterNum = maxValueIter)
 randIntercept_max = getRandomIntercept(mcmcfit, maxValueIter)
-xBeta_max = getXBeta(mcmcfit, mcmcIterNum = maxValueIter)
 eta_max = getEta(mcmcfit, mcmcIterNum = maxValueIter)
 
-chib = logL(dswide_y, eta_max, sigma_max, xBeta_max, randmu_max) +
-        log_prior(eta_max,randmu_max, betaGender_max, betaBy_max, betaTime_max, errPrecision_max, randPrecision_max)
+chib = logL(dswide, eta_max, sigma_max, betaGender_max, betaBy_max, betaTime_max, 
+            randmu_max) + log_prior(eta_max,randmu_max, betaGender_max, 
+            betaBy_max, betaTime_max, errPrecision_max, randPrecision_max)
 
 ###### Conditional posterior of randprecision #######
 #p(randPrecision|data)
@@ -123,8 +131,8 @@ chib = chib - log(mean(foreach(i=1:mcmcLen, .combine = c) %dopar%{
   randComp = getRandomIntercept(mcmcfit_randPrecision, i)
   allocations = getAllocations(mcmcfit_randPrecision,i)
   randmu = getRandMu(mcmcfit_randPrecision, i)
-  
-  meanCentredRandEff=numeric()
+
+    meanCentredRandEff=numeric()
   for(j in 1:ncomponents){
     meanCentredRandEff = c(meanCentredRandEff, randComp[allocations==j]-randmu[j])
   }
@@ -203,15 +211,15 @@ chib = chib - log(mean(foreach(i=1:mcmcLen, .combine = c) %dopar%{
 }))
 
 ######## Conditional posterior of eta #########
-#p(beta|errPrecision, randPrecision, randmu, beta, x)
+#p(eta|errPrecision, randPrecision, randmu, beta, x)
 mcmcfit_eta = fitModel_eta(niter, nthin, nburnin, jagsmodel = model_eta, 
-                                             nchains = numchains, ncomponents, xBeta_max, randmu_max, 
+                                             nchains = numchains, ncomponents, randmu_max, 
                                              randPrecision_max, errPrecision_max, betaGender_max,
                                             betaBy_max, betaTime_max)$mcmcfit
 
 chib = chib - log(mean(foreach(i=1:mcmcLen, .combine = c) %dopar%{
   
-  allocations = getAllocations(mcmcfit_errPrecision,i)
+  allocations = getAllocations(mcmcfit_eta,i)
   dirichParm=getDirichParam(ncomponents)
   n <- sapply(1:ncomponents, function(j){sum(allocations==j)})
   

@@ -30,6 +30,12 @@ betaMu=0
 betaTau=0.0001
 gammaShapeRate = 0.0001
 
+reg=lm(ds$weight~I(as.numeric(ds$gender)-1)+I(as.numeric(ds$by)-1)+ds$time)
+
+initialBetaGender = reg$coefficients[2]
+initialBetaBy = reg$coefficients[3]
+initialBetaTime = reg$coefficients[4]
+
 #use consecutive ones
 fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3){
   
@@ -39,7 +45,7 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
                    "gammaShape"=gammaShapeRate, "gammaRate"=gammaShapeRate,
                    "dirichParm"=getDirichParam(ncomp))
     
-  initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
+  initialValues = list("betaGender"=initialBetaGender,"betaBy"=initialBetaBy, "betaTime"=initialBetaTime,
                        "errPrecision"=c(1),
                        "randPrecision"=rep(1, 1),
                        "Eta"=rep(1/ncomp, ncomp),
@@ -68,7 +74,8 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
   return(list("fit" = fit, "mcmcfit" = mcmcfit))
 }
 
-fitModel_randmu = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, rPrecision){
+fitModel_randmu = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, 
+                           ncomp=3, rPrecision){
   
   datanodes = list("dsweight"=ds$weight,"dsby"= as.numeric(ds$by)-1,"dstime"=ds$time,
                    "dsgender"= as.numeric(ds$gender)-1,"nsubjects"=nrow(dswide), 
@@ -76,7 +83,7 @@ fitModel_randmu = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmo
                    "gammaShape"=gammaShapeRate, "gammaRate"=gammaShapeRate,
                    "dirichParm"=getDirichParam(ncomp), "randPrecision"=rPrecision)
   
-  initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
+  initialValues = list("betaGender"=initialBetaGender,"betaBy"=initialBetaBy, "betaTime"=initialBetaTime,
                        "errPrecision"=c(1),
                        "Eta"=rep(1/ncomp, ncomp),
                        "randmue"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomp+1),ncomp/(ncomp+1), length.out = ncomp)), 
@@ -114,7 +121,7 @@ fitModel_errPrecision = function(niter=10000, nthin=50, nburnin=200, nchains=1, 
                    "dirichParm"=getDirichParam(ncomp), 
                    "randPrecision"=rPrecision, "randmu"=rMu)
   
-  initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
+  initialValues = list("betaGender"=initialBetaGender,"betaBy"=initialBetaBy, "betaTime"=initialBetaTime,
                        "errPrecision"=c(1),
                        "Eta"=rep(1/ncomp, ncomp),
                        "S"=initS(nsubjects, ncomp))
@@ -150,7 +157,7 @@ fitModel_beta = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmode
                    "dirichParm"=getDirichParam(ncomp),"errPrecision"=ePrecision,
                    "randPrecision"=rPrecision, "randmu"=rMu)
   
-  initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
+  initialValues = list("betaGender"=initialBetaGender,"betaBy"=initialBetaBy, "betaTime"=initialBetaTime,
                        "Eta"=rep(1/ncomp, ncomp),
                        "S"=initS(nsubjects, ncomp))
   
@@ -176,14 +183,12 @@ fitModel_beta = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmode
   return(list("fit" = fit, "mcmcfit" = mcmcfit))
 }
 
-
-
 fitModel_eta = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, 
                          rMu,rPrecision, ePrecision, bGender, bBy, bTime){
   
   datanodes = list("dsweight"=ds$weight,"dsby"= as.numeric(ds$by)-1,"dstime"=ds$time,
                    "dsgender"= as.numeric(ds$gender)-1,"nsubjects"=nrow(dswide), 
-                   "nrep"=nrep, "betaMu"=betaMu, "betaTau"=betaTau,"ncomponents"=ncomp,
+                   "nrep"=nrep, "ncomponents"=ncomp,
                    "dirichParm"=getDirichParam(ncomp),"errPrecision"=ePrecision,
                    "randPrecision"=rPrecision, "randmu"=rMu, "betaGender"=bGender,
                    "betaBy"=bBy, "betaTime"=bTime)

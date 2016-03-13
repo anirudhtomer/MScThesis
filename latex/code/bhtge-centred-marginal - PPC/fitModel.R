@@ -37,7 +37,8 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
                        "Eta"=rep(1/ncomp, ncomp),
                        "randmu"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomp+1),ncomp/(ncomp+1), length.out = ncomp)), 
                        "S"=initS(nsubjects, ncomp))
-  stochasticNodes = c("XBeta","sigma", "omega", "randmu", "Eta", "S")
+  stochasticNodes = c("XBeta","sigma", "omega", "randmu", "Eta", "S", 
+                      "betaBy","betaTime", "betaGender","randPrecision", "errPrecision")
   
   unload.module("glm")
   chainInits = list(initialValues)

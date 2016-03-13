@@ -13,13 +13,13 @@ library(mvtnorm)
 registerDoParallel(cores = 8)
 
 ########## OTHER SOURCE CODE FILES ############
-source("fitModel.R")
 source("generateData.R")
 source("createModel.R")
+source("fitModel.R")
 
 numchains = 1
-niter = 10000
-nburnin = 2000
+niter = 80000
+nburnin = 20000
 nthin = 50
 mcmcLen=(niter-nburnin)/nthin
 
