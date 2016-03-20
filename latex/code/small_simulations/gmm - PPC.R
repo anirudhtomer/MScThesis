@@ -5,92 +5,123 @@ library(R2jags)
 library(ggmcmc)
 library(doParallel)
 library(moments)
+library(beepr)
 
 registerDoParallel(cores = 8)
 
 ############ MIXTURE WITH INTERCEPT 1st way ###############
-mat=rmultinom(1, 1000, c(1/3,1/3,1/3))
-first=rnorm(mat[1,1], -16, 3)
-second=rnorm(mat[2,1], 0, 3)
-third=rnorm(mat[3,1], 16, 3)
+nobs = 1000
+first=rnorm(floor(nobs*0.6), -16, 3)
+second=rnorm(floor(nobs*0.3), 0, 3)
+third=rnorm(floor(nobs*0.1), 16, 3)
 sample = c(first, second, third)
+nobs = length(sample)
 densityplot = ggplot()+ aes(sample) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Random effect") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
 
-intercept = 20
-sample = sample + intercept
-
-nobs = length(sample)
-ncomponents=2
-dirichParm = rep(1, ncomponents)
-
 model=function(){
   for(i in 1:nobs){
-    sample[i]~dnorm(intercept + mu[S[i]], precision)
+    sample[i]~dnorm(mu[S[i]], precision[S[i]])
     S[i]~dcat(eta[])
   }
   
   for(j in 1:ncomponents){
-    mue[j]~dnorm(0, 0.0001)  
+    mue[j]~dnorm(0, 0.0001) 
+    precision[j]~dgamma(0.0005, 0.0005)
   }
   mu<-sort(mue[]-mean(mue[]))
   
-  precision~dgamma(0.0005, 0.0005)
-  intercept~dnorm(0, 0.0001)
   eta~ddirch(dirichParm[])
 }
 
+nobs = length(sample)
+ncomponents=5
+dirichParm = rep(1, ncomponents)
+
 datanodes = c("sample","nobs","ncomponents", "dirichParm")
-initialValues = list(list("precision"=c(1), 
+initialValues = list(list("precision"=rep(1,ncomponents), 
                           "eta"=rep(1/ncomponents, ncomponents),
-                          "mue"=rep(0, ncomponents),
-                          "intercept"=c(0)))
-params = c("precision","mu","eta","intercept", "S")
+                          "mue"=rep(0, ncomponents)))
+params = c("precision","mu","eta", "S")
 
 unload.module("glm")
+nthin = 10
+niter = 20000
+nburnin = 8000
 fit = jags(data=datanodes, inits=initialValues, params, 
-           n.chains=1, n.iter=10000,n.thin=10, n.burnin=3000, 
+           n.chains=1, n.iter=niter,n.thin=nthin, n.burnin=0, 
            model.file=model, jags.module=NULL)
 mcmcfit = as.mcmc(fit)
+mcmcfit_partial = list(mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),])
+attributes(mcmcfit_partial) = attributes(mcmcfit)
+mcmcLen = nrow(mcmcfit_partial[[1]])
+attributes(mcmcfit_partial[[1]])$mcpar = c(1, mcmcLen, 1)
 
-ggsobject = ggs(mcmcfit)
+ggsobject = ggs(mcmcfit_partial)
+ggs_traceplot(ggsobject, "mu")
+ggs_density(ggsobject, "eta")
 ggs_density(ggsobject, "mu")
+ggs_traceplot(ggsobject, "mu")
 ggs_compare_partial(ggsobject,"mu")
-ggs_running(ggsobject, "mu")
+ggs_running(ggsobject, "precision")
 
-mcmcLen = (3000-300)/5
-
-mapeDiff=foreach(i=1:mcmcLen, .combine='c') %dopar%{
+mis_count=foreach(i=1:mcmcLen, .combine='rbind') %do%{
   eta = getEta(mcmcfit, mcmcIterNum = i)
   randmu = getRandMu(mcmcfit, mcmcIterNum = i)
-  precision = mcmcfit[[1]][i, "precision"]
+  randPrecision = getRandPrecision(mcmcfit, mcmcIterNum = i)
+  allocations=getAllocations(mcmcfit_partial, i)
   
-  mapeObs = 0
-  mapeNew = 0
+  count = 0
   for(j in 1:nobs){
-    alloc = mcmcfit[[1]][i, paste("S[",j, "]", sep="")]
-    mapeObs = mapeObs + abs(sample[j]-intercept-randmu[alloc])
-    mapeNew = mapeNew + abs(rnorm(1, randmu[alloc], sqrt(1/precision))-randmu[alloc])
+    selfMahala = mahalanobis(sample[j], randmu[allocations[j]], 1/randPrecision[allocations[j]])
+    for(m in 1:ncomponents){
+      if(allocations[j]!=m){
+        otherMahala = mahalanobis(sample[j], randmu[m], 1/randPrecision[m])
+        if(selfMahala > otherMahala){
+          count = count + 1
+          break
+        }
+      }
+    }
   }
-  mapeObs = mapeObs/nobs
-  mapeNew = mapeNew/nobs
   
-  mapeNew-mapeObs
+  return(count)
 }
-HPDinterval(mcmc(mapeDiff))
-plot(density(mapeDiff))
+beep(sound=8)
+HPDinterval(mcmc(mis_count))
+plot(density(mis_count))
+
+mahalaDist=foreach(i=1:mcmcLen, .combine='rbind') %do%{
+  eta = getEta(mcmcfit, mcmcIterNum = i)
+  randmu = getRandMu(mcmcfit, mcmcIterNum = i)
+  randPrecision = getRandPrecision(mcmcfit, mcmcIterNum = i)
+  allocations=getAllocations(mcmcfit_partial, i)
+  
+  obsMahal = rep(0, nobs)
+  for(j in 1:nobs){
+    for(m in 1:ncomponents){
+      if(allocations[j]!=m){
+        obsMahal[j] = obsMahal[j] + 
+          mahalanobis(sample[j], randmu[allocations[m]], sqrt(1/randPrecision[allocations[m]]))
+      }
+    }
+    obsMahal[j] = obsMahal[j]/(ncomponents-1)
+  }
+  
+  return(mean(obsMahal))
+}
+beep(sound=8)
+HPDinterval(mcmc(mahalaDist))
 
 postPredictive=foreach(i=1:mcmcLen, .combine='rbind', .packages = 'moments') %dopar%{
   eta = getEta(mcmcfit, mcmcIterNum = i)
   randmu = getRandMu(mcmcfit, mcmcIterNum = i)
-  precision = mcmcfit[[1]][i, "precision"]
-  allocations = rmultinom(1, nobs, eta)
+  randPrecision = getRandPrecision(mcmcfit, mcmcIterNum = i)
   
   postPred = numeric()
   for(j in 1:length(eta)){
-    postPred = c(postPred, rnorm(n = allocations[j], sd = sqrt(1/precision), mean = randmu[j]))
+    postPred = c(postPred, rnorm(n = floor(nobs*eta[j]), sd = sqrt(1/randPrecision[j]), mean = randmu[j]))
   }
-  postPred = postPred + intercept
   
   c(mean(postPred), var(postPred), skewness(postPred),kurtosis(postPred),
     IQR(postPred), max(postPred), min(postPred), moment(postPred, order = 6, central = T))
@@ -130,6 +161,21 @@ getRandMu=function(mcmcfit,  summaryFuncName="mean",  mcmcIterNum = NA){
   return(randmu)
 }
 
+getRandPrecision=function(mcmcfit,  summaryFuncName="mean",  mcmcIterNum = NA){
+  summaryFunc = get(summaryFuncName)
+  randPrecision=numeric()
+  
+  for(i in 1:ncomponents){
+    if(!is.numeric(mcmcIterNum)){
+      randPrecision[i] = summaryFunc(mcmcfit[[1]][,paste("precision[",i,"]", sep="")])
+    }else{
+      randPrecision[i] = mcmcfit[[1]][mcmcIterNum, paste("precision[",i,"]", sep="")]
+    }
+  }
+  randPrecision[randPrecision<1e-300]=1e-300
+  return(randPrecision)
+}
+
 getEta=function(mcmcfit, summaryFuncName="mean", mcmcIterNum = NA){
   summaryFunc = get(summaryFuncName)
   eta=numeric()
@@ -143,4 +189,12 @@ getEta=function(mcmcfit, summaryFuncName="mean", mcmcIterNum = NA){
   }
   
   return(eta)
+}
+
+getAllocations=function(mcmcfit, mcmcIterNum){
+  allocation = numeric(nobs)
+  for(j in 1:nobs){
+    allocation[j] = mcmcfit[[1]][mcmcIterNum, paste("S[",j,"]", sep="")]
+  }
+  return(allocation)
 }

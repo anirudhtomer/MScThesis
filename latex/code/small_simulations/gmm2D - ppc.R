@@ -16,70 +16,92 @@ registerDoParallel(cores = 8)
 ############ MIXTURE WITH INTERCEPT 1st way ###############
 sigma <- matrix(c(16,3,3,9),2,2)
 
-mat=rmultinom(1, 1000, c(1/4,1/4,1/4,1/4))
-first=mvrnorm(mat[1,1], c(-108,0), sigma)
-second=mvrnorm(mat[2,1], c(-7,0), sigma)
-third=mvrnorm(mat[3,1], c(7,0), sigma)
-fourth=mvrnorm(mat[4,1], c(18,0), sigma)
-sample = rbind(first, second, third, fourth)
-
-componentCol=c(rep("C1", mat[1,1]),rep("C2", mat[2,1]),
-               rep("C3", mat[3,1]),rep("C4", mat[4,1]))
-
-qplot(x = sample[,1],y=sample[,2], color=componentCol)
-
+nobs = 200
+nobsPerComp=c(floor(nobs*0.6),floor(nobs*0.3),floor(nobs*0.1))
+first=mvrnorm(nobsPerComp[1], c(-108,0), sigma)
+second=mvrnorm(nobsPerComp[2], c(-7,0), sigma)
+third=mvrnorm(nobsPerComp[3], c(20,0), sigma)
+sample = rbind(first, second, third)
 nobs = nrow(sample)
-ncomponents=4
-dirichParm = rep(1, ncomponents)
 
+qplot(x = sample[,1],y=sample[,2], color=
+        unlist(lapply(nobsPerComp, function(i){rep(paste("C",i,sep=""), i)})))
+
+ndim=2
 model=function(){
   for(i in 1:nobs){
-    sample[i,]~dmnorm(mu[S[i],1:2], omega)
+    sample[i,]~dmnorm(mu[S[i],1:ndim], omega[1:ndim, 1:ndim, S[i]])
     S[i]~dcat(eta[])
   }
   
   for(j in 1:ncomponents){
     mu[j,1]~dnorm(0, 0.0001)
     mu[j,2]~dnorm(0, 0.0001)
+    
+    cor[j]~dunif(-1,1)
+    precision1[j]~dgamma(0.0005, 0.0005)
+    precision2[j]~dgamma(0.0005, 0.0005)
+    
+    sigma[1,1,j]<-1/precision1[j]
+    sigma[2,2,j]<-1/precision2[j]
+    sigma[1,2,j]<-cor[j] * sqrt(1/precision1[j]) * sqrt(1/precision2[j])
+    sigma[2,1,j]<-cor[j] * sqrt(1/precision1[j]) * sqrt(1/precision2[j])
+    
+    omega[1:ndim,1:ndim,j]<-inverse(sigma[1:ndim, 1:ndim,j])
   }
   
-  sigma[1,1]<-var1
-  sigma[2,2]<-var2
-  sigma[1,2]<-cor * sqrt(var1) * sqrt(var2)
-  sigma[2,1]<-cor * sqrt(var1) * sqrt(var2)
-  
-  var1<-1/precision1
-  var2<-1/precision2
-  cor~dunif(-1,1)
-  
-  omega<-inverse(sigma)
-  
-  precision1~dgamma(0.0005, 0.0005)
-  precision2~dgamma(0.0005, 0.0005)
   eta~ddirch(dirichParm[])
 }
 
-datanodes = c("sample","nobs","ncomponents", "dirichParm")
-initialValues = list(list("precision1"=c(1), "precision2"=c(1),
-                          "eta"=rep(1/ncomponents, ncomponents)))
+ncomponents=5
+dirichParm = rep(1, ncomponents)
+
+datanodes = c("sample","nobs","ncomponents", "dirichParm", "ndim")
+tryMeanDim1=quantile(sample[,1], probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents))
+tryMeanDim2=quantile(sample[,2], probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents))
+initialValues = list(list("precision1"=rep(1, ncomponents), "precision2"=rep(1, ncomponents),
+                          "eta"=rep(1/ncomponents, ncomponents), 
+                          "mu"=matrix(c(tryMeanDim1, tryMeanDim2), nrow = ncomponents, ncol = ndim, byrow = F)))
 params = c("sigma","omega","mu","eta", "S")
 
 unload.module("glm")
-niter=10000
-nthin=10
-nburn=1000
+nthin = 10
+niter = 4000
+nburnin = 0
 fit = jags(data=datanodes, inits=initialValues, params, 
-           n.chains=1, n.iter=niter,n.thin=nthin, n.burnin=nburn, 
+           n.chains=1, n.iter=niter,n.thin=nthin, n.burnin=0, 
            model.file=model, jags.module=NULL)
+
 mcmcfit = as.mcmc(fit)
-beep(sound=8)
+mcmcfit_partial = list(mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),])
+attributes(mcmcfit_partial) = attributes(mcmcfit)
+mcmcLen = nrow(mcmcfit_partial[[1]])
+attributes(mcmcfit_partial[[1]])$mcpar = c(1, mcmcLen, 1)
 
 ggsobject = ggs(mcmcfit)
 ggs_density(ggsobject, "mu")
 ggs_compare_partial(ggsobject,"mu")
 ggs_running(ggsobject, "mu")
 
-mcmcLen = (niter-nburn)/nthin
+mcmcLen = (niter-nburnin)/nthin
+
+multMean_DetCov=foreach(i=1:mcmcLen, .combine='rbind', .packages=c('MASS', 'MVN')) %do%{
+  eta = getEta(mcmcfit, mcmcIterNum = i)
+  randmu = getRandMu(mcmcfit, mcmcIterNum = i)
+  sigmaEst = getSigma(mcmcfit, mcmcIterNum = i)
+
+  postPred = matrix(nrow=0, ncol=2)
+  for(j in 1:length(eta)){
+    sampleSize = floor(1000*eta[j])
+    if(sampleSize>0){
+      postPred=rbind(postPred, mvrnorm(sampleSize, randmu[j,], sigmaEst[[j]]))
+    }
+  }
+  
+  return(c(apply(postPred, MARGIN=2, FUN = mean), det(cov(postPred))))
+}
+postPredDetCov=multMean_DetCov[,3]
+sum(postPredDetCov>det(cov((sample))))
 
 mahalaDist=foreach(i=1:mcmcLen, .combine='rbind', .packages=c('MASS', 'MVN')) %do%{
   eta = getEta(mcmcfit, mcmcIterNum = i)
@@ -152,12 +174,14 @@ densityplot = ggplot()+ aes(means) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Random effect") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
 
 getSigma = function(mcmcfit, mcmcIterNum){
-  sigma = matrix(nrow = 2, ncol = 2)
-  sigma[1,1] = mcmcfit[[1]][mcmcIterNum, "sigma[1,1]"]
-  sigma[1,2] = mcmcfit[[1]][mcmcIterNum, "sigma[1,2]"]
-  sigma[2,1] = mcmcfit[[1]][mcmcIterNum, "sigma[2,1]"]
-  sigma[2,2] = mcmcfit[[1]][mcmcIterNum, "sigma[2,2]"]
-  
+  sigma = list(ncomponents)
+  for(i in 1:ncomponents){
+    sigma[[i]] = matrix(nrow = ndim, ncol = ndim)
+    sigma[[i]][1,1] = mcmcfit[[1]][mcmcIterNum, paste("sigma[1,1,",i,"]",sep="")]
+    sigma[[i]][1,2] = mcmcfit[[1]][mcmcIterNum, paste("sigma[1,2,",i,"]",sep="")]
+    sigma[[i]][2,2] = mcmcfit[[1]][mcmcIterNum, paste("sigma[2,2,",i,"]",sep="")]
+    sigma[[i]][2,1] = mcmcfit[[1]][mcmcIterNum, paste("sigma[2,1,",i,"]",sep="")]
+  }
   return(sigma)
 }
 
