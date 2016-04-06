@@ -5,28 +5,41 @@ install.packages('ggmcmc')
 library(R2jags)
 library(ggmcmc)
 library(reshape2)
+library(beepr)
 library(doParallel)
-registerDoParallel(cores=8)
+library(MASS)
+
+registerDoParallel(cores = 8)
 
 ########## OTHER SOURCE CODE FILES ############
 source("fitModel.R")
 source("generateData.R")
 source("createModel.R")
-source("DIC_functions.R")
 
 numchains = 1
-niter = 500
-nthin=50
-nburnin=200
+niter = 10000
+nburnin = 2000
+nthin = 20
 
-fit = fitModel(niter, nthin, nburnin, jagsmodel = model, nchains = numchains)
-mcmcfit = as.mcmc(fit)
-calculateObsDIC1(mcmcfit, "obsDeviance")
-calculateObsDIC2(mcmcfit, "obsDeviance")
-calculateObsDIC3(mcmcfit, "obsDeviance","obsL")
+if(ncomponents==1){
+  fit = fitModel(niter, nthin, 0, jagsmodel = singleMarginalModel, nchains = numchains, ncomponents)
+  mcmcfit = as.mcmc(fit)
+  colnames(mcmcfit[[1]])[6]="Eta[1]"
+  colnames(mcmcfit[[1]])[107]="randmu[1]"
+  colnames(mcmcfit[[1]])[108]="randPrecision[1]"
+}else{
+  fit = fitModel(niter, nthin, 0, jagsmodel = marginalModel, nchains = numchains, ncomponents)
+  mcmcfit = as.mcmc(fit)
+}
+
+beep(sound=8)
+
+mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
+mcmcLen = nrow(mcmcfit[[1]])
+attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
 ggsobject = ggs(mcmcfit)
-
 dev.off()
+num
 ########## Graphical analysis of the simulated mixture distribution #######
 densityplot = ggplot()+ aes(extractRandomComp(viaReg = T)) + geom_density()
 densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
@@ -38,6 +51,7 @@ ggs_density(ggsobject, "beta")
 ggs_density(ggsobject, "Precision")
 ggs_density(ggsobject, "randmu")
 ggs_density(ggsobject, "Eta")
+ggs_density(ggsobject, "correlation")
 
 #Compare the whole chainw with the last part...similar to geweke
 ggs_compare_partial(ggsobject, "randmu", rug = T)
@@ -46,11 +60,13 @@ ggs_running(ggsobject, "beta")
 ggs_running(ggsobject, "Precision")
 ggs_running(ggsobject, "randmu")
 ggs_running(ggsobject, "Eta")
+ggs_running(ggsobject, "correlation")
 
 ggs_autocorrelation(ggsobject, "beta")
 ggs_autocorrelation(ggsobject, "Precision")
 ggs_autocorrelation(ggsobject, "randmu")
 ggs_autocorrelation(ggsobject, "Eta")
+ggs_autocorrelation(ggsobject, "correlation")
 
 #dont attempt ggs_pairs on entire object
 ggs_crosscorrelation(ggsobject)

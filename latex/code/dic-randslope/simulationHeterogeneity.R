@@ -3,52 +3,80 @@ install.packages('R2jags')
 install.packages('ggmcmc')
 library(R2jags)
 library(ggmcmc)
-library(MASS)
+library(doParallel)
+library(beepr)
+
+registerDoParallel(cores=8)
 
 ########## OTHER SOURCE CODE FILES ############
-source("fitModel.R")
-source("generateData.R")
-source("createModel.R")
+source("../common/fitModelRandSlopeConditional.R")
+source("../common/generateDataRandSlope.R")
+source("../common/createModelRandSlopeConditional.R")
+source("../common/extractFuncRandSlopeConditional.R")
+source("DIC_functions.R")
 
-numchains = 4
-fit = fitModel(niter = 50000, jagsmodel = model, nchains = numchains)
+numchains = 1
+niter = 30000
+nthin=30
+nburnin=5000
+
+ncomponents=3
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents)
 mcmcfit = as.mcmc(fit)
-ggsobject = ggs(mcmcfit[-3])
-dev.off()
+attributes(mcmcfit)$ncomponents = ncomponents
+attributes(mcmcfit)$nsubjects = nsubjects
+attributes(mcmcfit)$nrep = nrep
+attributes(mcmcfit)$time = time
 
-mean(mcmcfit[[2]][,"randMuSlope[1]"])
-mean(mcmcfit[[2]][,"randMuSlope[2]"])
-mean(mcmcfit[[2]][,"randMuSlope[3]"])
-mean(mcmcfit[[2]][,"randMuIntercept[1]"])
-mean(mcmcfit[[2]][,"randMuIntercept[2]"])
-mean(mcmcfit[[2]][,"randMuIntercept[3]"])
+beep(sound=8)
+
+mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
+mcmcLen = nrow(mcmcfit[[1]])
+attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
+ggsobject = ggs(mcmcfit)
 
 ########## Graphical analysis of the simulated mixture distribution #######
-densityplot = ggplot()+ aes(extractRandomComp()) + geom_density()
-densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
+qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)))
 
 ########## Graphical analysis of MCMC fit #########
 heidel.diag(mcmcfit)
 
 ggs_density(ggsobject, "beta")
-ggs_density(ggsobject, "Precision")
+ggs_density(ggsobject, "errPrecision")
 ggs_density(ggsobject, "randSigma")
-ggs_density(ggsobject, "randMuIntercept")
+ggs_density(ggsobject, "randmu")
 ggs_density(ggsobject, "Eta")
 
-#Compare the whole chainw with the last part...similar to geweke
+par(mfrow=c(2,2))
+for(k in 1:ncomponents){
+  for(i in 1:2){
+    for(j in 1:2){
+      paramName = paste("randSigma[",i,",",j,",",k,"]", sep="")
+      parmData = mcmcfit[[1]][,paramName]
+      plot(density(parmData), main=paramName)
+      abline(v = median(parmData), col="red")
+      abline(v = mean(parmData))
+    }
+  }
+  readline()
+}
+
+#Compare the whole chain with the last part...similar to geweke
 ggs_compare_partial(ggsobject, "randmu", rug = T)
 
 ggs_running(ggsobject, "beta")
 ggs_running(ggsobject, "Precision")
-ggs_running(ggsobject, "randMuIntercept")
-ggs_running(ggsobject, "randMuSlope")
+ggs_running(ggsobject, "randmu")
 ggs_running(ggsobject, "Eta")
 ggs_running(ggsobject, "randSigma")
 
+install.packages("igraph")
+library(igraph)
+plot(running.mean(mcmcfit[[1]][,"randSigma[1,1,1]"], binwidth = 2))
+
 ggs_autocorrelation(ggsobject, "beta")
 ggs_autocorrelation(ggsobject, "Precision")
-ggs_autocorrelation(ggsobject, "randmu")
+ggs_autocorrelation(ggsobject, "randMuMean")
 ggs_autocorrelation(ggsobject, "Eta")
 
 #dont attempt ggs_pairs on entire object

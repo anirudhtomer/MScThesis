@@ -68,27 +68,24 @@ ncomponents=2
 
 model=function(){
   for(i in 1:nobs){
-    sample[i]~dnorm(mu[S[i]], precision)
+    sample[i]~dnorm(mu[S[i]], precision[S[i]])
     S[i]~dcat(eta[])
-    D[i] <- - log(precision) + log(2*pi)  + pow(sample[i]-mu[S[i]],2) * precision
   }
   
   for(j in 1:ncomponents){
-    mu[j]~dnorm(0, 0.0001)  
+    mu[j]~dnorm(0, 0.0001)
+    precision[j]~dgamma(0.0005, 0.0005)
   }
   
-  Deviance <- sum(D)
-  
-  precision~dgamma(0.0005, 0.0005)
   eta~ddirch(dirichParm[])
 }
 
 datanodes = list("sample"=sample,"nobs"=nobs,"ncomponents"=ncomponents, 
                  "dirichParm"=rep(1, ncomponents), "pi"=pi)
-initialValues = list(list("precision"=c(1),
+initialValues = list(list("precision"=rep(1, ncomponents),
                           "eta"=rep(1/ncomponents, ncomponents),
                           "mu"=quantile(sample, probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents))))
-params = c("precision","mu","eta", "Deviance")
+params = c("precision","mu","eta")
 
 unload.module("glm")
 fit = jags(data=datanodes, inits=initialValues, params, 
@@ -97,5 +94,5 @@ fit = jags(data=datanodes, inits=initialValues, params,
 mcmcfit = as.mcmc(fit)
 
 ggsobject = ggs(mcmcfit)
-ggs_density(ggsobject, "mu")
+ggs_density(ggsobject, "precision")
 ggs_running(ggsobject)

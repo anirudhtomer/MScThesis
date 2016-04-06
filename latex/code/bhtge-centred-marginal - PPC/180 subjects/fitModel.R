@@ -4,6 +4,7 @@ initS=function(nfolks, ncomponents){
   for(i in 1:ncomponents){
     retval[randomorder[((i-1)*(nfolks/ncomponents)+1):(i*(nfolks/ncomponents))]] = i;
   }
+  retval[retval==0]=1
   return (retval)
 }
 
@@ -22,23 +23,43 @@ generateCovMatrixNonDiagonalIndices=function(nrep){
   return(indices)
 }
 
+
 #use consecutive ones
 fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3){
+  reg=lm(ds$weight~I(as.numeric(ds$gender)-1)+I(as.numeric(ds$by)-1)+ds$time)
+  
+  initialBetaGender = reg$coefficients[2]
+  initialBetaBy = reg$coefficients[3]
+  initialBetaTime = reg$coefficients[4]
   
   datanodes = list("weight"=dswide_y,"dsby"= as.numeric(dswide$by)-1,"dstime"=time,
                    "dsgender"= as.numeric(dswide$gender)-1,"nsubjects"=nrow(dswide), 
                    "nrep"=nrep, "betaMu"=0, "betaTau"=0.0001,"ncomponents"=ncomp,
                    "varGammaParm"=0.0001,"dirichParm"=rep(1, ncomp),
+                   "betaRandMu" = rep(0,ncomp), "betaRandMuTau"=diag(ncomp),
                    "covMatNonDiagIndices"=generateCovMatrixNonDiagonalIndices(nrep))
     
-  initialValues = list("betaGender"=c(0),"betaBy"=c(0), "betaTime"=c(0),
-                       "errPrecision"=c(1),
-                       "randPrecision"=rep(1, 1),
+  initialValues = list("betaGender"=c(initialBetaGender),"betaBy"=c(initialBetaBy), 
+                       "betaTime"=c(initialBetaTime),
+                       "errPrecision"=c(1),"correlation"=rep(0, ncomponents),
+                       "randPrecision"=rep(1, ncomponents),
                        "Eta"=rep(1/ncomp, ncomp),
-                       "randmu"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomp+1),ncomp/(ncomp+1), length.out = ncomp)), 
+                       #"mue"=c(120,150,180), 
+                       "randmu"=c(120,150,200),
+                       #"randmu"=quantile(extractRandomComp(viaReg = T), probs = seq(1/(ncomp+1),ncomp/(ncomp+1), length.out = ncomp)), 
                        "S"=initS(nsubjects, ncomp))
-  stochasticNodes = c("XBeta","sigma", "omega", "randmu", "Eta", "S", 
+  stochasticNodes = c("XBeta","sigma", "omega", "randmu", "Eta", "S", "correlation", 
                       "betaBy","betaTime", "betaGender","randPrecision", "errPrecision")
+  
+  if(ncomponents==1){
+    #The following line removes the element Eta from initial values
+    initialValues$Eta = NULL
+    datanodes$dirichParm = NULL
+    datanodes$S = initialValues$S
+    initialValues$S=NULL
+    datanodes$Eta=c(1)
+    datanodes$ncomponents = NULL
+  }
   
   unload.module("glm")
   chainInits = list(initialValues)

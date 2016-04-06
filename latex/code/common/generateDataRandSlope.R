@@ -1,16 +1,31 @@
+library(MASS)
+library(reshape2)
+
 extractRandomComp = function(viaReg=F){
   temp = ds$weight
   if(viaReg==T){
     reg=lm(weight~gender+by+time,data=ds)
     temp = temp-(as.numeric(ds$gender)-1)*reg$coefficients[2]
     temp = temp-(as.numeric(ds$by)-1)*reg$coefficients[3]
-    temp = temp-ds$time*reg$coefficients[4]
+    #temp = temp-ds$time*reg$coefficients[4]
   }else{
     temp = temp-(as.numeric(ds$gender)-1)*40
     temp = temp-(as.numeric(ds$by)-1)*30
-    temp = temp-ds$time*10
+    #temp = temp-ds$time*10
   }
   temp
+  
+  randIntercept = numeric()
+  randSlope = numeric()
+  for(i in 1:nsubjects){
+    startIndex = (i-1)*nrep + 1
+    endIndex = i*nrep
+    reg=lm(temp[startIndex:endIndex]~time)   
+    randIntercept[i] = reg$coefficients[1]
+    randSlope[i] = reg$coefficients[2]
+  }
+  
+  return(cbind(randIntercept, randSlope))
 }
 
 nrep = 10
@@ -28,21 +43,23 @@ weightgen=function(gender, by, diet){
   
   weight = weight + time*10
   
-  precision = 0.0625
-  sd = sqrt(1/precision)
+  varcovMatrix=matrix(c(8,4.2,4.2,18),2,2)
   
   switch(diet,
          poor={
-           weight = weight + rnorm(1, -30, sd)
+           randeff=mvrnorm(1,c(-20,-30), varcovMatrix)
+           weight = weight + randeff[1] + randeff[2]*time
          },
          ok={
-           weight = weight + rnorm(1, 0, sd)
+           randeff=mvrnorm(1,c(0,0), varcovMatrix)
+           weight = weight + randeff[1] + randeff[2]*time
          },
          good={
-           weight = weight + rnorm(1, 30, sd)
+           randeff=mvrnorm(1,c(20, 30), varcovMatrix)
+           weight = weight + randeff[1] + randeff[2]*time
          })
   
-  weight = weight + rnorm(length(time), 0, 3)
+  weight = weight + rnorm(length(time), 0, 6)
 }
 
 ncomponents = 3
@@ -50,7 +67,7 @@ ncomponents = 3
 if(ncomponents == 3){
   diets = c("poor", "ok", "good")
 }else{
-  diets = c("poor", "good")
+  diets = c("poor", "good", "ok", "baam", "kaam")
 }
 
 sublist = matrix(nrow = 0, ncol = 6)

@@ -4,41 +4,44 @@ install.packages('mcmcse')
 install.packages('ggmcmc')
 library(R2jags)
 library(ggmcmc)
-library(reshape2)
-library(beepr)
 library(doParallel)
-library(MASS)
+library(beepr)
 
-registerDoParallel(cores = 8)
+registerDoParallel(cores=8)
 
 ########## OTHER SOURCE CODE FILES ############
-source("fitModel.R")
-source("generateData.R")
-source("createModel.R")
+source("../common/fitModelRandSlope.R")
+source("../common/generateDataRandSlope.R")
+source("../common/createModelRandSlope.R")
+source("../common/extractFuncRandSlope.R")
+source("DIC_functions.R")
 
 numchains = 1
-niter = 30000
-nburnin = 0
-nthin = 50
-mcmcLen=(niter-nburnin)/nthin
+niter = 3000
+nthin=50
+nburnin=200
 
-if(ncomponents==1){
-  fit = fitModel(niter, nthin, nburnin, jagsmodel = singleModel, nchains = numchains, ncomponents)
-  mcmcfit = as.mcmc(fit)
-  colnames(mcmcfit[[1]])[6]="Eta[1]"
-  colnames(mcmcfit[[1]])[7]="randmu[1]"
-}else{
-  fit = fitModel(niter, nthin, nburnin, jagsmodel = model, nchains = numchains, ncomponents)
-  mcmcfit = as.mcmc(fit)
-}
+ncomponents=3
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents)
+mcmcfit = as.mcmc(fit)
+attributes(mcmcfit)$ncomponents = ncomponents
+attributes(mcmcfit)$nsubjects = nsubjects
+attributes(mcmcfit)$nrep = nrep
 
 beep(sound=8)
+
+mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
+mcmcLen = nrow(mcmcfit[[1]])
+attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
 ggsobject = ggs(mcmcfit)
+
+calculateObsDIC1(mcmcfit, "obsDeviance")
+calculateObsDIC2(mcmcfit, "obsDeviance")
+calculateObsDIC3(mcmcfit, "obsDeviance","obsL")
+
 dev.off()
-num
 ########## Graphical analysis of the simulated mixture distribution #######
-densityplot = ggplot()+ aes(extractRandomComp(viaReg = T)) + geom_density()
-densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
+qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)))
 
 ########## Graphical analysis of MCMC fit #########
 heidel.diag(mcmcfit)

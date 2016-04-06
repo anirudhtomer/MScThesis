@@ -1,30 +1,16 @@
-library(MASS)
-
 extractRandomComp = function(viaReg=F){
   temp = ds$weight
   if(viaReg==T){
     reg=lm(weight~gender+by+time,data=ds)
     temp = temp-(as.numeric(ds$gender)-1)*reg$coefficients[2]
     temp = temp-(as.numeric(ds$by)-1)*reg$coefficients[3]
-    #temp = temp-ds$time*reg$coefficients[4]
+    temp = temp-ds$time*reg$coefficients[4]
   }else{
     temp = temp-(as.numeric(ds$gender)-1)*40
     temp = temp-(as.numeric(ds$by)-1)*30
-    #temp = temp-ds$time*10
+    temp = temp-ds$time*10
   }
   temp
-
-  randIntercept = numeric()
-  randSlope = numeric()
-  for(i in 1:nsubjects){
-    startIndex = (i-1)*nrep + 1
-    endIndex = i*nrep
-    reg=lm(temp[startIndex:endIndex]~time)   
-    randIntercept[i] = reg$coefficients[1]
-    randSlope[i] = reg$coefficients[2]
-  }
-  
-  return(cbind(randIntercept, randSlope))
 }
 
 nrep = 10
@@ -42,26 +28,30 @@ weightgen=function(gender, by, diet){
   
   weight = weight + time*10
   
-  varcovMatrix=matrix(c(8,4.2,4.2,18),2,2)
+  precision = 0.0625
+  sd = sqrt(1/precision)
   
   switch(diet,
          poor={
-           randeff=mvrnorm(1,c(-10,-15), varcovMatrix)
-           weight = weight + randeff[1] + randeff[2]*time
+           weight = weight + rnorm(1, -30, sd)
          },
          ok={
-           randeff=mvrnorm(1,c(0,0), varcovMatrix)
-           weight = weight + randeff[1] + randeff[2]*time
+           weight = weight + rnorm(1, 0, sd)
          },
          good={
-           randeff=mvrnorm(1,c(10, 15), varcovMatrix)
-           weight = weight + randeff[1] + randeff[2]*time
+           weight = weight + rnorm(1, 30, sd)
+         },
+         baam={
+           weight = weight + rnorm(1, 60, sd)
+         },
+         kaam={
+           weight = weight + rnorm(1, 90, sd)
          })
   
-  weight = weight + rnorm(length(time), 0, 6)
+  weight = weight + rnorm(length(time), 0, 3)
 }
 
-ncomponents = 3
+ncomponents = 5
 
 if(ncomponents == 3){
   diets = c("poor", "ok", "good")
@@ -69,11 +59,13 @@ if(ncomponents == 3){
   diets = c("poor", "good", "ok", "baam", "kaam")
 }
 
+dietsProp=c("poor"=0.29, "good"=0.36,"ok"=0.2, "baam"=0.1, "kaam"=0.05)
+
 sublist = matrix(nrow = 0, ncol = 6)
 for(gender in c("M", "F")){
   for(by in c("96", "97")){
     for(diet in diets){
-      for(k in 1:3){
+      for(k in 1:ceiling(30*dietsProp[diet])){
         id = rep(paste(gender, by, diet, k, sep=""), length(time))
         weight = weightgen(gender, by, diet)
         subject = cbind(id, rep(gender, length(time)),

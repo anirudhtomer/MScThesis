@@ -17,27 +17,32 @@ source("generateData.R")
 source("createModel.R")
 
 numchains = 1
-niter = 4000
-nburnin = 1000
-nthin = 10
-mcmcLen=(niter-nburnin)/nthin
+niter = 6000
+nburnin = 2000
+nthin = 20
 
 if(ncomponents==1){
-  fit = fitModel(niter, nthin, nburnin, jagsmodel = singleModel, nchains = numchains, ncomponents)
+  fit = fitModel(niter, nthin, 0, jagsmodel = singleMarginalModel, nchains = numchains, ncomponents)
   mcmcfit = as.mcmc(fit)
   colnames(mcmcfit[[1]])[6]="Eta[1]"
-  colnames(mcmcfit[[1]])[7]="randmu[1]"
+  colnames(mcmcfit[[1]])[32]="randmu[1]"
+  colnames(mcmcfit[[1]])[33]="randPrecision[1]"
 }else{
-  fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents)
+  fit = fitModel(niter, nthin, 0, jagsmodel = marginalModel, nchains = numchains, ncomponents)
   mcmcfit = as.mcmc(fit)
 }
 
 beep(sound=8)
+
+mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
+mcmcLen = nrow(mcmcfit[[1]])
+attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
 ggsobject = ggs(mcmcfit)
 dev.off()
 num
 ########## Graphical analysis of the simulated mixture distribution #######
-qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)))
+densityplot = ggplot()+ aes(extractRandomComp(viaReg = T)) + geom_density()
+densityplot + ylab(expression("p"[ Y ]*"(y)"))  + xlab("Y") + theme(axis.text=element_text(size=14),axis.title=element_text(size=18), plot.title=element_text(size=20))
 
 ########## Graphical analysis of MCMC fit #########
 heidel.diag(mcmcfit)
@@ -54,6 +59,7 @@ ggs_running(ggsobject, "beta")
 ggs_running(ggsobject, "Precision")
 ggs_running(ggsobject, "randmu")
 ggs_running(ggsobject, "Eta")
+ggs_running(ggsobject, "correlation")
 
 ggs_autocorrelation(ggsobject, "beta")
 ggs_autocorrelation(ggsobject, "Precision")
@@ -71,6 +77,7 @@ ggs_traceplot(ggsobject, "beta")
 ggs_traceplot(ggsobject, "Precision")
 ggs_traceplot(ggsobject, "randmu")
 ggs_traceplot(ggsobject, "Eta")
+ggs_traceplot(ggsobject, "correlation")
 
 ########## Mode hunting, works only for 2 or 4 chains ##########
 mcmcfitdf = data.frame(y= numeric(0), x= numeric(0), 
