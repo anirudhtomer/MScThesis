@@ -4,6 +4,7 @@ initS=function(nfolks, ncomponents){
   for(i in 1:ncomponents){
     retval[randomorder[((i-1)*(nfolks/ncomponents)+1):(i*(nfolks/ncomponents))]] = i;
   }
+  retval[retval==0]=1
   return (retval)
 }
 

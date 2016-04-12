@@ -16,13 +16,23 @@ source("../common/extractFuncRandSlopeConditional.R")
 source("DIC_functions.R")
 
 numchains = 1
-niter = 30000
+niter = 300000
 nthin=30
-nburnin=5000
+nburnin=50000
 
 ncomponents=3
-fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents)
-mcmcfit = as.mcmc(fit)
+if(ncomponents==1){
+  fit = fitModel(niter, nthin, 0, jagsmodel = singleModel, nchains = numchains, ncomponents)  
+  mcmcfit = as.mcmc(fit)
+  colnames(mcmcfit[[1]])[match("Eta",colnames(mcmcfit[[1]]))] = "Eta[1]"
+  colnames(mcmcfit[[1]])[match("precision1",colnames(mcmcfit[[1]]))] = "precision1[1]"
+  colnames(mcmcfit[[1]])[match("precision2",colnames(mcmcfit[[1]]))] = "precision2[1]"
+  colnames(mcmcfit[[1]])[match("rho",colnames(mcmcfit[[1]]))] = "rho[1]"
+}else{
+  fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents)
+  mcmcfit = as.mcmc(fit)
+}
+
 attributes(mcmcfit)$ncomponents = ncomponents
 attributes(mcmcfit)$nsubjects = nsubjects
 attributes(mcmcfit)$nrep = nrep
@@ -34,6 +44,16 @@ mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
 mcmcLen = nrow(mcmcfit[[1]])
 attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
 ggsobject = ggs(mcmcfit)
+
+attributes(mcmcfit)
+#save.image("F:/docs/Dropbox/MSc Stats/Thesis/MScThesis/latex/code/dic-ppc-randslope/.RData")
+
+calculateDIC1(mcmcfit)
+calculateDIC2(mcmcfit)
+calculateDIC3(mcmcfit)
+calculateDIC4(mcmcfit)
+calculateDIC5(mcmcfit)
+calculateDIC7(mcmcfit)
 
 ########## Graphical analysis of the simulated mixture distribution #######
 qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)))
