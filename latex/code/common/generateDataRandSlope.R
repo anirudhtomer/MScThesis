@@ -1,5 +1,3 @@
-library(MASS)
-library(reshape2)
 
 extractRandomComp = function(viaReg=F){
   temp = ds$weight
@@ -43,34 +41,45 @@ weightgen=function(gender, by, diet){
   
   weight = weight + time*10
   
-  varcovMatrix=matrix(c(8,4.2,4.2,18),2,2)
+  varcovMatrix=matrix(c(12,4.2,4.2,20),2,2)
   
   switch(diet,
          poor={
-           randeff=mvrnorm(1,c(-17,-20), varcovMatrix)
+           randeff=mvrnorm(1,c(-30,-20), varcovMatrix)
            weight = weight + randeff[1] + randeff[2]*time
+           splaash1 <<- rbind(splaash1, randeff)
          },
          ok={
            randeff=mvrnorm(1,c(0,0), varcovMatrix)
            weight = weight + randeff[1] + randeff[2]*time
+           splaash2 <<- rbind(splaash2, randeff)
          },
          good={
-           randeff=mvrnorm(1,c(17, 20), varcovMatrix)
+           randeff=mvrnorm(1,c(30, 20), varcovMatrix)
            weight = weight + randeff[1] + randeff[2]*time
+           splaash3 <<- rbind(splaash3, randeff)
          },
          baam={
            randeff=mvrnorm(1,c(0, 30), varcovMatrix)
            weight = weight + randeff[1] + randeff[2]*time
+           splaash4 <<- rbind(splaash4, randeff)
          },
          kaam={
            randeff=mvrnorm(1,c(-27, 0), varcovMatrix)
            weight = weight + randeff[1] + randeff[2]*time
+           splaash5 <<- rbind(splaash5, randeff)
          })
   
-  weight = weight + rnorm(length(time), 0, 6)
+  weight = weight + rnorm(length(time), 0, 2)
 }
 
-ncomponents = 1
+splaash1 = matrix(nrow=0, ncol=2)
+splaash2 = matrix(nrow=0, ncol=2)
+splaash3 = matrix(nrow=0, ncol=2)
+splaash4 = matrix(nrow=0, ncol=2)
+splaash5 = matrix(nrow=0, ncol=2)
+
+ncomponents = 5
 
 if(ncomponents == 3){
   diets = c("poor", "ok", "good")
@@ -80,7 +89,7 @@ if(ncomponents == 3){
   diets = c("ok")
 }
 
-dietSubjects = c("poor"=7,"ok"=15,"good"=7, "baam"=7, "kaam"=7)
+dietSubjects = c("poor"=15,"ok"=15,"good"=15, "baam"=7, "kaam"=7)
 
 sublist = matrix(nrow = 0, ncol = 6)
 for(gender in c("M", "F")){

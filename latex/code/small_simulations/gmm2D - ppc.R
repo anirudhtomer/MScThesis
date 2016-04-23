@@ -14,13 +14,13 @@ library(beepr)
 registerDoParallel(cores = 8)
 
 ############ MIXTURE WITH INTERCEPT 1st way ###############
-sigma <- matrix(c(16,3,3,9),2,2)
+sigma <- matrix(c(16,11.9,11.9,9),2,2)
 
-nobs = 200
-nobsPerComp=c(floor(nobs*0.6),floor(nobs*0.3),floor(nobs*0.1))
-first=mvrnorm(nobsPerComp[1], c(-108,0), sigma)
-second=mvrnorm(nobsPerComp[2], c(-7,0), sigma)
-third=mvrnorm(nobsPerComp[3], c(20,0), sigma)
+nobs = 90
+nobsPerComp=c(floor(nobs/3),floor(nobs/3),floor(nobs/3))
+first=mvrnorm(nobsPerComp[1], c(-30,-20.7), sigma)
+second=mvrnorm(nobsPerComp[2], c(0,0), sigma)
+third=mvrnorm(nobsPerComp[3], c(30,20.7), sigma)
 sample = rbind(first, second, third)
 nobs = nrow(sample)
 
@@ -35,34 +35,41 @@ model=function(){
   }
   
   for(j in 1:ncomponents){
-    mu[j,1]~dnorm(0, 0.0001)
-    mu[j,2]~dnorm(0, 0.0001)
+    mu[j, 1:ndim]~dmnorm(betaMuMult, betaTauMult)
+    #mu[j,1]~dnorm(0,0.0001)
+    #mu[j,2]~dnorm(0,0.0001)
+   
+    # omega[1:ndim, 1:ndim, j]~dwish(wishScale, 3)
+    # sigma[1:ndim, 1:ndim, j]<-inverse(omega[1:ndim, 1:ndim, j])
     
     cor[j]~dunif(-1,1)
-    precision1[j]~dgamma(0.0005, 0.0005)
-    precision2[j]~dgamma(0.0005, 0.0005)
-    
+    precision1[j]~dgamma(0.00001, 0.00001)
+    precision2[j]~dgamma(0.00001, 0.00001)
+
     sigma[1,1,j]<-1/precision1[j]
     sigma[2,2,j]<-1/precision2[j]
     sigma[1,2,j]<-cor[j] * sqrt(1/precision1[j]) * sqrt(1/precision2[j])
     sigma[2,1,j]<-cor[j] * sqrt(1/precision1[j]) * sqrt(1/precision2[j])
-    
+
     omega[1:ndim,1:ndim,j]<-inverse(sigma[1:ndim, 1:ndim,j])
   }
   
   eta~ddirch(dirichParm[])
 }
 
-ncomponents=5
+ncomponents=3
 dirichParm = rep(1, ncomponents)
 
-datanodes = c("sample","nobs","ncomponents", "dirichParm", "ndim")
+betaMuMult = c(0,0)
+betaTauMult = diag(2)*0.0001
+wishScale = diag(2)*0.0001
+datanodes = c("sample","nobs","ncomponents", "dirichParm", "ndim", "betaMuMult", "betaTauMult", "wishScale")
 tryMeanDim1=quantile(sample[,1], probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents))
 tryMeanDim2=quantile(sample[,2], probs = seq(1/(ncomponents+1),ncomponents/(ncomponents+1), length.out = ncomponents))
 initialValues = list(list("precision1"=rep(1, ncomponents), "precision2"=rep(1, ncomponents),
                           "eta"=rep(1/ncomponents, ncomponents), 
                           "mu"=matrix(c(tryMeanDim1, tryMeanDim2), nrow = ncomponents, ncol = ndim, byrow = F)))
-params = c("sigma","omega","mu","eta", "S")
+params = c("sigma","omega","mu","eta", "S", "cor")
 
 unload.module("glm")
 nthin = 10
@@ -78,9 +85,18 @@ attributes(mcmcfit_partial) = attributes(mcmcfit)
 mcmcLen = nrow(mcmcfit_partial[[1]])
 attributes(mcmcfit_partial[[1]])$mcpar = c(1, mcmcLen, 1)
 
+matrix(c(mean(mcmcfit[[1]][,"sigma[1,1,1]"]), mean(mcmcfit[[1]][,"sigma[1,2,1]"]),mean(mcmcfit[[1]][,"sigma[1,2,1]"]),mean(mcmcfit[[1]][,"sigma[2,2,1]"])), nrow=2, ncol=2)
+matrix(c(mean(mcmcfit[[1]][,"sigma[1,1,2]"]), mean(mcmcfit[[1]][,"sigma[1,2,2]"]),mean(mcmcfit[[1]][,"sigma[1,2,2]"]),mean(mcmcfit[[1]][,"sigma[2,2,2]"])), nrow=2, ncol=2)
+matrix(c(mean(mcmcfit[[1]][,"sigma[1,1,3]"]), mean(mcmcfit[[1]][,"sigma[1,2,3]"]),mean(mcmcfit[[1]][,"sigma[1,2,3]"]),mean(mcmcfit[[1]][,"sigma[2,2,3]"])), nrow=2, ncol=2)
+
+matrix(c(mean(temp[[1]][,"sigma[1,1,1]"]), mean(temp[[1]][,"sigma[1,2,1]"]),mean(temp[[1]][,"sigma[1,2,1]"]),mean(temp[[1]][,"sigma[2,2,1]"])), nrow=2, ncol=2)
+matrix(c(mean(temp[[1]][,"sigma[1,1,2]"]), mean(temp[[1]][,"sigma[1,2,2]"]),mean(temp[[1]][,"sigma[1,2,2]"]),mean(temp[[1]][,"sigma[2,2,2]"])), nrow=2, ncol=2)
+matrix(c(mean(temp[[1]][,"sigma[1,1,3]"]), mean(temp[[1]][,"sigma[1,2,3]"]),mean(temp[[1]][,"sigma[1,2,3]"]),mean(temp[[1]][,"sigma[2,2,3]"])), nrow=2, ncol=2)
+
 ggsobject = ggs(mcmcfit)
 ggs_density(ggsobject, "mu")
-ggs_compare_partial(ggsobject,"mu")
+ggs_density(ggsobject, "sigma")
+  ggs_compare_partial(ggsobject,"mu")
 ggs_running(ggsobject, "mu")
 
 mcmcLen = (niter-nburnin)/nthin

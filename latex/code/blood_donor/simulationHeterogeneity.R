@@ -2,31 +2,29 @@
 install.packages('R2jags')
 install.packages('ggmcmc')
 install.packages("doParallel")
-install.packages("MCMCpack")
-install.packages("mvtnorm")
 library(R2jags)
 library(ggmcmc)
 library(doParallel)
 library(beepr)
 library(MASS)
-library(MCMCpack)
 library(reshape2)
-library(mvtnorm)
 
 registerDoParallel(cores=8)
 
 ########## OTHER SOURCE CODE FILES ############
-source("../common/fitModelRandSlopeConditional.R")
+source("datacleaning.R")
+
+source("fitModelRandSlopeConditional.R")
 source("../common/generateDataRandSlope.R")
-source("../common/createModelRandSlopeConditional.R")
+source("createModelRandSlopeConditional.R")
 source("../common/extractFuncRandSlopeConditional.R")
 source("DIC_functions.R")
-source("bfWishart.R")
+source("bf.R")
 
 numchains = 1
-niter = 40000
-nthin=100
-nburnin=10000
+niter = 30000
+nthin=30
+nburnin=5000
 
 ncomponents=3
 if(ncomponents==1){
@@ -65,7 +63,8 @@ calculateDIC5(mcmcfit)
 calculateDIC7(mcmcfit)
 
 ########## Graphical analysis of the simulated mixture distribution #######
-qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)))
+qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp()), xlim = c(-25,25),ylim = c(-25,25))
+qplot(y=Hb, x=TSPD,data=ds[1:400,], geom = "line", group=Id)
 
 ########## Graphical analysis of MCMC fit #########
 heidel.diag(mcmcfit)
@@ -144,4 +143,5 @@ for(i in 1:numchains){
 
 xylims = c(100,200)
 qplot(y=y, x=x, data=mcmcfitdf, color=pairId, facets = row~col, ylim = xylims, xlim=xylims) + 
-  geom_abline(intercept = 0, slope = 1)
+  geom_abline(intercept = 0, slope = 1) 
+

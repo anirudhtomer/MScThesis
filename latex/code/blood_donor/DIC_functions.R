@@ -266,15 +266,23 @@ calculate_E_theta_givenY_Z = function(mcmcfit){
     eta=(1+freqPerGroup)/(ncomponents + nsubjects)
     
     #randmu and #randSigma
+    wishartPriorDf = 3
     randmu = rep(list(c(0,0)), ncomponents)
     randSigma=rep(list(diag(2)),ncomponents)
-    
-    randCompPerGroup = lapply(1:ncomponents, function(x){randComp[allocations==x,]})
-    
+    randCompPerGroup = rep(list(matrix(nrow=0, ncol=2)), ncomponents)
+    for(j in 1:nsubjects){
+      randCompPerGroup[[allocations[j]]] = rbind(randCompPerGroup[[allocations[j]]], randComp[j,])
+    }
     for(j in 1:ncomponents){
       if(freqPerGroup[j]>0){
+        #should've considered prior information as well
         randmu[[j]] = apply(randCompPerGroup[[j]], MARGIN=2, FUN=mean)
-        randSigma[[j]] = var(randCompPerGroup[[j]])
+        
+        varIntercept = (sum((randCompPerGroup[[j]][,1]-randmu[[j]][1])^2)+0.001)/(freqPerGroup[j]+0.001-2)
+        varSlope = (sum((randCompPerGroup[[j]][,2]-randmu[[j]][2])^2)+0.001)/(freqPerGroup[j]+0.001-2)
+        covIntSlope = cov(randCompPerGroup[[j]][,1], randCompPerGroup[[j]][,2])
+
+        randSigma[[j]] = matrix(c(varIntercept, covIntSlope, covIntSlope, varSlope), nrow=2, ncol=2)
       }
     }
     
@@ -292,7 +300,7 @@ calculate_E_theta_givenY_Z = function(mcmcfit){
     }
     
     reg=lm(dsweight~dsgender + dsby + 0)
-    errVariance = summary(reg)$sigma^2 * ((nsubjects*nrep-2)/(nsubjects*nrep-2-2))
+    errVariance = summary(reg)$sigma^2
     
     list("eta"=eta, "randmu"=randmu, "randSigma"=randSigma, 
          "betaBy"=reg$coefficients["dsby"], 

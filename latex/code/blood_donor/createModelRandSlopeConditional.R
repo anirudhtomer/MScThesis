@@ -1,10 +1,10 @@
 model = function(){
   for(i in 0:(nsubjects-1)){
-    for(j in 1:nrep){
-      dsweight[i*nrep+j]~dnorm(mu[i*nrep+j],errPrecision)
-      mu[i*nrep+j]<- betaGender*dsgender[i*nrep+j] +
-        betaBy*dsby[i*nrep+j] +
-        randomComp[i+1,1] + randomComp[i+1,2]*dstime[i*nrep+j]
+    for(j in 1:nrep[[i]]){
+      dsHb[i*nrep+j]~dnorm(mu[i*nrep+j],errPrecision)
+      mu[i*nrep+j]<- betaDonate*dsDonate[i*nrep+j] + betaAge*dsAge[i*nrep+j] + 
+        betaSeason*dsSeason[i*nrep+j] + betaTSPD*dsTSPD[i*nrep+j] +
+        randomComp[i+1,1] + randomComp[i+1,2]*(donationLastTwoYears[i*nrep+j]*0.1)
     }
     
     randomComp[i+1,1:2]~dmnorm(randmu[S[i+1], 1:2], randPrecision[1:2,1:2,S[i+1]])
@@ -15,17 +15,18 @@ model = function(){
   for(k in 1:ncomponents){
     randmu[k,1]~dnorm(betaMu, betaTau)
     randmu[k,2]~dnorm(betaMu, betaTau)
+    #randmu[k,1:2]~dmnorm(betaMuMult, inverse(randSigma[1:2,1:2,k]/10))
     
     # randSigma[1,1,k]<-1/precisionIntercept[k]
     # randSigma[1,2,k]<-rho[k] / sqrt(precisionIntercept[k] * precisionSlope[k])
     # randSigma[2,1,k]<-rho[k] / sqrt(precisionIntercept[k] * precisionSlope[k])
     # randSigma[2,2,k]<-1/precisionSlope[k]
-    # rho[k]~dunif(-1,1)
+    # rho[k]~dunif(0,1)
     # randPrecision[1:2,1:2,k]<-inverse(randSigma[1:2,1:2,k])
     # precisionIntercept[k]~dgamma(gammaShapeRate, gammaShapeRate)
     # precisionSlope[k]~dgamma(gammaShapeRate, gammaShapeRate)
     
-    randPrecision[1:2,1:2,k]~dwish(wishartPriorScale, wishartPriorDf)
+    randPrecision[1:2,1:2,k]~dwish(wishartParm,3)
     randSigma[1:2,1:2,k]<-inverse(randPrecision[1:2,1:2,k])
   }
   
@@ -34,22 +35,25 @@ model = function(){
   
   errPrecision~dgamma(gammaShapeRate,gammaShapeRate)
   
-  betaGender~dnorm(betaMu,betaTau)
-  betaBy~dnorm(betaMu,betaTau)
+  betaDonate~dnorm(betaMu,betaTau)
+  betaAge~dnorm(betaMu,betaTau)
+  betaSeason~dnorm(betaMu,betaTau)
+  betaTSPD~dnorm(betaMu,betaTau)
   
   Eta~ddirch(dirichParm[])
 }
 
 singleModel = function(){
   for(i in 0:(nsubjects-1)){
-    for(j in 1:nrep){
-      dsweight[i*nrep+j]~dnorm(mu[i*nrep+j],errPrecision)
-      mu[i*nrep+j]<- betaGender*dsgender[i*nrep+j] +
-        betaBy*dsby[i*nrep+j] +
-        randomComp[i+1,1] + randomComp[i+1,2]*dstime[i*nrep+j]
+    for(j in 1:nrep[[i]]){
+      dsHb[i*nrep+j]~dnorm(mu[i*nrep+j],errPrecision)
+      mu[i*nrep+j]<- betaDonate*dsDonate[i*nrep+j] + betaAge*dsAge[i*nrep+j] + 
+        betaSeason*dsSeason[i*nrep+j] + betaTSPD*dsTSPD[i*nrep+j] +
+        randomComp[i+1,1] + randomComp[i+1,2]*(donationLastTwoYears[i*nrep+j]*0.1)
     }
     
     randomComp[i+1,1:2]~dmnorm(randmu[S[i+1], 1:2], randPrecision[1:2,1:2,S[i+1]])
+    #randomComp[i+1,1:2]~dmnorm(randmu[S[i+1], 1:2], randPrecision[1:2,1:2])
     S[i+1]~dcat(Eta[])
   }
   
@@ -71,8 +75,10 @@ singleModel = function(){
   
   errPrecision~dgamma(gammaShapeRate,gammaShapeRate)
   
-  betaGender~dnorm(betaMu,betaTau)
-  betaBy~dnorm(betaMu,betaTau)
+  betaDonate~dnorm(betaMu,betaTau)
+  betaAge~dnorm(betaMu,betaTau)
+  betaSeason~dnorm(betaMu,betaTau)
+  betaTSPD~dnorm(betaMu,betaTau)
   
   Eta[1]~dbeta(100,1)
 }

@@ -44,6 +44,30 @@ getRandSigma=function(mcmcfit, summaryFuncName="mean", mcmcIterNum=NA){
   return(randSigma)
 }
 
+getRandPrecision=function(mcmcfit, summaryFuncName="mean", mcmcIterNum=NA){
+  ncomponents = attributes(mcmcfit)$ncomponents
+  
+  summaryFunc = get(summaryFuncName)
+  randPrecision = list(ncomponents)
+  
+  for(b in 1:ncomponents){
+    d11=d22=d12=0
+    
+    if(!is.numeric(mcmcIterNum)){
+      d11 = summaryFunc(mcmcfit[[1]][,paste("randPrecision[1,1,",b,"]", sep="")])
+      d22 = summaryFunc(mcmcfit[[1]][,paste("randPrecision[2,2,",b,"]", sep="")])
+      d12 = summaryFunc(mcmcfit[[1]][,paste("randPrecision[1,2,",b,"]", sep="")])
+    }else{
+      d11 = mcmcfit[[1]][mcmcIterNum, paste("randPrecision[1,1,",b,"]", sep="")]
+      d22 = mcmcfit[[1]][mcmcIterNum, paste("randPrecision[2,2,",b,"]", sep="")]
+      d12 = mcmcfit[[1]][mcmcIterNum, paste("randPrecision[1,2,",b,"]", sep="")]
+    }
+    randPrecision[[b]]=matrix(c(d11,d12,d12,d22),nrow=2, ncol=2)
+  }
+  
+  return(randPrecision)
+}
+
 getSigma=function(mcmcfit,  summaryFuncName="mean", mcmcIterNum = NA){
   ncomponents = attributes(mcmcfit)$ncomponents
   nrep = attributes(mcmcfit)$nrep
