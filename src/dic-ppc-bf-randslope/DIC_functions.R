@@ -18,6 +18,7 @@ calculateObsDThetaBar=function(mcmcfit, summaryFuncName){
   randmuSummary = getRandMu(mcmcfit, summaryFuncName)
   betaBy = summaryFunc(mcmcfit[[1]][,"betaBy"])
   betaGender = summaryFunc(mcmcfit[[1]][,"betaGender"])
+  betaAge = summaryFunc(mcmcfit[[1]][,"betaAge"])
   
   Dthetabar = 0
   for(i in 1:nsubjects){
@@ -25,7 +26,7 @@ calculateObsDThetaBar=function(mcmcfit, summaryFuncName){
     for(j in 1:ncomponents){
       randomPartMean = randmuSummary[[j]][1] + randmuSummary[[j]][2]*time
       fixedPartMean = betaBy * (as.numeric(dswide[i, "by"])-1) + 
-        betaGender * (as.numeric(dswide[i, "gender"])-1)
+        betaGender * (as.numeric(dswide[i, "gender"])-1) + betaAge * dswide[i,"age"]
       temp = temp + etaSummary[j] * dmvnorm(x = dswide_y[i,], 
                                             mean = randomPartMean + fixedPartMean, 
                                             sigma = sigmaSummary[[j]], log = F)
@@ -44,14 +45,15 @@ calculateObsTotalDTheta = function(mcmcfit){
   nsubjects = attributes(mcmcfit)$nsubjects
   
   totalDtheta=foreach(k=1:nrow(mcmcfit[[1]]), .combine = c, .packages = c('mvtnorm')) %dopar%{
+   #for(k in 1:nrow(mcmcfit[1])){ 
     
     source("../common/extractFuncRandSlopeConditional.R")
-    
     eta = getEta(mcmcfit, mcmcIterNum = k)
     sigma = getSigma(mcmcfit, mcmcIterNum = k)
     randmu = getRandMu(mcmcfit, mcmcIterNum = k)
     betaBy = mcmcfit[[1]][k,"betaBy"]
     betaGender = mcmcfit[[1]][k,"betaGender"]
+    betaAge = mcmcfit[[1]][k,"betaAge"]
     
     Dtheta = 0
     for(i in 1:nsubjects){
@@ -59,7 +61,7 @@ calculateObsTotalDTheta = function(mcmcfit){
       for(j in 1:ncomponents){
         randomPartMean = randmu[[j]][1] + randmu[[j]][2]*time
         fixedPartMean = betaBy * (as.numeric(dswide[i, "by"])-1) + 
-          betaGender * (as.numeric(dswide[i, "gender"])-1)
+          betaGender * (as.numeric(dswide[i, "gender"])-1) + betaAge * dswide[i, "age"]
         temp = temp + eta[j] * dmvnorm(x = dswide_y[i,], 
                                        mean = randomPartMean + fixedPartMean, 
                                        sigma = sigma[[j]], log = F)
@@ -68,6 +70,7 @@ calculateObsTotalDTheta = function(mcmcfit){
     }
     -2*Dtheta
   }
+  totalDtheta
 }
 
 calculateDIC1 = function(mcmcfit){
@@ -98,13 +101,14 @@ calculateDIC3 = function(mcmcfit){
     randmu = getRandMu(mcmcfit, mcmcIterNum = k)
     betaBy = mcmcfit[[1]][k,"betaBy"]
     betaGender = mcmcfit[[1]][k,"betaGender"]
+    betaAge = mcmcfit[[1]][k,"betaAge"]
     
     Dtheta = rep(0, nsubjects)
     for(i in 1:nsubjects){
       for(j in 1:ncomponents){
         randomPartMean = randmu[[j]][1] + randmu[[j]][2]*time
         fixedPartMean = betaBy * (as.numeric(dswide[i, "by"])-1) + 
-          betaGender * (as.numeric(dswide[i, "gender"])-1)
+          betaGender * (as.numeric(dswide[i, "gender"])-1) + betaAge * dswide[i, "age"]
         Dtheta[i] = Dtheta[i] + eta[j] * dmvnorm(x = dswide_y[i,], 
                                            mean = randomPartMean + fixedPartMean, 
                                            sigma = sigma[[j]], log = F)
@@ -133,6 +137,7 @@ calculateDIC7 = function(mcmcfit, summaryFuncName="modeFunc"){
     
     betaBy = mcmcfit[[1]][k,"betaBy"]
     betaGender = mcmcfit[[1]][k,"betaGender"]
+    betaAge = mcmcfit[[1]][k,"betaAge"]
     randComp = getRandomComp(mcmcfit, mcmcIterNum = k)
     errVariance = 1/mcmcfit[[1]][k,"errPrecision"]
     
@@ -140,7 +145,7 @@ calculateDIC7 = function(mcmcfit, summaryFuncName="modeFunc"){
     for(i in 1:nsubjects){
       randomPartMean = randComp[i,1] + randComp[i,2]*time
       fixedPartMean = betaBy * (as.numeric(dswide[i, "by"])-1) + 
-        betaGender * (as.numeric(dswide[i, "gender"])-1)
+        betaGender * (as.numeric(dswide[i, "gender"])-1) + betaAge * dswide[i, "age"]
       Dtheta = Dtheta + dmvnorm(x = dswide_y[i,], 
                                      mean = randomPartMean + fixedPartMean, 
                                      sigma = diag(nrep)*errVariance, log = T)
@@ -155,13 +160,14 @@ calculateDIC7 = function(mcmcfit, summaryFuncName="modeFunc"){
   randComp = getRandomComp(mcmcfit, summaryFuncName)
   betaBy = summaryFunc(mcmcfit[[1]][,"betaBy"])
   betaGender = summaryFunc(mcmcfit[[1]][,"betaGender"])
+  betaAge = summaryFunc(mcmcfit[[1]][,"betaAge"])
   errVariance = summaryFunc(1/mcmcfit[[1]][,"errPrecision"])
   
   Dthetabar = 0
   for(i in 1:nsubjects){
     randomPartMean = randComp[i,1] + randComp[i,2]*time
     fixedPartMean = betaBy * (as.numeric(dswide[i, "by"])-1) + 
-      betaGender * (as.numeric(dswide[i, "gender"])-1)
+      betaGender * (as.numeric(dswide[i, "gender"])-1) + betaAge * dswide[i, "age"]
     Dthetabar = Dthetabar + dmvnorm(x = dswide_y[i,], 
                               mean = randomPartMean + fixedPartMean, 
                               sigma = diag(nrep)*errVariance, log = T)
@@ -185,6 +191,7 @@ calculateDIC5 = function(mcmcfit){
   randSigma = getRandSigma(mcmcfit, summaryFuncName)
   betaBy = summaryFunc(mcmcfit[[1]][,"betaBy"])
   betaGender = summaryFunc(mcmcfit[[1]][,"betaGender"])
+  betaAge = summaryFunc(mcmcfit[[1]][,"betaAge"])
   errVariance = summaryFunc(1/mcmcfit[[1]][,"errPrecision"])
   allocations = getAllocations(mcmcfit, summaryFuncName)
   
@@ -192,7 +199,7 @@ calculateDIC5 = function(mcmcfit){
   for(i in 1:nsubjects){
     randomPartMean = randComp[i,1] + randComp[i,2]*time
     fixedPartMean = betaBy * (as.numeric(dswide[i, "by"])-1) + 
-      betaGender * (as.numeric(dswide[i, "gender"])-1)
+      betaGender * (as.numeric(dswide[i, "gender"])-1) + betaAge * dswide[i, "age"]
     Dthetabar = Dthetabar + log(eta[allocations[i]])+
       dmvnorm(x = dswide_y[i,],
               mean = randomPartMean + fixedPartMean, 
@@ -223,6 +230,7 @@ calculateDIC4 = function(mcmcfit){
     randSigma = E_theta_givenY_Z[[k]]$randSigma
     betaBy = E_theta_givenY_Z[[k]]$betaBy
     betaGender = E_theta_givenY_Z[[k]]$betaGender
+    betaAge = E_theta_givenY_Z[[k]]$betaAge
     errVariance = E_theta_givenY_Z[[k]]$errVariance
 
     source("../common/extractFuncRandSlopeConditional.R")
@@ -233,7 +241,7 @@ calculateDIC4 = function(mcmcfit){
     for(i in 1:nsubjects){
       randomPartMean = randComp[i,1] + randComp[i,2]*time
        fixedPartMean = betaBy * (as.numeric(dswide[i, "by"])-1) + 
-         betaGender * (as.numeric(dswide[i, "gender"])-1)
+         betaGender * (as.numeric(dswide[i, "gender"])-1) + betaAge*dswide[i, "age"]
        Dthetabar = Dthetabar + log(eta[allocations[i]])+
          dmvnorm(x = dswide_y[i,], 
                  mean = randomPartMean + fixedPartMean, 
@@ -269,7 +277,7 @@ calculate_E_theta_givenY_Z = function(mcmcfit){
     randmu = rep(list(c(0,0)), ncomponents)
     randSigma=rep(list(diag(2)),ncomponents)
     
-    randCompPerGroup = lapply(1:ncomponents, function(x){randComp[allocations==x,]})
+    randCompPerGroup = lapply(1:ncomponents, function(x){matrix(randComp[allocations==x,], ncol=2)})
     
     for(j in 1:ncomponents){
       if(freqPerGroup[j]>0){
@@ -282,6 +290,7 @@ calculate_E_theta_givenY_Z = function(mcmcfit){
     dstime = ds$time
     dsgender = as.numeric(ds$gender)-1
     dsby = as.numeric(ds$by)-1
+    dsage = ds$age
     
     #Beta for regression
     for(i in 1:nsubjects){
@@ -291,12 +300,12 @@ calculate_E_theta_givenY_Z = function(mcmcfit){
       }
     }
     
-    reg=lm(dsweight~dsgender + dsby + 0)
-    errVariance = summary(reg)$sigma^2 * ((nsubjects*nrep-2)/(nsubjects*nrep-2-2))
+    reg=lm(dsweight~dsgender + dsby + dsage + 0)
+    errVariance = summary(reg)$sigma^2 * ((nsubjects*nrep-3)/(nsubjects*nrep-3-2))
     
     list("eta"=eta, "randmu"=randmu, "randSigma"=randSigma, 
          "betaBy"=reg$coefficients["dsby"], 
-         "betaGender"=reg$coefficients["dsgender"], "errVariance"=errVariance)
+         "betaGender"=reg$coefficients["dsgender"], "betaAge"=reg$coefficients["dsage"], "errVariance"=errVariance)
   }
   
   return(theta_givenY_Z)
@@ -317,6 +326,8 @@ calculateCompleteMeanPostDeviance=function(mcmcfit){
     eta = getEta(mcmcfit, mcmcIterNum = k)
     betaBy = mcmcfit[[1]][k,"betaBy"]
     betaGender = mcmcfit[[1]][k,"betaGender"]
+    betaAge = mcmcfit[[1]][k,"betaAge"]
+    
     randComp = getRandomComp(mcmcfit, mcmcIterNum = k)
     randmu = getRandMu(mcmcfit, mcmcIterNum = k)
     errVariance = 1/mcmcfit[[1]][k,"errPrecision"]
@@ -327,7 +338,7 @@ calculateCompleteMeanPostDeviance=function(mcmcfit){
     for(i in 1:nsubjects){
       randomPartMean = randComp[i,1] + randComp[i,2]*time
       fixedPartMean = betaBy * (as.numeric(dswide[i, "by"])-1) + 
-        betaGender * (as.numeric(dswide[i, "gender"])-1)
+        betaGender * (as.numeric(dswide[i, "gender"])-1) + betaAge * dswide[i, "age"]
       
       Dtheta = Dtheta + log(eta[allocations[i]]) + 
         dmvnorm(x = dswide_y[i,], 

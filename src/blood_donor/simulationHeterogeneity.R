@@ -8,6 +8,7 @@ library(doParallel)
 library(beepr)
 library(MASS)
 library(reshape2)
+library(corrplot)
 
 registerDoParallel(cores=8)
 
@@ -15,16 +16,15 @@ registerDoParallel(cores=8)
 source("datacleaning.R")
 
 source("fitModelRandSlopeConditional.R")
-source("../common/generateDataRandSlope.R")
-source("createModelRandSlopeConditional.R")
+source("createModel.R")
 source("../common/extractFuncRandSlopeConditional.R")
 source("DIC_functions.R")
 source("bf.R")
 
 numchains = 1
-niter = 30000
-nthin=30
-nburnin=5000
+niter = 100000
+nthin=100
+nburnin=10000
 
 ncomponents=3
 if(ncomponents==1){
@@ -104,7 +104,7 @@ plot(running.mean(mcmcfit[[1]][,"randSigma[1,1,1]"], binwidth = 2))
 
 ggs_autocorrelation(ggsobject, "beta")
 ggs_autocorrelation(ggsobject, "Precision")
-ggs_autocorrelation(ggsobject, "randMuMean")
+ggs_autocorrelation(ggsobject, "randmu")
 ggs_autocorrelation(ggsobject, "Eta")
 
 #dont attempt ggs_pairs on entire object

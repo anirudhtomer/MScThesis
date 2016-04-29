@@ -1,6 +1,6 @@
 obsCovMatrix =  var(splaash1)
 priorDf = 3
-posteriorScale = solve(solve(diag(2)) + obsCovMatrix*59 + 0.001*meanSplaash1%*%t(meanSplaash1))
+posteriorScale = solve(solve(diag(2)) + obsCovMatrix*59)
 posteriordf = priorDf + 60
 
 var1 = numeric()
@@ -8,8 +8,8 @@ var2 = numeric()
 cov = numeric()
 
 for(i in 1:1000){
-  posteriorPrecisionSample = rWishart(n=1, posteriordf, posteriorScale)[,,1]
-  posteriorVarianceSample  = solve(posteriorPrecisionSample)
+  posteriorPrecisionSample = rwish(wishartPostDf[1], wishartPosteriorScale[[1]])
+  posteriorVarianceSample  = (posteriorPrecisionSample)
   var1[i] = posteriorVarianceSample[1,1]
   var2[i] = posteriorVarianceSample[2,2]
   cov[i] = posteriorVarianceSample[2,1]

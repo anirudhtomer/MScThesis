@@ -42,26 +42,31 @@ runJagsModel = function(datanodes, initialValues, stochasticNodes,jagsmodel, nco
 fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3){
   
   dirichParm = rep(1, ncomp)
-  randComp=extractRandomComp(viaReg = T)
+  randComp=extractRandomComp()
   quantiles = seq(1/(ncomp+1),ncomp/(ncomp+1),length.out = ncomp)
-  randIntQuantiles = quantile(randComp[,1], probs = quantiles)
-  randSlopeQuantiles = quantile(randComp[,2], probs = quantiles)
-  reg=lm(weight~gender+by+age+time,data=ds)
+  randIntQuantiles = quantile(randComp[!is.na(randComp[,1]),1], probs = quantiles)
+  randSlopeQuantiles = quantile(randComp[!is.na(randComp[,2]),2], probs = quantiles)
+  reg=lm(Hb~Season+Donate+Age+TSPD+donationLast2Years,data=ds)
   
-  datanodes = list("dsweight"=ds$weight,"dsby"=as.numeric(ds$by)-1, "dsage"=ds$age,
-                   "dsgender"=as.numeric(ds$gender)-1,"dstime"=ds$time,
-                   "nsubjects"=nsubjects,"nrep"=nrep, "gammaShapeRate"=gammaShapeRate, "betaMu"=betaMu,
+  datanodes = list("dsHb"=ds$Hb,"dsDonate"=as.numeric(ds$Donate), "dsAge"=ds$Age, "dsfirstAge"=ds$firstAge,
+                   "dsSeason"=as.numeric(ds$Season)-1,"dsTSPD"=ds$TSPD, "dsDonationLast2Years"=ds$donationLast2Years,
+                   "dsAgeSeason"=ds$ageSeason, "dsTSPDDonate"=ds$TSPDdonate, "dsTSPDSeason"=ds$TSPDSeason,
+                   "dsDonateLast2TSPD"=ds$donateLast2TSPD, "dsDonateLast2Donate"=ds$donateLast2Donate, 
+                   "dsDonateLast2Season"=ds$donateLast2Season,"dsDonateLast2Square"=ds$donateLast2Square,
+                   "nsubjects"=nsubjects,"numHb"=numHb, "cumsumHb"=cumsumHb, "gammaShapeRate"=gammaShapeRate, "betaMu"=betaMu,
                    "betaTau"=betaTau, "betaMuMult"=rep(betaMu,2),"ncomponents"=ncomp, "betaTauMult"=diag(2),
-                  "dirichParm"=dirichParm, "wishartPriorScale"=wishartPriorScale, "wishartPriorDf"=wishartPriorDf)
+                   "dirichParm"=dirichParm, "wishartPriorScale"=wishartPriorScale, "wishartPriorDf"=wishartPriorDf)
   
-  initialValues = list("betaGender"=c(reg$coefficients[2]),"betaBy"=c(reg$coefficients[3]), "betaAge"=c(reg$coefficients[4]),
-                       "errPrecision"=c(1), 
-                       #"precisionIntercept"=rep(1, ncomp), "precisionSlope"=rep(1, ncomp),"rho"=rep(0, ncomp),
-                       "Eta"=rep(1/ncomp, ncomp),
+  initialValues = list("betaSeason"=c(reg$coefficients[2]), "betaDonate"=c(reg$coefficients[3]),"betaAge"=c(reg$coefficients[4]),
+                       "betaTSPD"=c(reg$coefficients[5]),"betaDonateLast2Years"=c(reg$coefficients[6]),
+                       "errPrecision"=c(1), "Eta"=rep(1/ncomp, ncomp),
                        "S"=initS(nsubjects, ncomp),
                        "randmu_unordered"=cbind(randIntQuantiles, randSlopeQuantiles))
   
-  stochasticNodes = c("betaGender","betaBy", "betaAge", "errPrecision", "randSigma","randPrecision",
+  stochasticNodes = c("betaAge","betaSeason", "betaDonate", "betaTSPD", 
+                      "betaAgeSeason", "betaTSPDDonate", "betaTSPDSeason",
+                      "betaDonateLast2TSPD", "betaDonateLast2Donate", "betaDonateLast2Season", "betaDonateLast2Square",
+                      "errPrecision", "randSigma","randPrecision",
                       "randmu", "randomComp", "Eta", "S", "precisionIntercept","precisionSlope", "rho")
   
   
@@ -131,7 +136,7 @@ fitModel_errPrecision = function(niter=10000, nthin=50, nburnin=200, nchains=1, 
 }
 
 fitModel_beta = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, randmu_max, 
-                                 randPrecision_max, errPrecision_max){
+                         randPrecision_max, errPrecision_max){
   
   dirichParm = rep(1, ncomp)
   reg=lm(weight~gender+by+age+time,data=ds)
@@ -160,7 +165,7 @@ fitModel_beta = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmode
 }
 
 fitModel_eta = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, randmu_max, 
-                         randPrecision_max, errPrecision_max, betaBy_max, betaGender_max, betaAge_max){
+                        randPrecision_max, errPrecision_max, betaBy_max, betaGender_max, betaAge_max){
   
   dirichParm = rep(1, ncomp)
   

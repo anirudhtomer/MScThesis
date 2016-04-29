@@ -4,7 +4,7 @@ blood_donor = blood_donor[,-c(8,9)]
 blood_donor$Season = as.factor(ifelse(blood_donor$Season==3 | blood_donor$Season==0,"Cold","Hot"))
 blood_donor$Donate = ifelse(blood_donor$Donate==0, FALSE,TRUE)
 blood_donor$firstAge = rep(0, nrow(blood_donor))
-blood_donor$donationLastTwoYears = rep(0, nrow(blood_donor))
+blood_donor$donationLast2Years = rep(0, nrow(blood_donor))
 
 #Age, Id, (Donation date, TSFV), Season, Donate are all available
 
@@ -25,6 +25,11 @@ ds = blood_donor[!(blood_donor$Id %in% rejectIdList),]
 
 #Process the selected blood donors
 uniqueIds = unique(ds$Id)
+
+randomSample = sample(1:1595, size = 200, replace = F)
+uniqueIds = uniqueIds[randomSample]
+
+ds = ds[ds$Id %in% uniqueIds, ]
 
 timePerSubject = list()
 agePerSubject = list()
@@ -51,10 +56,21 @@ for(i in 1:nsubjects){
       donationLast2years[j] = sum(temp$Donate[(j-1):k])
     }
   }
-  ds[ds$Id==id,]$donationLastTwoYears = donationLast2years
+  ds[ds$Id==id,]$donationLast2Years = donationLast2years/100
   
   donationLast2YearsPerSubject[[paste(id)]] = donationLast2years
 }
+
+ds$TSPDdonate = ds$TSPD*ds$Donate
+ds$ageSeason = ds$Age*(as.numeric(ds$Season)-1)
+ds$TSPDSeason = ds$TSPD*(as.numeric(ds$Season)-1)
+ds$donateLast2TSPD = ds$TSPD*ds$donationLast2Years
+ds$donateLast2Donate = ds$Donate*ds$donationLast2Years
+ds$donateLast2Season = (as.numeric(ds$Season)-1)*ds$donationLast2Years
+ds$donateLast2Square = ds$donationLast2Years^2
+
+numHb = table(ds$Id)
+cumsumHb = c(0, cumsum(numHb))
 
 write.csv(ds[,-2], file = "dataset.csv", row.names = F)
 
