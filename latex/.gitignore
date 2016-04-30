@@ -5,4 +5,5 @@
 *.blg
 *.log
 *.xml
+*.gz
 thesis-blx.bib
