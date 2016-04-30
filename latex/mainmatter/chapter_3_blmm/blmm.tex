@@ -5,27 +5,28 @@
 
 \section{Introduction to linear mixed model}
 \label{sec : lmm}
-A linear mixed effects model, also known as linear mixed model(LMM) is a statistical model for data which is hierarchical in structure. The specialty of the models is that apart from the fixed effects, they also model the correlation between the observations falling in the same group at a certain level in the hierarchy. The correlation is modeled with the help of random effects and the response is modeled as a linear function of both fixed and random effects.\\
+A linear mixed effects model, also known as linear mixed model(LMM) is a statistical model for data which is hierarchical in structure. The specialty of the models is that apart from the fixed effects, they also model the correlation between the observations falling in the same group at a certain level in the hierarchy. The correlation is modeled using the random effects and the response is modeled as a linear function of both fixed and random effects.\\
 
-There are many synonymous terminologies for data sets which are hierarchical in nature albeit with subtle nuances differentiating them. In this thesis our focus will be on Longitudinal data sets. A longitudinal data set is the one where multiple observations are collected from subjects at different points in time. For e.g. measurement of Hemoglobin of 20 patients with observations taken every month for a period of 24 months. Since the observations collected from a subject will be correlated a linear model will not be useful because of the restrictions it imposes on the covariance structure.\\
-
-\todo[inline]{Should I mention that Laird and Ware proposed the model?}
+There are many synonymous terminologies for data sets which are hierarchical in nature albeit with subtle nuances differentiating them. In this thesis our focus will be on Longitudinal data sets. A longitudinal data set is the one where multiple observations are collected from subjects at different points in time. For e.g. measurement of Hemoglobin of 20 patients with observations taken every month for a period of 24 months. Since the observations collected from a subject will be correlated a linear model will not be useful because of the restrictions it imposes on the covariance structure.
 
 \subsection{LMM definition}
 \label{subsec : lmm_definition}
-Following the notations from \citet{lesaffre_bayesian_2012}, the LMM for the observations of the $i^{th}$ subject among the $n$ subjects is given by\\
+Following the notations from \citet{lesaffre_bayesian_2012}, the LMM for the observations of the $i^{th}$ subject among the $n$ subjects is given by
 
-$$\boldsymbol{y_i} = \boldsymbol{X}_{i}\boldsymbol{\beta} + \boldsymbol{Z}_{i}\boldsymbol{b}_{i} + \boldsymbol{\varepsilon}_{i}$$\\
+\begin{equation}
+\label{eq : lmm_definition}
+\boldsymbol{y}_i = \boldsymbol{X}_{i}\boldsymbol{\beta} + \boldsymbol{Z}_{i}\boldsymbol{b}_{i} + \boldsymbol{\varepsilon}_{i}
+\end{equation}
 
 where $1 \le i \le n$,\\
 $\boldsymbol{y}_i = {(y_{i1}, y_{i2}, \ldots, y_{im_i})}^T$ is a vector of observations for the $i^{th}$ subject taken at $m_i$ time points,\\
 $\boldsymbol{X}_i = {(\boldsymbol{x}_{i1}^T, \boldsymbol{x}_{i2}^T, \ldots, \boldsymbol{x}_{im_i}^T)}^T$ is the $m_i \times (d+1)$ design matrix for the $i^{th}$ subject,\\
 $\boldsymbol{\beta} = {(\beta_0, \beta_1, \ldots, \beta_d)}^T$ is a $(d+1) \times 1$ vector of fixed effects with $\beta_0$ being the intercept,\\
-$\boldsymbol{Z}_i = {(\boldsymbol{z}_{i1}^T, \boldsymbol{z}_{i2}^T, \ldots, \boldsymbol{z}_{im_i}^T)}^T$ is the $m_i \times q$ design matrix of covariates varying for a subject at each observation,\\
+$\boldsymbol{Z}_i = {(\boldsymbol{z}_{i1}^T, \boldsymbol{z}_{i2}^T, \ldots, \boldsymbol{z}_{im_i}^T)}^T$ is the $m_i \times q$ design matrix of covariates multiplying the random effects,\\
 $\boldsymbol{b}_i = {(b_{0i}, b_{1i}, \ldots, b_{(q-1)i})}^T$ is a $q \times 1$ vector of random effects with $b_{0i}$ being the random intercept. The random effects $\boldsymbol{b}_i \sim N_q(\boldsymbol{0}, G)$ with $G$ being the $q \times q$ covariance matrix,\\ 
 $\boldsymbol{\varepsilon}_{i} = {(\varepsilon_{i1}, \varepsilon_{i2}, \ldots, \varepsilon_{im_i})}^T$ is a $m_i \times 1$ vector of measurement errors. The errors $\boldsymbol{\varepsilon}_{i} \sim N_{m_i}(\boldsymbol{0}, R_i)$ with $R_i$ being the $(m_i \times m_i)$ covariance matrix of errors,\\
 
-The errors $\boldsymbol{\varepsilon}_{i}$ and the random effects $\boldsymbol{b_i}$ are assumed to be independent. $R_i$ is usually a diagonal matrix of the form $\sigma^2I_{m_i}$. While one might only model the correlation between the observations of a subject using random effects, it is also possible to model the serial correlation component. For this and an in depth coverage of LMM we refer the reader to \citet{verbeke_linear_2009}.\\
+The errors $\boldsymbol{\varepsilon}_{i}$ and the random effects $\boldsymbol{b_i}$ are assumed to be independent. $R_i$ is usually a diagonal matrix of the form $\sigma^2I_{m_i}$. While one might only model the correlation between the observations of a subject using random effects, it is also possible to model the serial correlation component.
 
 \section{Motivation for Bayesian linear mixed model}
 \label{sec : blmm}
@@ -48,19 +49,43 @@ As we saw above the random effects are assumed to be multivariate normally distr
 	\label{fig : random_slope_dummy_data}
 \end{figure}
 
-In a LMM is quite common to use histogram of Empirical Bayes estimates of random effects to detect groups of individuals. However \citet{verbeke_linear_1996} have shown that if the prior is misspecified(for e.g. if in our example we use a single normal distribution), then it is possible that the histogram of estimates of random effects will be shrunk towards the prior distribution. This means that in our case we may not see a histogram with two distinct modes. The model where a mixture of Gaussian components were used to specify the random effects distribution is called a Heterogeneity model. Various applications of the heterogeneity model can be found in \citet[pg. 264]{fruhwirth-schnatter_finite_2013}.\\
+In a LMM is quite common to use histogram of Empirical Bayes estimates of random effects to detect groups of individuals. However \citet{verbeke_linear_1996} have shown that if the prior is misspecified(for e.g. if in our example we use a univariate normal distribution), then the histogram of estimates of random effects will be shrunk towards the prior distribution. Thus it would be impossible to classify the subjects into different categories based on empirical bayes estimates of random effects as they are incorrect. A solution to this problem is using a mixture of Gaussian components for random effects distribution. Such a linear mixed model is termed as a Heterogeneity model.
 
-\subsection{Mathematical notation}
-Since the random effects are having a Gaussian mixture distribution we will use the following notation to express it mathematically.\\
+\subsection{Bayesian heterogeneity model}
+\label{subsec : bhtge}
+The formal definition of a Bayesian heterogeneity model can be given by extending the Bayesian linear mixed model definition given in section \ref{sec : blmm}. Since, now the random effects have a Gaussian mixture distribution we will use the following notation to express the distribution mathematically.
 
 $$\boldsymbol{b}_i \sim \sum_{k=1}^{K} \eta_k N_q(\boldsymbol{b}_k^C, G_k)$$\\
-where $\boldsymbol{b}_k^C$ and $G_k$ are the mean vector and covariance matrices for the $k^{th}$ component in the mixture distribution respectively. The vector $\boldsymbol{\eta} = (\eta_1, \eta_2, \ldots, \eta_K)$ is the weight distribution for the component densities. Since we are following the bayesian paradigm, in addition to prior distribution for $\boldsymbol{\beta}$ and $\sigma^2$ we will now have prior for ($\boldsymbol{b}_1^C, \boldsymbol{b}_2^C, \ldots, \boldsymbol{b}_K^C, \boldsymbol{\eta}, G_1, G_2, \ldots, G_K$).
+where $\boldsymbol{b}_k^C$ and $G_k$ are the mean vector and covariance matrices for the $k^{th}$ component in the mixture distribution respectively. The vector $\boldsymbol{\eta} = (\eta_1, \eta_2, \ldots, \eta_K)$ is the weight distribution for the component densities. The vector $\boldsymbol{S}=(S_1, S_2, ..., S_n)$ represents the allocation vector for all of the subjects. Since we are following the bayesian paradigm, in addition to prior distribution for $\boldsymbol{\beta}$ and $\sigma^2$ we also have prior for ($\boldsymbol{b}_1^C, \boldsymbol{b}_2^C, \ldots, \boldsymbol{b}_K^C, \boldsymbol{\eta}, G_1, G_2, \ldots, G_K$).
 
-\section{Parametrization in BLMM}
-The random effects $\boldsymbol{b}_i$ in a mixed model could be seen as random deviations from the fixed effects($\boldsymbol{\beta}$) with a mean $\boldsymbol{0}$. For a longitudinal data set, it means that the overall effect of a covariate like time for a subject should be the sum of both fixed and random effects. In this case matrices $\boldsymbol{X}$ and $\boldsymbol{Z}$ both share columns corresponding to the variable time. To enforce the mean $\boldsymbol{0}$ on the random effects in a mixture distribution the following condition should be satisfied.\\
+\section{Estimation of parameters in the Bayesian heterogeneity model}
+In this section we will discuss some of the challenges in Bayesian estimation of parameters in the Bayesian heterogeneity model. We will also discuss the approaches we used to deal with them in this thesis.
 
-$$E(\boldsymbol{b}_i | \boldsymbol{\phi}) = \sum_{k=1}^{K} \eta_k N_q(\boldsymbol{b}_k^C, G_k) = 0$$,\\
-where $\boldsymbol{\phi}$ is the vector ($\boldsymbol{b}_1^C, \boldsymbol{b}_2^C, \ldots, \boldsymbol{b}_K^C, \boldsymbol{\eta}, G_1, G_2, \ldots, G_K$). This further means that $E(\boldsymbol{y}_i | \boldsymbol{\phi}) = \boldsymbol{X}_{i}\boldsymbol{\beta}$. This parametrization which was also used in the original paper on Heterogeneity model \citep{verbeke_linear_1996} is called noncentralized parametrization. The centralized parametrization assumes that the random effects are not deviations from the fixed effects and are centred around a non zero mean. The choice of parametrization has an effect on the rate of convergence while estimating parameters using MCMC. The non-centralized parametrization could be used when within subject heterogeneity is considerably smaller than the heterogeneity due to random effects. Otherwise a centralized parametrization is preferred. We refer the reader to \citet{fruhwirth-schnatter_bayesian_2004} for further details.
+\subsection{Marginal vs. Hierarchical model}
+Suppose that in our heterogeneity model we know the alloation vector $S_i$ for each subject. Then conditional on knowing $S_i=k$ the following LMM equation has a hierarchical interpretation.
+
+$$\boldsymbol{y}_i|\boldsymbol{b}_{i} \sim N(\boldsymbol{X}_{i}\boldsymbol{\beta} + \boldsymbol{Z}_{i}\boldsymbol{b}_{i},\boldsymbol{\varepsilon}_{i}), 
+\boldsymbol{\varepsilon}_{i} \sim N_{m_i}(\boldsymbol{0}, R_i)$$
+
+One can however integrate out the random effects $\boldsymbol{b}_{i}$ and obtain the corresponding marginal Bayesian heterogeneity model,
+
+$$\boldsymbol{y}_i \sim N(\boldsymbol{X}_{i}\boldsymbol{\beta} + \boldsymbol{Z}_{i}\boldsymbol{b}_k^C, \boldsymbol{\varepsilon}_{i}^*), 
+\boldsymbol{\varepsilon}_{i} \sim N_{m_i}(\boldsymbol{0}, \boldsymbol{Z}_{i}G_k\boldsymbol{Z}_{i}^T+ R_i)$$
+
+The marginal model is recommended by \citet{fruhwirth-schnatter_bayesian_2004} for good mixing of chains, and while doing the simulation study(presented in chapter \ref{ch : simulation_study}) we found that claim to be true. However the Marginal model took quite a long time to for each iteration. Secondly it did not give posterior estimates of the random effects $\boldsymbol{b}_i$ which were required for calculation of certain definitions of DIC (discussed in chapter \ref{ch : model_selection}). Besides we found that a model with hierarchical centering had as much autocorrelated estimates as the marginal model and took less time for each iteration.
+
+\subsection{Hierarchical centering}
+The random effects $\boldsymbol{b}_i$ in a mixed model could be seen as random deviations from the fixed effects($\boldsymbol{\beta}$) with a mean $\boldsymbol{0}$. For a longitudinal data set, it means that the overall effect of a covariate like time for a subject should be the sum of both fixed and random effects. In this case matrices $\boldsymbol{X}$ and $\boldsymbol{Z}$ both share columns corresponding to the variable time. To enforce the mean $\boldsymbol{0}$ on the random effects in a mixture distribution the following condition should be satisfied.
+
+\begin{equation}
+\label{eq : non_centred_constraint}
+E(\boldsymbol{b}_i | \boldsymbol{\phi}) = \sum_{k=1}^{K} \eta_k N_q(\boldsymbol{b}_k^C, G_k) = 0
+\end{equation}
+
+where $\boldsymbol{\phi}$ is the vector ($\boldsymbol{b}_1^C, \boldsymbol{b}_2^C, \ldots, \boldsymbol{b}_K^C, \boldsymbol{\eta}, G_1, G_2, \ldots, G_K$). This further means that $E(\boldsymbol{y}_i | \boldsymbol{\phi}) = \boldsymbol{X}_{i}\boldsymbol{\beta}$. This parametrization, which was also used in the original paper on Heterogeneity model \citep{verbeke_linear_1996} is called noncentralized parametrization. The centralized parametrization assumes that the random effects are not deviations from the fixed effects and are centred around a non zero mean.
+The choice of parametrization has an effect on the rate of convergence while estimating parameters using MCMC. While doing the simulation study we figured out that imposing the constraint in equation \ref{eq : non_centred_constraint} drastically slows the convergence as well increases the autocorrelation in parameter estimates. Thus, in this thesis we have only used hierarchically centred parametrization.
+
+\subsection{Label Switching}
 
 \section{Likelihood: Complete data vs Mixture}
 The likelihood function in a mixture distribution depends on how much we know about the data. If we know both the data and the allocation vector $\boldsymbol{S}$ then the following likelihood function of parameters is called a complete data likelihood function.\\
@@ -84,40 +109,3 @@ It is interesting that if our prior for the parameters was not vague, but exactl
 A mixture model will also be unidentified if we have an empty component or two components with the same parameters. Suppose the true number of components is $K^{true}$ and we fit $K = K^{true} + 1$ components. In the MCMC sampler suppose one of the components is assigned any observation. Thus the posterior for the parameters will remain the same as the prior. Assuming that the prior for weight distribution $\boldsymbol{\eta}$was a Dirichlet prior $\mathcal{D}(0.5, 0.5, \ldots, 0.5)$, then we will have a posterior for $\boldsymbol{\eta}$ such that the $K^{th}$ component will always have an almost 0 weight in the mixture distribution. This means that at the end of MCMC sampling the component density's posterior will be same as its prior and no observations will be allocated to the component. In such cases the true number of components could be estimated by the count of components with non zero number of allocations. However this situation could be avoided with a stronger prior on the weight distribution which forces the posterior distribution of $\boldsymbol{\eta}$ to be such that no components are empty at the end of MCMC sampling. Identification of number of components in such case is explained in the next section.\\
 
 \textcolor{red}{Gosh! I should explain it in terms of pulling away the posterior eta from the boundary where components of eta are linearly dependent.}. 
-
-\todo[inline]{Should I also discuss the choice of prior?}
-
-\section{Choosing the right number of mixture components}
-In most cases we do not know the right number of mixture components in advance unless we have some expert knowledge available or we know them from a previous/similar study. As part of this thesis we will compare many of the existing methods for finding the right number of mixture components.\\
-
-\subsection{Information criteria based methods}
-Information criteria are used to select models with parimony and good predictive power. Some of information criteria proposed in the literature are AIC proposed by Akaike, BIC (a minor modification of Schwarz's original criteria), DIC. While AIC and BIC are primarily used in frequentist statistics as they use point estimates of the parameters, DIC follows a more bayesian approach. Following are the definitions of the three criteria:\\
-
-\begin{itemize}
-\item $AIC = -2log(p(\boldsymbol{y}|\boldsymbol{\hat{\theta}})) + 2p$
-\item $BIC = -2log(p(\boldsymbol{y}|\boldsymbol{\hat{\theta}})) + log(N)p$
-\item $DIC = -2log(p(\boldsymbol{y}|\boldsymbol{\bar{\theta}})) + 2p_{DIC}$\\
-where $\boldsymbol{\bar{\theta}} = E(\boldsymbol{\theta}_{post}|\boldsymbol{y})$,\\
-$p_{DIC} = -2(E(log(p(\boldsymbol{y}|\boldsymbol{\theta}_{post}))) - log(p(\boldsymbol{y}|\boldsymbol{\bar{\theta}})))$ is the penalty for model complexity.
-\end{itemize}
-
-It is interesting to mention that the hierarchical nature of the mixture model implies a marginal model as well, which can be found by integrating out the random effects. \citet{verbeke_linear_1996} in their paper on heterogeneity model estimate the fixed effects and all covariance components using this marginal model. In our case y has a marginal model given by:\\
-
-$$\boldsymbol{y_i} \sim \sum_{k=1}^{K} \eta_k N(\boldsymbol{X}_{i}\boldsymbol{\beta} + \boldsymbol{Z}_{i}\boldsymbol{b}_k^C,\boldsymbol{Z}_{i}G_{\boldsymbol{S}_i}\boldsymbol{Z}_{i}^T + R_i)$$\\
-
-If our likelihood function is based on the marginal model then DIC could be used to select models which have good predictive power for an observation which is not necessarily from a subject who is in the current study. The total number of terms which will be penalized by AIC is equal to $dim(\boldsymbol{\eta}) + dim(\boldsymbol{\beta}) + dim(\boldsymbol{b}_{1}^C) + \ldots + dim(\boldsymbol{b}_{K}^C) + dim(G_1) + \ldots + dim(G_K) + 1(for \sigma^2)$, where dim is the total number of elements in the vector or matrix. On the other hand if we stick to the hierarchical interpretation, then DIC could be used to select models which have good predictive power for an observation which has to be from the current set of subjects. The total number of terms which will be penalized by AIC is equal to $dim(\boldsymbol{\beta}) + dim(\boldsymbol{b}_1) + \ldots + dim(\boldsymbol{b}_n) + 1(for \sigma^2)$. A model.
-
-\subsection{Trans Dimensional Bayesian inference}
-To compare a set of competing models $\mathcal{M}_1, \mathcal{M}_2, \ldots, \mathcal{M}_{K_{max}}$ each with their own set of parameters $\boldsymbol{\nu}_1, \boldsymbol{\nu}_2, \ldots, \boldsymbol{\nu}_{K_{max}}$ trans dimensional MCMC methods can be used. For e.g. Product space MCMC methods try to simultaneously sample the posterior probability $p(\mathcal{M}_{k}, \boldsymbol{\nu}_1, \boldsymbol{\nu}_2, \ldots, \boldsymbol{\nu}_{K_{max}}, \boldsymbol{y}$ for all $K_{max}$ models. The idea is that during each run a model indicator $\mathcal{M}$ which could follow for e.g. a multinomial distribution, is sampled. Suppose the model indicator is $M=2$ then all the parameters $\boldsymbol{\nu_{2}}$ are sampled whereas parameters for other models are kept what they were. The marginal posterior probability $p(\mathcal{M}_k|\boldsymbol{y}$ of the $k^{th}$ model is found by integrating out the parameters from the joint posterior. These could be further compared to select one of the K models.\\
-
-\subsubsection{Marginal likelihood}
-The ratio of marginal posterior could also be expressed as a Bayes Factor (assuming the prior probabilities for both models are equal) which is a ratio of Marginal likelihoods $\dfrac{p(\boldsymbol{y}|\mathcal{M}_i}{p(\boldsymbol{y}|\mathcal{M}_j}$ for the models. 
-However \citet{johannes_berkhof_bayesian_2003} also suggest to use goodness of fit measures to be used along with Bayes factor. This because bayes factor is a relative measure. Relying on it completely could lead to selection of a model which is relatively better but overall does not provide a good fit. They also suggest using posterior predictive checks which is our next subsection.
-
-\subsection{Posterior predictive checks}
-The idea of the posterior predictive checks is to evaluate the model fit using simulations from the posterior predictive distribution(PPD) $p(\boldsymbol{\tilde{y}}|\boldsymbol{y}$. As an informal check one could sample 1000 values from the PPD 20 times and make 20 histograms to show the density. If the histograms do not match with the histogram of the original sample one could say that the model did not fit the data well.\\ 
-
-A formal way to do this is using Posterior predictive p-values(PPP) or Bayesian p-values. In the frequentist paradigm after fitting a model based on parameter $\hat{\theta}$ one could test the model using test statistic. Let us represent that test statistic value for original sample to be $T(\boldsymbol{y})$. Now based on the sampling distribution of $T(\boldsymbol{\tilde{y}})$ we could check the probability $P(T(\boldsymbol{\tilde{y}}) > T(\boldsymbol{y})$. In the bayesian paradigm the parameter $\theta$ has a posterior distribution and so we find the same probability like before albeit averaged over the entire posterior $p(\theta|\boldsymbol{y})$. A small PPP value indicates bad fit of model to the data. For a complete interpretation of this p-value we refer the readers to \citet{gelman_understanding_2012}.
-
-\subsection{Other methods}
-We will also explore other graphical methods or informal methods like method of moments in this thesis. For further reading on them we refer the reader to \citet[pg. 107-114]{fruhwirth-schnatter_finite_2013}

@@ -34,9 +34,9 @@ One of the biggest challenges while modeling a mixture density for a random vari
 
 While Maximum Likelihood based methods such as the EM algorithm could be used to deal with the above mentioned challenges, there are certain downsides to them. Firstly it is well known that 95\% confidence intervals of ML estimates are based on asymptotical normality of the estimators. Thus in case of small sample size, or small mixture weights the results will not be correct \citep[pg. 35]{fruhwirth-schnatter_finite_2013}. A Bayesian approach however is immune to these issues as the posterior distribution of parameters can be non normal. Secondly, in case of univariate and multivariate GMM, the maximum likelihood function,\\
 
-$$ p(\boldsymbol{y|\mu, \sigma^2, \eta}) = \prod_{i=1}^{N} (\sum_{k=1}^{K} f_N(y_i; \mu_k, \sigma^2_k) \eta_k)$$
+$$ p(\boldsymbol{y}|\boldsymbol{\mu}, \boldsymbol{\sigma^2}, \boldsymbol{\eta}) = \prod_{i=1}^{N} (\sum_{k=1}^{K} f_N(y_i; \mu_k, \sigma^2_k) \eta_k)$$
 
-is unbounded and has many spurious nodes \citep{kiefer_consistency_1956,day_estimating_1969}. A bayesian approach however, handles this problem more elegantly using priors for parameters ($\boldsymbol{\mu, \sigma^2}$), as shown by \cite[pg. 176]{fruhwirth-schnatter_finite_2013}.
+is unbounded and has many spurious nodes \citep{kiefer_consistency_1956,day_estimating_1969}. A bayesian approach however, handles this problem more elegantly using priors for parameters ($\boldsymbol{\mu}, \boldsymbol{\sigma^2}$), as shown by \cite[pg. 176]{fruhwirth-schnatter_finite_2013}.
 
 \subsection{Applications of mixture distribution}
 Mixture models have found usage in a variety of domains. Some of the examples are:
