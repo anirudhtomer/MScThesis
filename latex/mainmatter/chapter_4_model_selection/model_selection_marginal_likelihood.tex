@@ -38,20 +38,54 @@ Firstly $\log{L({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*|\boldsy
 \log{p({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*|\boldsymbol{y})} = 
 \sum_{k=1}^K{\log{p(G_k^*|\boldsymbol{y})}} + 
 \sum_{k=1}^K{\log{p({\boldsymbol{b}_k^C}^*|G_k^*, \boldsymbol{y})}} + 
-\log{p({\boldsymbol{\beta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, \boldsymbol{y})}\\
-+ \log{p({\sigma^2}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\boldsymbol{\beta}}^*, \boldsymbol{y})} + 
-\log{p({\boldsymbol{\eta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{y})}
+\log{p({\sigma^2}^*|G_k^*, {\boldsymbol{b}_k^C}^*, \boldsymbol{y})}\\
++ \log{p({\boldsymbol{\beta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\sigma^2}^*, \boldsymbol{y})} + 
+\log{p({\boldsymbol{\eta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\sigma^2}^*,{\boldsymbol{\beta}}^*, \boldsymbol{y})}
 \end{multline}
 
-An interesting problem one faces in such an expansion is that the posteriors may not be available as well known density. For e.g. we began with choosing indepdent gamma priors for precision parameter of random effects and uniform prior for correlation. However the posterior density was not well known. One could try to fit it with a wrapper density however as we will show ahead this is practically improbable. An obvious alternative is to choose conjugate priors in such situation. However as we mentioned in section \ref{subsec : choice_priors} the joint conjugate prior in the case of unknown mean and precision matrix is a Normal-Wishart-Prior and the joint posterior is a Normal-Wishart-Posterior. Although one does not use them in practice while using BUGS family of software, the problem of posterior being from a unknown family remains the same. \citet{chib_marginal_1995} suggest using the Rao-Blackwellization method to solve this problem. For e.g. the Rao-Blackwellized estimate of $p(G_k^*|\boldsymbol{y})$ is given by
+An interesting problem one faces in such an expansion is that the posteriors may not be available as well known density. For e.g. we began with choosing indepdent gamma priors for precision parameters of random effects and uniform prior for correlation. However the posterior density was not well known. One could try to fit it with a wrapper density however as we will show ahead this is practically improbable. An obvious alternative is to choose conjugate priors in such situation. However as we mentioned in section \ref{subsec : choice_priors} the joint conjugate prior in the case of unknown mean and precision matrix is a Normal-Wishart-Prior and the joint posterior is a Normal-Wishart-Posterior. Although one does not use them in practice while using BUGS family of software, the problem of posterior being from a unknown family remains the same. \citet{chib_marginal_1995} suggested using the Rao-Blackwellization method to solve this problem. For e.g. the Rao-Blackwellized estimate of $p(G_k^*|\boldsymbol{y})$ is given by
 
 \begin{equation}
 \label{eq : rao_blackwellization_wishart}
 \begin{split}
-\prod_{k=1}^{K} p(G_k^*|\boldsymbol{y}) & = \int \prod_{k=1}^{K} p(G_k^*| \boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}, \boldsymbol{b}_k^C) p(\boldsymbol{b}_1^C, \boldsymbol{b}_2^C,..., \boldsymbol{b}_K^C,\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}) 
+\prod_{k=1}^K p(G_k^*|\boldsymbol{y}) & = \int \prod_{k=1}^{K} p(G_k^*| \boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}, \boldsymbol{b}_k^C) p(\boldsymbol{b}_1^C, \boldsymbol{b}_2^C,..., \boldsymbol{b}_K^C,\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}) 
 \diff{\boldsymbol{b}_1^C} \diff{\boldsymbol{b}_2^C} ... \diff{\boldsymbol{b}_K^C} \diff{\boldsymbol{b}} \diff{\boldsymbol{S}}\\
-& \approx \frac 1 m \sum_{l=1}^m \prod_{k=1}^{K} p(G_k^*| \boldsymbol{y}, \boldsymbol{b}^{(l)}, \boldsymbol{S}^{(l)}, {\boldsymbol{b}_k^C}^{(l)})
+& \approx \frac 1 m \sum_{l=1}^m \prod_{k=1}^{K} p(G_k^*| \boldsymbol{y}, \boldsymbol{b}^{(l)}, \boldsymbol{S}^{(l)}, {\boldsymbol{b}_k^C}^{(l)
+})\\
+& \approx \frac 1 m \sum_{l=1}^m \prod_{k=1}^{K} f_{\mathcal{W}^{-1}}(G_k^*; n_k^{(l)}+n_0, \Psi + \sum_{i=1}^{n_k^{(l)}}(\boldsymbol{b_i}^{(l)} - {\boldsymbol{b}_k^C}^{(l)})(\boldsymbol{b_i}^{(l)} - {\boldsymbol{b}_k^C}^{(l)})^T)
 \end{split}
 \end{equation}
 
-The approximation is \ref{eq : rao_blackwellization_wishart} is done by approximating the integral with the samples obtained from the MCMC iterations.
+where, $n_k^{(l)}$ are number of subjects classified under component $k$ in iteration $l$and $(n_0, \Psi)$ are the parameters for the inverse wishart distribution specified as prior for the variance covariance matrix of the component densities. The approximation in \ref{eq : rao_blackwellization_wishart} is done by approximating the integral with the samples obtained from the MCMC iterations. As we can see the benefit of this approach is that $p(G_k^*| \boldsymbol{y}, \boldsymbol{b}^{(l)}, \boldsymbol{S}^{(l)}, {\boldsymbol{b}_k^C}^{(l)})$ is the well known inverse wishart density. However in cases when this posterior is not well known, then given that the large number of MCMC iterations one does, it is not possible to manually check and fit wrapper densities to posterior densities. The use kernel density estimation procedures can also be dismissed as they require significant computational power. It is because of these reasons we avoided calculation of Bayes factor in the case where we took indepdent gamma priors for precision of random effects and uniform prior for correlation.\\
+
+Proceeding further with the Rao-Blackwellization procedure one can obtain the following approximations for the other parameters.
+
+\begin{equation}
+\prod_{k=1}^K p({\boldsymbol{b}_k^C}^*|G_k^*, \boldsymbol{y}) \approx 
+\frac 1 m \sum_{l=1}^m \prod_{k=1}^{K} f_N({\boldsymbol{b}_k^C}^*; (G_0^{-1} + n_k^{(l)} {G_k^*}^{-1})^{-1} (G_0^{-1}\boldsymbol{\mu}_0 + n_k^{(l)} {G_k^*}^{-1} \bar{\boldsymbol{b}_{ik}^{(l)}}) , (G_0^{-1} + n_k {G_k^*}^{-1})^{-1})
+\end{equation}
+
+\begin{equation}
+p({\sigma^2}^*|G_k^*, {\boldsymbol{b}_k^C}^*, \boldsymbol{y}) \approx 
+\frac 1 m \sum_{l=1}^m f_{Inv-Gamma}({\sigma^2}^*; \alpha_0 + \frac {\sum_{i=1}^n m_i} 2, 
+\beta_0 + \frac {\sum_{i=1}^n \sum_{j=1}^{m_i} (y_{ij} - \boldsymbol{x_{ij}}\boldsymbol{\beta}^{(l)} - \boldsymbol{z_{ij}}\boldsymbol{b_i^{(l)}})} 2)
+\end{equation}
+
+\begin{equation}
+p({\boldsymbol{\beta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\sigma^2}^*, \boldsymbol{y}) \approx 
+\frac 1 m \sum_{l=1}^m f_N({\boldsymbol{\beta}}^*; (X^TX)^{-1}X^T(\boldsymbol{y} - {\boldsymbol{Zb}}^{(l)}), {\sigma^2}^*(X^TX)^{-1})
+\end{equation}
+
+\begin{equation}
+p({\boldsymbol{\eta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\sigma^2}^*,{\boldsymbol{\beta}}^*, \boldsymbol{y}) \approx 
+\frac 1 m \sum_{l=1}^m f_{Dir}({\boldsymbol{\eta}}^*; {a_0}_1 + n_1^{(l)}, {a_0}_2 + n_2^{(l)}, ..., {a_0}_K + n_K^{(l)})
+\end{equation}
+
+where, 
+$(\boldsymbol{\mu}_0, G_0)$ are the parameters for the multivariate normal prior for the mean $\boldsymbol{b}_k^C$ of the $k^{th}$ component density,\\
+$\bar{\boldsymbol{b}_{ik}^{(l)}}$ is the mean of the estimated random effects corresponding to the $n_k$ subjects classified under the $k^{th}$ component in the $l^{th}$ MCMC iteration,\\
+$(\alpha_0, \beta_0)$ are the parameters of the inverse gamma density specified as the prior for the within subject variance $\sigma^2$,\\
+${a_0}_1, {a_0}_2,..., {a_0}_K$ are the parameters of the Dirichlet density specified as the prior for component weight vector $\boldsymbol{\eta}$.\\
+
+Using these values an estimate of $\log{p({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*|\boldsymbol{y})}$ is available which can be further substituted in equation \ref{eq : chib_approx} to obtain $\log{\hat{m}(\boldsymbol{y})}$. In ideal cases, i.e. where marginal likelihood is known to work well as a model selection criteria, models with higher value of $\log{\hat{m}(\boldsymbol{y})}$ should be chosen.
+
