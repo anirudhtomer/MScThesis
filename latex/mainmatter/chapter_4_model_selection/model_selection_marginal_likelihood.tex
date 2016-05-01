@@ -1,3 +1,4 @@
+% !TEX root =  ../../thesis.tex
 
 \section{Marginal Likelihood}
 \label{sec : marginal_likelihood}
@@ -22,18 +23,35 @@ Since we have the same belief in each of these models, prior odds is equal to 1 
 m(\boldsymbol{y}) = p(\boldsymbol{y}|M) = \dfrac {L(\boldsymbol{\theta}|\boldsymbol{y}, M) p(\boldsymbol{\theta}|M)} {p(\boldsymbol{\theta}|\boldsymbol{y}, M)}
 \end{equation}
 
-Equation \ref{eq : chib_trick} is valid for all $\boldsymbol{\theta}$, though Chib recommends using posterior mode $\argmax_\theta p(\boldsymbol{\theta}|\boldsymbol{y})$. Let's denote the selected $\boldsymbol{\theta}$ as $\boldsymbol{\theta}^*$. Chib's approximation for marginal likelihood on log scale is given by,
+Equation \ref{eq : chib_trick} is valid for all $\boldsymbol{\theta}$, though Chib recommends using posterior mode $\argmax_\theta p(\boldsymbol{\theta}|\boldsymbol{y})$ of parameters or the maximum likelihood estimate $\argmax_\theta L(\boldsymbol{\theta}|\boldsymbol{y})$. We decided to choose the latter of the two. Further, in context of the Bayesian heterogeneity model, we will denote the selected parameter values as ${\boldsymbol{\beta}}^*$, ${\sigma^2}^*$ and $\boldsymbol{\nu}^*$. Thus Chib's approximation for marginal likelihood on log scale is given by,
 
 \begin{equation}
 \label{eq : chib_approx}
-\log{\hat{m}(\boldsymbol{y})} = \log{L(\boldsymbol{\theta}^*|\boldsymbol{y})} + \log{p(\boldsymbol{\theta}^*)} - \log{p(\boldsymbol{\theta}^*|\boldsymbol{y})}
+\log{\hat{m}(\boldsymbol{y})} = \log{L({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*|\boldsymbol{y})} + \log{p({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*)} - \log{p({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*|\boldsymbol{y})}
 \end{equation}
 
-Note that we have dropped the model indicator $M$ from equation \ref{eq : chib_approx} for readability in further equations. We will now further solve this equation using the parameters from the Bayesian heterogeneity model discussed in the previous chapter. 
-An interesting aspect of this equation is that if the posterior is not available in closed form then calculation of Marginal likelihood can become tedious. 
+Note that we have dropped the model indicator $M$ from equation \ref{eq : chib_approx} for readability. We will now show calculations for determing the marginal likelihood value using Chib's approxmiation.\\ 
 
-\section{Posterior predictive checks}
-\label{sec : ppc}
+Firstly $\log{L({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*|\boldsymbol{y})} = f(\boldsymbol{y}|{\boldsymbol{\beta}}^*, \sigma^2, {\boldsymbol{\nu}}^*)$ can be easily determined using the formula given in equation \ref{eq : obs_data_likelihood}. As for the calculation of $\log{p({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*)}$, it is also straightforward as we take independent priors for these parameters and they are well known in advance. The details of the priors we chose are given in section \ref{subsec : choice_priors}. Assuming that the parameters of component densities of the mixture distribution of random effects are indepdent, one can use the following to calculate $\log{p({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*|\boldsymbol{y})}$.
 
-The idea of the posterior predictive checks is to evaluate the model fit using simulations from the posterior predictive distribution(PPD) $p(\boldsymbol{\tilde{y}}|\boldsymbol{y}$. As an informal check one could sample 1000 values from the PPD 20 times and make 20 histograms to show the density. If the histograms do not match with the histogram of the original sample one could say that the model did not fit the data well.\\ 
-A formal way to do this is using Posterior predictive p-values(PPP) or Bayesian p-values. In the frequentist paradigm after fitting a model based on parameter $\hat{\theta}$ one could test the model using test statistic. Let us represent that test statistic value for original sample to be $T(\boldsymbol{y})$. Now based on the sampling distribution of $T(\boldsymbol{\tilde{y}})$ we could check the probability $P(T(\boldsymbol{\tilde{y}}) > T(\boldsymbol{y})$. In the bayesian paradigm the parameter $\theta$ has a posterior distribution and so we find the same probability like before albeit averaged over the entire posterior $p(\theta|\boldsymbol{y})$. A small PPP value indicates bad fit of model to the data. For a complete interpretation of this p-value we refer the readers to \citet{gelman_understanding_2012}.
+\begin{multline}
+\log{p({\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{\nu}^*|\boldsymbol{y})} = 
+\sum_{k=1}^K{\log{p(G_k^*|\boldsymbol{y})}} + 
+\sum_{k=1}^K{\log{p({\boldsymbol{b}_k^C}^*|G_k^*, \boldsymbol{y})}} + 
+\log{p({\boldsymbol{\beta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, \boldsymbol{y})}\\
++ \log{p({\sigma^2}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\boldsymbol{\beta}}^*, \boldsymbol{y})} + 
+\log{p({\boldsymbol{\eta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\boldsymbol{\beta}}^*, {\sigma^2}^*, \boldsymbol{y})}
+\end{multline}
+
+An interesting problem one faces in such an expansion is that the posteriors may not be available as well known density. For e.g. we began with choosing indepdent gamma priors for precision parameter of random effects and uniform prior for correlation. However the posterior density was not well known. One could try to fit it with a wrapper density however as we will show ahead this is practically improbable. An obvious alternative is to choose conjugate priors in such situation. However as we mentioned in section \ref{subsec : choice_priors} the joint conjugate prior in the case of unknown mean and precision matrix is a Normal-Wishart-Prior and the joint posterior is a Normal-Wishart-Posterior. Although one does not use them in practice while using BUGS family of software, the problem of posterior being from a unknown family remains the same. \citet{chib_marginal_1995} suggest using the Rao-Blackwellization method to solve this problem. For e.g. the Rao-Blackwellized estimate of $p(G_k^*|\boldsymbol{y})$ is given by
+
+\begin{equation}
+\label{eq : rao_blackwellization_wishart}
+\begin{split}
+\prod_{k=1}^{K} p(G_k^*|\boldsymbol{y}) & = \int \prod_{k=1}^{K} p(G_k^*| \boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}, \boldsymbol{b}_k^C) p(\boldsymbol{b}_1^C, \boldsymbol{b}_2^C,..., \boldsymbol{b}_K^C,\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}) 
+\diff{\boldsymbol{b}_1^C} \diff{\boldsymbol{b}_2^C} ... \diff{\boldsymbol{b}_K^C} \diff{\boldsymbol{b}} \diff{\boldsymbol{S}}\\
+& \approx \frac 1 m \sum_{l=1}^m \prod_{k=1}^{K} p(G_k^*| \boldsymbol{y}, \boldsymbol{b}^{(l)}, \boldsymbol{S}^{(l)}, {\boldsymbol{b}_k^C}^{(l)})
+\end{split}
+\end{equation}
+
+The approximation is \ref{eq : rao_blackwellization_wishart} is done by approximating the integral with the samples obtained from the MCMC iterations.
