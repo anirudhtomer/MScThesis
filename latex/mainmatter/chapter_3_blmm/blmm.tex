@@ -56,7 +56,7 @@ In a LMM is quite common to use histogram of Empirical Bayes estimates of random
 The formal definition of a Bayesian heterogeneity model can be given by extending the Bayesian linear mixed model definition given in section \ref{sec : blmm}. Since, now the random effects have a Gaussian mixture distribution we will use the following notation to express the distribution mathematically.
 
 $$\boldsymbol{b}_i \sim \sum_{k=1}^{K} \eta_k N_q(\boldsymbol{b}_k^C, G_k)$$\\
-where $\boldsymbol{b}_k^C$ and $G_k$ are the mean vector and covariance matrices for the $k^{th}$ component in the mixture distribution respectively. The vector $\boldsymbol{\eta} = (\eta_1, \eta_2, \ldots, \eta_K)$ is the weight distribution for the component densities. The vector $\boldsymbol{S}=(S_1, S_2, ..., S_n)$ represents the allocation vector for all of the subjects. Since we are following the bayesian paradigm, in addition to prior distribution for $\boldsymbol{\beta}$ and $\sigma^2$ we also have prior for ($\boldsymbol{b}_1^C, \boldsymbol{b}_2^C, \ldots, \boldsymbol{b}_K^C, \boldsymbol{\eta}, G_1, G_2, \ldots, G_K$).
+where $\boldsymbol{b}_k^C$ and $G_k$ are the mean vector and covariance matrices for the $k^{th}$ component in the mixture distribution respectively. The vector $\boldsymbol{\eta} = (\eta_1, \eta_2, \ldots, \eta_K)$ is the weight distribution for the component densities. The vector $\boldsymbol{S}=(S_1, S_2, ..., S_n)$ represents the allocation vector for all of the subjects. Since we are following the bayesian paradigm, in addition to prior distribution for $\boldsymbol{\beta}$ and $\sigma^2$ we also have prior for $\boldsymbol{\nu} = (\boldsymbol{b}_1^C, \boldsymbol{b}_2^C, \ldots, \boldsymbol{b}_K^C, \boldsymbol{\eta}, G_1, G_2, \ldots, G_K)$.
 
 \section{Estimation of parameters in the Bayesian heterogeneity model}
 In this section we will discuss some of the challenges in Bayesian estimation of parameters in the Bayesian heterogeneity model. We will also discuss the approaches we used to deal with them in this thesis.
@@ -84,6 +84,9 @@ E(\boldsymbol{b}_i | \boldsymbol{\phi}) = \sum_{k=1}^{K} \eta_k N_q(\boldsymbol{
 
 where $\boldsymbol{\phi}$ is the vector ($\boldsymbol{b}_1^C, \boldsymbol{b}_2^C, \ldots, \boldsymbol{b}_K^C, \boldsymbol{\eta}, G_1, G_2, \ldots, G_K$). This further means that $E(\boldsymbol{y}_i | \boldsymbol{\phi}) = \boldsymbol{X}_{i}\boldsymbol{\beta}$. This parametrization, which was also used in the original paper on Heterogeneity model \citep{verbeke_linear_1996} is called noncentralized parametrization. The centralized parametrization assumes that the random effects are not deviations from the fixed effects and are centred around a non zero mean.
 The choice of parametrization has an effect on the rate of convergence while estimating parameters using MCMC. While doing the simulation study we figured out that imposing the constraint in equation \ref{eq : non_centred_constraint} drastically slows the convergence as well increases the autocorrelation in parameter estimates. Thus, in this thesis we have only used hierarchically centred parametrization.
+
+\subsection{Choice of priors}
+\label{subsec : choice_priors}
 
 \subsection{Label Switching}
 

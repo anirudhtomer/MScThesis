@@ -1,0 +1,94 @@
+% !TEX root =  ../../thesis.tex
+
+\chapter{Model selection criteria}
+\label{ch : model_selection}
+
+In most cases we do not know the right number of mixture components in advance unless we have some expert knowledge available or we know them from a previous/similar study. As part of this thesis we will compare many of the existing methods for finding the right number of mixture components.
+
+\section{Deviance information criteria}
+\label{sec : dic}
+
+The Deviance information criteria or DIC was first proposed by \citet{spiegelhalter_bayesian_2002} for Bayesian model selection. The idea is similar to frequentist AIC/BIC criteria in the sense that DIC also penalizes more elaborate models using a penalty component. The definition for DIC is given by 
+
+$$\text{DIC} = -2\log{p(\boldsymbol{y}|\boldsymbol{\bar{\theta}})} + 2\text{p}_\text{D}$$
+where $\boldsymbol{\bar{\theta}} = \text{E}(\boldsymbol{\theta}_{\text{post}}|\boldsymbol{y})$,\\
+$\text{p}_\text{D} = -2\text{E}_{\boldsymbol{\theta}}(\log{p(\boldsymbol{y}|\boldsymbol{\theta}_{\text{post}})}) + \log{p(\boldsymbol{y}|\boldsymbol{\bar{\theta}})})$ is the penalty for model complexity,and can also be written as 
+
+$$\text{p}_\text{D}=\overline{D(\boldsymbol{\theta})} - D(\boldsymbol{\bar{\theta}})$$
+
+where $D(\boldsymbol{\theta}) = -2\log{p(\boldsymbol{y}|\boldsymbol{\theta}_{\text{post}})} + 2\log{f(\boldsymbol{y})}$ is called the Bayesian deviance. The term $f(\boldsymbol{y})$ however cancels out in the expression for $\text{p}_\text{D}$ and hence is not discussed. 
+
+\subsection{DIC for missing data models}
+\label{subsec : DIC_missing_data_models}
+Mixture models and mixed models both are both a member of the clas of models called missing data models. The reason is that the allocation vector $\boldsymbol{S}$ in a mixture model and vector of random effects $\boldsymbol{b_i}$ in a LMM, both are not observed directly. Thus one could have various incompatible definitions of DIC based on observed data likelihood, complete data likelihood and conditional data likelihood, as shown by DeIorio and Robert in a discussion on the paper of \citet{spiegelhalter_bayesian_2002}. Further, \citet{celeux_deviance_2006} proposed multiple definitions of DIC under each of the aforementioned likelihood classes and showed that each has a different value and thus different impact on model selection. In this thesis we will take some of those definitions and apply them in context of the Bayesian heterogeneity model. 
+
+\subsubsection{Observed DIC}
+The first category of DIC's is associated with observed data likelihood $f(\boldsymbol{y}|\boldsymbol{\theta})$ or in our case $f(\boldsymbol{y}|\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu})$, where $\boldsymbol{\nu}$ is as defined in section \ref{subsec : bhtge}. The observed likelihood can be obtained by marginalizing over the allocation vector of subjects $\boldsymbol{S}$ and random effects $\boldsymbol{b_i}$. This give us the following formula for observed data likelihood.
+
+\begin{equation}
+\label{eq : obs_data_likelihood}
+f(\boldsymbol{y}|\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu}) = \prod_{i=1}^n \sum_{k=1}^K f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta} + \boldsymbol{Z}_i \boldsymbol{b}_k^C, \boldsymbol{Z}_{i} G_k \boldsymbol{Z}_{i}^T+ R_i) \eta_k
+\end{equation}
+ 
+Based on equation \ref{eq : obs_data_likelihood} we will now extend the definition of $\text{DIC}_1$, $\text{DIC}_2$ and $\text{DIC}_3$ proposed by \citet{celeux_deviance_2006} to give
+
+\begin{equation}
+\label{eq : DIC1}
+\text{DIC}_1 = -4\text{E}_{\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu}} (\log{p(\boldsymbol{y}|\boldsymbol{\beta}_{\text{post}}, \sigma^2_{\text{post}}, \boldsymbol{\nu}_{\text{post}})}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\bar{\beta}}, \bar{\sigma^2}, \boldsymbol{\bar{\nu}})})
+\end{equation}
+
+where 
+$\boldsymbol{\bar{\beta}}=\text{E}(\boldsymbol{\beta}_{\text{post}}|\boldsymbol{y})$, 
+$\bar{\sigma^2}=\text{E}(\sigma^2_{\text{post}}|\boldsymbol{y})$ and 
+$\boldsymbol{\bar{\nu}}=\text{E}(\boldsymbol{\nu}_{\text{post}}|\boldsymbol{y})$,\\
+
+$\text{DIC}_2$'s definition is similar to $\text{DIC}_1$ but intead of posterior mean, posterior mode is used in calculation of $D(\boldsymbol{\bar{\theta}})$. It is given by
+
+\begin{equation}
+\label{eq : DIC2}
+\text{DIC}_2 = -4\text{E}_{\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu}}(\log{p(\boldsymbol{y}|\boldsymbol{\beta}_{\text{post}}, \sigma^2_{\text{post}}, \boldsymbol{\nu}_{\text{post}})}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\hat{\beta}}, \hat{\sigma^2}, \boldsymbol{\hat{\nu}})})
+\end{equation}
+
+where
+$\boldsymbol{\hat{\beta}} = \argmax_{\boldsymbol{\beta}}p(\boldsymbol{\beta}|\boldsymbol{y})$,
+$\hat{\sigma^2} = \argmax_{\sigma^2}p(\sigma^2|\boldsymbol{y})$ and
+$\boldsymbol{\hat{\nu}} = \argmax_{\boldsymbol{\nu}}p(\boldsymbol{\nu}|\boldsymbol{y})$,\\
+
+\citet{celeux_deviance_2006} suggest that for models where non identifiability of parameters is endemic, as is the case for mixtures usually, one should use an estimator $\hat{f}(\boldsymbol{y})$ for the approximation of the density $p(\boldsymbol{y} | \boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu})$. They further propose the following estimator for $\hat{f}(\boldsymbol{y})$ which uses posterior samples $\boldsymbol{\theta}^{(l)}$ from the $l^{\text{th}}$ MCMC iteration of a chain of length $m$.
+
+$$\hat{f}(\boldsymbol{y}) = \prod_{i=1}^n \hat{f}(\boldsymbol{y}_i) = \prod_{i=1}^n \frac 1 m \sum_{l=1}^m \sum_{k=1}^K f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta}^{(l)} + \boldsymbol{Z}_i {\boldsymbol{b}_k^C}^{(l)}, \boldsymbol{Z}_{i} G_k^{(l)} \boldsymbol{Z}_{i}^T+ R_i^{(l)}) \eta_k^{(l)}$$
+
+This gives us the following definition of DIC.
+
+\begin{equation}
+\label{eq : DIC3}
+\text{DIC}_3 = -4\text{E}_{\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu}}(\log{p(\boldsymbol{y}|\boldsymbol{\beta}_{\text{post}}, \sigma^2_{\text{post}}, \boldsymbol{\nu}_{\text{post}})}) + 2\log{\hat{f}(\boldsymbol{y})}
+\end{equation}
+
+In each of the equations \ref{eq : DIC1}, \ref{eq : DIC2}, \ref{eq : DIC3}, the calculation of $\text{E}_{\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu}}(\log{p(\boldsymbol{y}|\boldsymbol{\beta}_{\text{post}}, \sigma^2_{\text{post}}, \boldsymbol{\nu}_{\text{post}})})$ can be done by approximating it using the results from the MCMC iterations in the following way.
+
+\begin{equation}
+\label{eq : mean_posterior_deviance_approx}
+\text{E}_{\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu}}(\log{p(\boldsymbol{y}|\boldsymbol{\beta}_{\text{post}}, \sigma^2_{\text{post}}, \boldsymbol{\nu}_{\text{post}})}) = \frac 1 m \sum_{l=1}^m\log{p(\boldsymbol{y}|\boldsymbol{\beta}^{(l)}_{\text{post}}, {\sigma^2}^{(l)}_{\text{post}}, \boldsymbol{\nu}^{(l)}_{\text{post}})})
+\end{equation}
+
+\subsubsection{Complete DIC}
+
+
+\subsubsection{Conditional DIC}
+The third class of the DIC is based on the assumption that missing data i.e. allocation vector $\boldsymbol{S}$ and random effects $\boldsymbol{b}_i$ can be seen as additional parameter rather than as missing data. We will represent the new parameter space as $\boldsymbol{\theta}_\text{cond} = (\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu}, \boldsymbol{S}, \boldsymbol{b}_1, \boldsymbol{b}_2, ..., \boldsymbol{b}_n)$.This leads to the conditional data likelihood,
+
+\begin{equation}
+\label{eq : conditional_data_likelihood}
+f(\boldsymbol{y}|\boldsymbol{\theta}_\text{cond}) = \prod_{i=1}^n f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta} + \boldsymbol{Z}_i \boldsymbol{b}_i, R_i)
+\end{equation}
+
+Based on this conditional likelihood, \citet{celeux_deviance_2006} proposed the following DIC definition.
+
+\begin{equation}
+\label{eq : DIC6}
+\text{DIC}_6 = -4\text{E}_{\boldsymbol{\theta}_\text{cond}} (\log{p(\boldsymbol{y}|\boldsymbol{\theta}_{\text{cond}_\text{post}})}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\hat{\theta}}_\text{cond})})
+\end{equation}
+
+where
+$\boldsymbol{\hat{\theta}}_\text{cond} = \argmax_{\boldsymbol{\theta}_\text{cond}}p(\boldsymbol{\theta}_\text{cond}|\boldsymbol{y})$, and $\text{E}_{\boldsymbol{\theta}_\text{cond}} (\log{p(\boldsymbol{y}|\boldsymbol{\theta}_{\text{cond}_\text{post}})})$ can be approximated as done in equation \ref{eq : mean_posterior_deviance_approx}.
