@@ -41,9 +41,6 @@ model = function(){
     randmu[h,1:2]<-randmu_unordered[orderRandMu[h],1:2]
   }
   
-  # randPrecision[1:2,1:2]~dwish(wishartParm[,],4)
-  # randSigma[1:2,1:2]<-inverse(randPrecision[1:2,1:2])
-  
   errPrecision~dgamma(gammaShapeRate,gammaShapeRate)
   
   betaGender~dnorm(betaMu,betaTau)

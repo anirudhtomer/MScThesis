@@ -48,7 +48,7 @@ weightgen=function(gender, by, diet, age){
   
   switch(diet,
          poor={
-           randeff=mvrnorm(1,c(-20,-15), varcovMatrix)
+           randeff=mvrnorm(1,c(-17,-15), varcovMatrix)
            weight = weight + randeff[1] + randeff[2]*time
            splaash1 <<- rbind(splaash1, randeff)
          },
@@ -58,7 +58,7 @@ weightgen=function(gender, by, diet, age){
            splaash2 <<- rbind(splaash2, randeff)
          },
          good={
-           randeff=mvrnorm(1,c(20, 20), varcovMatrix)
+           randeff=mvrnorm(1,c(17, 15), varcovMatrix)
            weight = weight + randeff[1] + randeff[2]*time
            splaash3 <<- rbind(splaash3, randeff)
          },
@@ -82,7 +82,7 @@ splaash3 = matrix(nrow=0, ncol=2)
 splaash4 = matrix(nrow=0, ncol=2)
 splaash5 = matrix(nrow=0, ncol=2)
 
-ncomponents = 5
+ncomponents = 3
 
 if(ncomponents == 3){
   diets = c("poor", "ok", "good")
@@ -92,7 +92,7 @@ if(ncomponents == 3){
   diets = c("ok")
 }
 
-dietSubjects = c("poor"=8,"ok"=5,"good"=10, "baam"=12, "kaam"=4)
+dietSubjects = c("poor"=1,"ok"=10,"good"=10, "baam"=12, "kaam"=4)
 
 sublist = matrix(nrow = 0, ncol = 7)
 for(gender in c("M", "F")){
