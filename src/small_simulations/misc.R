@@ -36,20 +36,16 @@ response4 = c(rnorm(subject_count, group1, variance1) * 3, rnorm(subject_count, 
 response5 = c(rnorm(subject_count, group1, variance1) * 3.5, rnorm(subject_count, group2, variance2)*3.5)
 response6 = c(rnorm(subject_count, group1, variance1) * 4, rnorm(subject_count, group2, variance2)*4)
 
-resp = data.frame(response1, response2, response3, response4, response5, response6)
-plot(NULL,xlab="Time", ylab = "Response (Y)", xlim=c(0, 5), ylim=c(0, 400),type = 'n', yaxs="i", xaxs="i")
-
+temp = c()
+id = c()
 for(i in 1:(subject_count*2)){
-  if(i>subject_count){
-    color="blue"
-  }else{
-    color="darkgreen"
-  }
-  lines(x = c(0:5), y=c(resp$response1[i], resp$response2[i], resp$response3[i], resp$response4[i], resp$response5[i], resp$response6[i]), col=color)
+  id = c(id, rep(i, 6))
+  temp = c(temp, response1[i], response2[i], response3[i], response4[i], response5[i], response6[i])
 }
-legend("topleft", lty=1, col=c("blue", "darkgreen"),  legend=c("High risk group", "Low risk group"))
+riskgroup = c(rep("Low risk", subject_count*6), rep("High risk", subject_count*6))
+resp = data.frame(id, response=temp, time = rep(rep(1:6), subject_count*2), "Risk Group"=riskgroup)
 
-
+qplot(x = time, y=response, geom="line", group=id, colour=Risk.Group, data=resp, xlab="Time", ylab="Response") 
 #######  Constrained jags trial ########
 
 model=function(){
