@@ -1,5 +1,4 @@
 % !TEX root =  ../../thesis.tex
-
 \section{Marginal Likelihood}
 \label{sec : marginal_likelihood}
 
@@ -56,7 +55,7 @@ An interesting problem one faces in such an expansion is that the posteriors may
 \end{split}
 \end{equation}
 
-where, $n_k^{(l)}$ are number of subjects classified under component $k$ in iteration $l$and $(n_0, \Psi)$ are the parameters for the inverse wishart distribution specified as prior for the variance covariance matrix of the component densities. The approximation in \ref{eq : rao_blackwellization_wishart} is done by approximating the integral with the samples obtained from the MCMC iterations. As we can see the benefit of this approach is that $p(G_k^*| \boldsymbol{y}, \boldsymbol{b}^{(l)}, \boldsymbol{S}^{(l)}, {\boldsymbol{b}_k^C}^{(l)})$ is the well known inverse wishart density. However in cases when this posterior is not well known, then given that the large number of MCMC iterations one does, it is not possible to manually check and fit wrapper densities to posterior densities. The use kernel density estimation procedures can also be dismissed as they require significant computational power. It is because of these reasons we avoided calculation of Bayes factor in the case where we took indepdent gamma priors for precision of random effects and uniform prior for correlation.\\
+where, $n_k^{(l)}$ are number of subjects classified under component $k$ in iteration $l$ and $(n_0, \Psi)$ are the parameters for the inverse wishart distribution specified as prior for the variance covariance matrix of the component densities. The approximation in \ref{eq : rao_blackwellization_wishart} is done by approximating the integral with the samples obtained from the MCMC iterations. As we can see the benefit of this approach is that $p(G_k^*| \boldsymbol{y}, \boldsymbol{b}^{(l)}, \boldsymbol{S}^{(l)}, {\boldsymbol{b}_k^C}^{(l)})$ is the well known inverse wishart density. However in cases when this posterior is not well known, then given that the large number of MCMC iterations one does, it is not possible to manually check and fit wrapper densities to posterior densities. The use kernel density estimation procedures can also be dismissed as they require significant computational power. It is because of these reasons we avoided calculation of Bayes factor in the case where we took indepdent gamma priors for precision of random effects and uniform prior for correlation.\\
 
 Proceeding further with the Rao-Blackwellization procedure one can obtain the following approximations for the other parameters.
 
@@ -73,7 +72,7 @@ p({\sigma^2}^*|G_k^*, {\boldsymbol{b}_k^C}^*, \boldsymbol{y}) \approx
 
 \begin{equation}
 p({\boldsymbol{\beta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\sigma^2}^*, \boldsymbol{y}) \approx 
-\frac 1 m \sum_{l=1}^m f_N({\boldsymbol{\beta}}^*; (X^TX)^{-1}X^T(\boldsymbol{y} - {\boldsymbol{Zb}}^{(l)}), {\sigma^2}^*(X^TX)^{-1})
+\frac 1 m \sum_{l=1}^m f_N({\boldsymbol{\beta}}^*; (\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T(\boldsymbol{y} - {\boldsymbol{Zb}}^{(l)}), {\sigma^2}^*(\boldsymbol{X}^T\boldsymbol{X})^{-1})
 \end{equation}
 
 \begin{equation}
@@ -82,8 +81,8 @@ p({\boldsymbol{\eta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\sigma^2}^*,{\boldsymbol
 \end{equation}
 
 where, 
-$(\boldsymbol{\mu}_0, G_0)$ are the parameters for the multivariate normal prior for the mean $\boldsymbol{b}_k^C$ of the $k^{th}$ component density,\\
-$\bar{\boldsymbol{b}_{ik}^{(l)}}$ is the mean of the estimated random effects corresponding to the $n_k$ subjects classified under the $k^{th}$ component in the $l^{th}$ MCMC iteration,\\
+$(\boldsymbol{\mu}_0, G_0)$ are the parameters for the multivariate normal prior for the mean $\boldsymbol{b}_k^C$ of the $k^\text{th}$ component density,\\
+$\bar{\boldsymbol{b}_{ik}^{(l)}} = \frac {\sum_{i=1}^n I(S_i^{(l)}=k) \boldsymbol{b_i^{(l)}}} {n_k^{(l)}}$ is the mean of the estimated random effects corresponding to the $n_k$ subjects classified under the $k^\text{th}$ component in the $l^\text{th}$ MCMC iteration,\\
 $(\alpha_0, \beta_0)$ are the parameters of the inverse gamma density specified as the prior for the within subject variance $\sigma^2$,\\
 ${a_0}_1, {a_0}_2,..., {a_0}_K$ are the parameters of the Dirichlet density specified as the prior for component weight vector $\boldsymbol{\eta}$.\\
 

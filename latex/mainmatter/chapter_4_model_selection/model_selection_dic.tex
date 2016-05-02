@@ -79,7 +79,7 @@ In each of the equations \ref{eq : DIC1}, \ref{eq : DIC2}, \ref{eq : DIC3}, the 
 % Complete Data DIC
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Complete DIC}
-The second class of the DIC is based on the complete data likelihood. Complete data for the $i^{th}$ subject in a Bayesian heterogeneity model will be $(\boldsymbol{y}_i, S_i, \boldsymbol{b}_i)$. The following equation shows the complete data likelihood of the data at hand.
+The second class of the DIC is based on the complete data likelihood. Complete data for the $i^\text{th}$ subject in a Bayesian heterogeneity model will be $(\boldsymbol{y}_i, S_i, \boldsymbol{b}_i)$. The following equation shows the complete data likelihood of the data at hand.
 
 \begin{equation}
 \label{eq : complete_data_likelihood}
@@ -104,13 +104,20 @@ Unfortunately $(\boldsymbol{b}, \boldsymbol{S})$ are latent and thus \citet{cele
 \begin{equation}
 \label{eq : DIC4}
 \text{DIC}_4 = -4\text{E}_{\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu},\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}}(\log{p(\boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}|[\boldsymbol{\beta}, \sigma^2, \boldsymbol{\nu}|\boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}])}) + 
-2\text{E}_{\boldsymbol{b},\boldsymbol{S}}(\log{p(\boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}|\boldsymbol{\bar{\beta}}, \bar{\sigma^2}, \boldsymbol{\bar{\nu}})})
+2\text{E}_{\boldsymbol{b},\boldsymbol{S}|\boldsymbol{y}}(\log{p(\boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}|\boldsymbol{\bar{\beta}}, \bar{\sigma^2}, \boldsymbol{\bar{\nu}})})
 \end{equation}
 
 where 
 $\boldsymbol{\bar{\beta}}$, $\bar{\sigma^2}$ and $\boldsymbol{\bar{\nu}}$ remain same as for \ref{eq : complete_data_dic}. The first part of the formula for $\text{DIC}_4$ is not available in closed form for Bayesian heterogeneity model, however it can still be approximated using the output of Gibbs sampler in the same way as in \ref{eq : mean_posterior_deviance_approx}. However although one has to also simulate $(\boldsymbol{b}, \boldsymbol{S})$ in the MCMC iterations. The reason it works is that during each iteration of the Gibbs sampler, it simulates parameter values from the conditional distribution of the parameters. i.e. conditional on every other parameter being simulated in the chain, including the unobserved data. We further verified this approach by comparing the results of $\text{DIC}_4$ approximation for mixture distribution given by \citet{celeux_deviance_2006} with our approach and found the results to be differing only by a few decimal places.\\
 
-The second part of $\text{DIC}_4$, i.e. $\text{E}_{\boldsymbol{b},\boldsymbol{S}}(\log{p(\boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}|\boldsymbol{\bar{\beta}}, \bar{\sigma^2}, \boldsymbol{\bar{\nu}})})$, is also not straightforward to compute. \citet{celeux_deviance_2006} suggest calculating $\boldsymbol{\bar{\beta}}$, $\bar{\sigma^2}$ and $\boldsymbol{\bar{\nu}}$ using the posterior estimates $(\boldsymbol{b}, \boldsymbol{S} | \boldsymbol{y})$ of the unobserved data. 
+The second part of $\text{DIC}_4$, i.e. $\text{E}_{\boldsymbol{b},\boldsymbol{S}}(\log{p(\boldsymbol{y}, \boldsymbol{b}, \boldsymbol{S}|\boldsymbol{\bar{\beta}}, \bar{\sigma^2}, \boldsymbol{\bar{\nu}})})$, is also not straightforward to compute. While the expectation over $\boldsymbol{b}, \boldsymbol{S}$ can be approximated in the same way as in \ref{eq : mean_posterior_deviance_approx} but for calculating $\boldsymbol{\bar{\beta}}$, $\bar{\sigma^2}$ and $\boldsymbol{\bar{\nu}}$, \citet{celeux_deviance_2006} suggest using the posterior estimates $(\boldsymbol{b}, \boldsymbol{S} | \boldsymbol{y})$ of the unobserved data. We will now give the formulae for the expected values of parameters of interest during the $l^\text{th}$ iteration $\boldsymbol{\bar{\beta}}^{(l)}$, $\bar{\sigma^2}^{(l)}$ and $\boldsymbol{\bar{\nu}}^{(l)}$.
+
+$$\boldsymbol{\bar{\beta}}^{(l)} = (\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T(\boldsymbol{y}-\boldsymbol{Zb^{(l)}})$$
+$$\bar{\sigma^2}^{(l)} = \frac {(\boldsymbol{y}-\boldsymbol{Zb^{(l)}}-\boldsymbol{X}\boldsymbol{\bar{\beta}}^{(l)})^T (\boldsymbol{y}-\boldsymbol{Zb^{(l)}}-\boldsymbol{X}\boldsymbol{\bar{\beta}}^{(l)})} {(\sum_{i=1}^n m_i - p - 1) -2}$$
+$$\bar{\boldsymbol{b}_k^C}^{(l)} = \frac {\sum_{i=1}^n I(S_i^{(l)}=k) \boldsymbol{b_i^{(l)}}} {n_k^{(l)}}$$
+$$\bar{G_k^{(l)}} = \frac {\sum_{i=1}^n I(S_i^{(l)}=k) (\boldsymbol{b_i}^{(l)}-\bar{\boldsymbol{b}_k^C}^{(l)})(\boldsymbol{b_i}^{(l)}-\bar{\boldsymbol{b}_k^C}^{(l)})^T} 
+{(n_k^{(l)} - 1) - \text{rank}(\bar{\boldsymbol{b}_k^C}^{(l)}) - 1}$$
+$$\bar{\eta}_k^{(l)} = \frac {a_k + n_k^{(l)}} {\sum_{u=1}^K a_u + n}$$
 
 The next definition of DIC under the class of complete data DIC's is motivated by the fact that the at times $\text{E}(\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y})$ takes values outside the support of the joint distribution of $\boldsymbol{b}, \boldsymbol{S}$ \citet{celeux_deviance_2006}. Thus using MAP(maximum a posteriori) as the estimate instead, the following definition of DIC is proposed.
 
