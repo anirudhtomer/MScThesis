@@ -41,7 +41,7 @@ runJagsModel = function(datanodes, initialValues, stochasticNodes,jagsmodel, nco
 
 fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3){
   
-  dirichParm = rep(1, ncomp)
+  dirichParm = rep(3, ncomp)
   randComp=extractRandomComp(viaReg = T)
   quantiles = seq(1/(ncomp+1),ncomp/(ncomp+1),length.out = ncomp)
   randIntQuantiles = quantile(randComp[,1], probs = quantiles)

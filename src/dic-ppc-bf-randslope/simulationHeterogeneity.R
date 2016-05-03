@@ -115,14 +115,14 @@ attributes(mcmcfit)
 #save.image("F:/docs/Dropbox/MSc Stats/Thesis/MScThesis/latex/code/dic-ppc-randslope/.RData")
 
 ########## Graphical analysis of the simulated mixture distribution #######
-qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)))
+qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)), xlab="Random intercept", ylab="Random slope")
 
 ########## Graphical analysis of MCMC fit #########
 heidel.diag(mcmcfit)
 
 ggs_density(ggsobject, "beta")
 ggs_density(ggsobject, "errPrecision")
-ggs_density(ggsobject, "randSigma")
+ggs_density(ggsobject, "randPrecision")
 ggs_density(ggsobject, "randmu")
 ggs_density(ggsobject, "Eta")
 

@@ -12,7 +12,6 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='mvtnorm') %dopa
   randComp = getRandomComp(mcmcfit, mcmcIterNum = k)
   betaGender = mcmcfit[[1]][k, "betaGender"]
   betaBy = mcmcfit[[1]][k, "betaBy"]
-  betaAge = mcmcfit[[1]][k, "betaAge"]
   errSd = sqrt(1/mcmcfit[[1]][k, "errPrecision"])
   sigma = getSigma(mcmcfit, mcmcIterNum = k)
   
@@ -22,15 +21,16 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='mvtnorm') %dopa
   total = 0
   for(j in 1:nsubjects){
     fixedPartXBeta = betaBy * (as.numeric(dswide[j, "by"])-1) + 
-      betaGender * (as.numeric(dswide[j, "gender"])-1) + betaAge*dswide[j, "age"]
+      betaGender * (as.numeric(dswide[j, "gender"])-1)
     
-    #randomPartXBeta = randmu[[allocations[j]]][1] + randmu[[allocations[j]]][2]*time
-    randomPartXBeta = randComp[j, 1] + randComp[j, 2]*time
+    randomPartXBeta = randmu[[allocations[j]]][1] + randmu[[allocations[j]]][2]*time
+    #randomPartXBeta = randComp[j, 1] + randComp[j, 2]*time
     
-    op = rmvnorm(1, mean=fixedPartXBeta + randomPartXBeta, sigma = diag(nrep)*errSd^2)
+    #op = rmvnorm(1, mean=fixedPartXBeta + randomPartXBeta, sigma = diag(nrep)*errSd^2)
+    op = rmvnorm(1, mean=fixedPartXBeta + randomPartXBeta, sigma = sigma[[allocations[j]]])
     total = total + sum((op-mean(op))^2)
   }
-
+  
   return(total/(nsubjects*nrep))
 }
 
