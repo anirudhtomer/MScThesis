@@ -182,7 +182,7 @@ Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC app
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DIC to data set 4. So far we have observed that $\text{DIC}_3$ and $\text{DIC}_4$ can be used to detect the number of components. Since the components in this data set are fused, and the subjects count is moderately high the results following are interesting to analyze. Firstly, we can see that $\text{DIC}_4$ still follows the pattern we have discussed so far, but with $\text{DIC}_5$ it is a bit difficult to justify. i.e. even if the components are fused, $\text{DIC}_4$ may work well.\\
+Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DIC to data set 4. So far we have observed that $\text{DIC}_3$ and $\text{DIC}_4$ can be used to detect the right number of components. Since the components in this data set are fused, and the subjects count is moderately high, the following results are interesting to analyze. We can see that $\text{DIC}_4$ still follows the pattern we have discussed so far, but with $\text{DIC}_3$ and $\text{DIC}_5$ it is a bit difficult to justify. To further validate the patterns we observed so far, we decided to decrease the number of subjects to 36.\\
  
 \begin{table}[!htb]
 \centering
@@ -211,7 +211,9 @@ Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DI
 \end{tabular}
 \end{table}
 
-To see the patterns in further light, we decided to decrease the number of subjects to 36. Table \ref{table : ds_3fused_3ppg_dic} shows the corresponding results of DIC. At first glance one can see that the pattern we saw so far for $\text{DIC}_4$ doesn't exist anymore. However, the catch here is that these results are with a dirichlet prior $Dir(1, 1, ..., 1)$ for the weight distribution. When we fitted 2 or more components we found that the MCMC chains had not converged with this prior. Given the fused data set, even with fitting 2 components we risk unidentifiability due to empty components. Thus we changed the prior to $\text{Dir}(3, 3, ..., 3)$ and fitted for 2 and 3 components respectively. With 2 components we found $\text{DIC}_4$ = 2441 and $\text{p}_\text{D}$ = 461. Whereas $\text{DIC}_3$ was 1937 with $\text{p}_\text{D}$ = 14. Further fitting with 3 components we obtained $\text{DIC}_4$ = 2352 and $\text{DIC}_4$ = 2346 respective. In light of these results one can still justify the pattern we have observed for $\text{DIC}_4$ so far. An interesting result from this exercise was that using only $Dir(1, 1, ..., 1)$ can lead to severe underfitting. 
+Table \ref{table : ds_3fused_3ppg_dic} shows the results of DIC for data set 5. At first glance one can see that the pattern we saw so far for $\text{DIC}_4$ doesn't exist anymore. However, the catch here is that these results are based on a dirichlet prior $\text{Dir}(1, 1, ..., 1)$ for the weight distribution. When we fitted 2 or more components we found that the MCMC chains had not converged with this prior. Given the fused data set, even if one fits 2 components there is a risk of unidentifiability due to empty components.\\
+
+We changed the prior for weight distribution to $\text{Dir}(3, 3, ..., 3)$ and fitted models with 2, 3 and 4 components for the mixture. With 2 components we found $\text{DIC}_4 = 2441 ({\text{p}_\text{D}}_4 = 461)$ and $\text{DIC}_3 = 1937 ({\text{p}_\text{D}}_3 = 14)$. For 3 components we obtained $\text{DIC}_4$ = 2352 and for 4 components we obtained $\text{DIC}_4 = 2346$. For 4 components $\text{DIC}_3 = 1925$. In light of these results one can still justify the pattern we have observed for $\text{DIC}_4$ so far but not for $\text{DIC}_3$. An interesting result from this exercise was that the choice of $\text{Dir}(1, 1, ..., 1)$ prior is prone to severe underfitting.
 
 \begin{table}[!htb]
 \centering
@@ -240,7 +242,7 @@ To see the patterns in further light, we decided to decrease the number of subje
 \end{tabular}
 \end{table}
 
-Table 
+Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the various models fitted for data set 6. The pattern of $\text{DIC}_4$ decreasing by a large margin till the right number of components (5 in this case) are fitted is visible here as well. What is more interesting is that $\text{DIC}_3$ also seem to work well in this case. This is an indication that $\text{DIC}_3$ can used to select the correct model if the components are well separated.\\
 
 \begin{table}[!htb]
 \centering
@@ -273,11 +275,10 @@ Table
 \end{tabular}
 \end{table}
 
-
-\begin{table}[]
+\begin{table}[!htb]
 \centering
-\caption{My caption}
-\label{my-label}
+\caption{DIC and $\text{p}_\text{D}$ for data set 7}
+\label{table : ds_5fused_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
 \# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
@@ -304,6 +305,8 @@ Table
 8 & -36 & 14 & 32 & 1307 & 213 & 175 \\ \bottomrule
 \end{tabular}
 \end{table}
+
+Table \ref{table : ds_5fused_dic} shows the results of applying DIC to the various models fitted for data set 7. Based on figure \ref{fig : ds_5fused_randplot} one might only choose 3 components in this mixture. The pattern of $\text{DIC}_4$ decreasing by a large margin till the right number of components (5 in this case) are fitted is visible here as well. Although again the pattern for $\text{DIC}_3$ is a bit difficult to justify despite the large sample size.
 
 \subsection{Marginal likelihood}
 We implemented Chib's approximation mentioned in section \ref{sec : marginal_likelihood}. Table \ref{table : marginal_likelihood_results} shows the results of $\log{\hat{m}(\boldsymbol{y})}$ for the various data sets and the models fitted for them. One can see that there is no obvious pattern visible in these results to conclude the efficacy of Bayes factor in selection of a model. We had observed so far that given our data sets, the results of overfitting was label switching. However fitting 1 and 2 components did not have label switching and the chains had good convergence as well. However even if we take the cases where we had large number of observations and the components were well separated such as data set 6, we can see marginal likelihood prefers fitting 1 component over 2. Also the results of marginal likelihood for 3, 4 and 5 components for data set 6, are more or less the same. It is important to note that there is a higher margin of error in these results as the MCMC iterations were done multiple times for each data set and each component. However as we have already shown even for data sets where these chances were very less, marginal likelihood doesn't help choosing the right model.
