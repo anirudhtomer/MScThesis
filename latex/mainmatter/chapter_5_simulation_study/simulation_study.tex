@@ -5,11 +5,11 @@
 
 In this chapter we will share results from the simulation study we performed to check the efficacy of the model selection criteria described in Chapter \ref{ch : model_selection}. We implemented the Bayesian heterogeneity model using the R package R2jags \citep{su_r2jags:_2015} and analyzed the MCMC chains using the R package ggmcmc \citep{marin_ggmcmc:_2016}. For the calculation of marginal likelihood we required the density function of wishart distribution, which was available in two packages, namely MCMCpack and mixAK. There were inconsistencies in the results from the two implementations for extreme values of the wishart random variable. We eventually used mixAK \citep{komarek_mixak:_2015} as the MCMCpack package predicted density function value to be $\infty$ in some cases.
 
-\section{Description of the data sets}
+\section{Data sets for simulation study}
 The data sets we simulated were motivated by the study on predicting Zebu cow's weights in sub saharan Africa \citep{lesosky_live_2012}. We assumed our response to be the weight of the Zebu cows. The predictors we considered were hypothetical, namely gender of a cattle (Male/Female), birth year of the cattle (1996/1997), age of the cattle at the first measurement and the time at which measurement was taken. The measurements of the cows were done at 10 different equally spaced time intervals. We further added subject specific random intercept and random slope effect to each response so that the repeated measurements for a given cow were correlated. Simulatenously we made sure that these cow specific random effects were mixture distributed. We will refer to the cows as subjects hereforth.
 
-\subsection{Data sets for simulation study}
-Our aim was to create data sets differing in number of mixture components for random effects, number of subjects, statistical power to detect the fixed effects, separation of mixture components, number of subjects per component. To analyze the efficacy of model selection criteria under these different scenarios we created the multiple data sets. To get a rough idea about the random effects in each of these data sets, we did graphical analysis. For this purpose we first regressed the response $\boldsymbol{y}$ on the 3 predictors age, gender and birth year of cattle using OLS. We then subjectwise regressed the residuals from OLS on the intercept and time of measurement to obtain a rough estimate of the random effect $\tilde{\boldsymbol{b}_i}$ of the $i^\text{th}$ subject. It is to be noted that this estimator overestimates the actual size of the random effects.
+\subsection{Description of each data set}
+Our aim was to create data sets differing in number of mixture components for random effects, number of subjects, statistical power to detect the fixed effects, separation of mixture components, number of subjects per component. To analyze the efficacy of model selection criteria under these different scenarios we created the multiple data sets. To get a rough idea about the random effects in each of these data sets, we did graphical analysis. For this purpose we first regressed the response $\boldsymbol{y}$ on the 3 predictors age, gender and birth year of cattle using OLS. We then subjectwise regressed the residuals from OLS on the intercept and time of measurement to obtain a rough estimate of the random effect $\tilde{\boldsymbol{b}_i}$ of the $i^\text{th}$ subject. There are two important aspects of this method. Firstly this estimator overestimates the actual size of the random effects. Secondly, if in the mean structure, one misses out on a covariate other than the one which causes the mixture then it could be virtually impossible to decide on the number of components as shown in figure \ref{fig : missing_continuous_covariate_randplot}.
 
 \subsubsection{Data set 1: No mixture distribution of random effects}
 \label{subsubsec : ds_simple}
@@ -25,10 +25,10 @@ The next data set we created had 3 well separated components forming the mixture
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_simple_randplot.png}
        \caption{\label{fig : ds_simple_randplot}Data set 1}
 	\end{subfigure}    
-    \begin{subfigure}[b]{0.4\textwidth}
-		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_3wellsep_randplot.png}
-        \caption{\label{fig : ds_3wellsep_randplot}Data set 2}
-	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/missing_continuous_covariate_randplot.png}
+       \caption{\label{fig : missing_continuous_covariate_randplot} Data set 2: Missing covariate age}
+	\end{subfigure}     
 \caption{\label{fig : ds_simple_n_3wellsep}Rough estimate $\tilde{\boldsymbol{b}_i}$ for random effects}
 \end{figure}
 
@@ -42,15 +42,16 @@ In this data set we simulated the random effects from a mixture distribution whi
 
 \begin{figure}[!htb]
 \centering
+\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_3wellsep_randplot.png}
+        \caption{\label{fig : ds_3wellsep_randplot}Data set 2}
+	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_3wellsep3ppg_randplot.png}
        \caption{\label{fig : ds_3wellsep3ppg_randplot}Data set 3}
 	\end{subfigure}    
-    \begin{subfigure}[b]{0.4\textwidth}
-		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_3fused10ppg_randplot.png}
-        \caption{\label{fig : ds_3fused10ppg_randplot}Data set 4}
-	\end{subfigure}
-\caption{\label{fig : ds_3comp_3ppgwelsep_10ppgfused}Rough estimate $\tilde{\boldsymbol{b}_i}$ for random effects}
+    
+\caption{\label{fig : ds_3comp_3ppgwelsep}Rough estimate $\tilde{\boldsymbol{b}_i}$ for random effects}
 \end{figure}
 
 \subsubsection{Data set 5: 3 fused components but less subjects}
@@ -63,15 +64,16 @@ In this data set we simulated the random effects from a mixture distribution whi
 
 \begin{figure}[!htb]
 \centering
+\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_3fused10ppg_randplot.png}
+        \caption{\label{fig : ds_3fused10ppg_randplot}Data set 4}
+	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_3fused3ppg_randplot.png}
        \caption{\label{fig : ds_3fused3ppg_randplot}Data set 5}
 	\end{subfigure}    
-    \begin{subfigure}[b]{0.4\textwidth}
-		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_5wellsep_randplot.png}
-        \caption{\label{fig : ds_5wellsep_randplot}Data set 6}
-	\end{subfigure}
-\caption{\label{fig : ds_3fused3ppg_5wellsep}Rough estimate $\tilde{\boldsymbol{b}_i}$ for random effects}
+    
+\caption{\label{fig : ds_3fused10ppg_3fused3ppg}Rough estimate $\tilde{\boldsymbol{b}_i}$ for random effects}
 \end{figure}
 
 \subsubsection{Data set 7: 5 fused components}
@@ -80,17 +82,24 @@ his data is similar to Data set 6 in all regards except that the number of subje
 
 \begin{figure}[!htb]
 \centering
-	\includegraphics[scale=0.5]{mainmatter/chapter_5_simulation_study/ds_5fused_randplot.png}
-	\caption{Rough estimate $\tilde{\boldsymbol{b}_i}$ for random effects of data set 7.}
-	\label{fig : ds_5fused_randplot}    
+\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_5wellsep_randplot.png}
+        \caption{\label{fig : ds_5wellsep_randplot}Data set 6}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ds_5fused_randplot.png}
+        \caption{\label{fig : ds_5fused_randplot}Data set 7}
+	\end{subfigure}
+	\caption{Rough estimate $\tilde{\boldsymbol{b}_i}$ for random effects.}
+	\label{fig : ds_5wellsep_5fused}    
 \end{figure}
 
 
 \subsection{Running MCMC simulations}
-One of the primary issues we faced in running MCMC simulations were, label switching across chains, i.e. label 1 corresponding to component 1 in one chain and corresponding to some other component in another chain. This gave inconsistent and incorrect estimates for the various calculations we did. Although we dealt with it using the mechanism given in section \ref{subsec : label_switching_blmm}, it decreased the speed of simulations drastically. To make matters worse we had to use thinning of around 1 per 100 iterations to make sure the resulting chains were not autocorrelated. In light of these reasons and given the time constraints we had to be content with chains of 1300 iterations. MULTIPLE CHAINS,....CONSISTENT RESULTS.,...DIC results not based on a single chain.
+Some of the issues we faced in running MCMC simulations were, label switching across chains, i.e. label 1 corresponding to component 1 in one chain and corresponding to some other component in another chain. This gave inconsistent and incorrect estimates for the various calculations we did. Although we dealt with it using the mechanism given in section \ref{subsec : label_switching_blmm}, it decreased the speed of simulations drastically. To make matters worse we had to use thinning of around 1 per 100 iterations to make sure the resulting chains were not autocorrelated. In light of these reasons and given the time constraints we had to be content with chains of 1300 iterations. Although the following results are based on a single chain and are rounded to the nearest integer, we ran multiple chains and found results to be differing only in the ones's place or by a very small margin.
 
 \subsection{Deviance information criteria}
-Table \ref{table : ds_simple_dic} shows the values of the various Deviance information criteria (section \ref{sec : dic}) applied to data set 1. We can see that $\text{DIC}_1$ gives misleading results whereas the rest of the DIC's remain more or less the same for overfitted models. The value of ${\text{p}_\text{D}}_1$ is negative (-602) when we fitted 3 components. \citet[pg. 161]{lunn_bugs_2012} noted that this can happen if the posterior is multimodal, which as we know can happen due to label switching when models are overfitted. For the same reason \citet{celeux_deviance_2006} suggest using $\text{DIC}_3$ instead of the other two observed data DIC measures.
+Table \ref{table : ds_simple_dic} shows the values of the various Deviance information criteria (section \ref{sec : dic}) applied to data set 1. We can see $\text{DIC}_1$ gives misleading results whereas the rest of the DIC remain more or less the same for overfitted models. The value of ${\text{p}_\text{D}}_1$ is negative (-602) when we fitted 3 components. \citet[pg. 161]{lunn_bugs_2012} noted that this can happen if the posterior is multimodal, which as we know can happen due to label switching when models are overfitted. For the same reason \citet{celeux_deviance_2006} suggest using $\text{DIC}_3$ instead of the other two observed data DIC measures.\\
 
 \begin{table}[!htb]
 \centering
@@ -115,7 +124,7 @@ Table \ref{table : ds_simple_dic} shows the values of the various Deviance infor
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3wellsep_dic} shows the values of various DIC applied to the data set 2. One of the patterns we inferred out of the results was that for $\text{DIC}_4$ the DIC values decrease continually by a very large margin till the right number of components are fitted, whereas after that the DIC either decreases by a relative smaller margin or remains more or less the same. The behavior of $\text{DIC}_5$ and $\text{DIC}_3$ is similar to $\text{DIC}_4$, however the large decrease in DIC that we observe for $\text{DIC}_4$ is not that large for them. However these patterns do not seem applicable to $\text{DIC}_1$ and $\text{DIC}_6$. For $\text{DIC}_1$ the pattern is that the values of ${\text{p}_\text{D}}_1$ become negative for 4 or more components, i.e. sign of overfitting as we discussed above.
+Table \ref{table : ds_3wellsep_dic} shows the values of various DIC applied to the data set 2. One of the patterns we inferred out of these results was that for $\text{DIC}_4$ the DIC values decrease continually by a very large margin till the right number of components are fitted, whereas for the overfitted models that the DIC either decreases by a relatively smaller margin or remains more or less the same. The behavior of $\text{DIC}_5$ and $\text{DIC}_3$ is similar to $\text{DIC}_4$, however the magnitude difference in DIC that we observe for $\text{DIC}_4$ is not as much for them. These patterns, however do not seem applicable to $\text{DIC}_1$ and $\text{DIC}_6$. For $\text{DIC}_1$ the pattern is that the values of ${\text{p}_\text{D}}_1$ become negative for 4 or more components, i.e. sign of overfitting as we discussed above.\\
 
 \begin{table}[!htb]
 \centering
@@ -144,7 +153,7 @@ Table \ref{table : ds_3wellsep_dic} shows the values of various DIC applied to t
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC's applied to the data set 3. Firstly we can see that the pattern we inferred for $\text{DIC}_1$ above is not applicable here. Similar to the previous data set $\text{DIC}_6$ does not reveal any meaningful pattern. We can also see that the pattern of $\text{DIC}_5$ that we noted above is also not applicable here. However for $\text{DIC}_3$ and $\text{DIC}_4$ one can still see that the pattern of DIC decreasing by big margins till the right number of components are fitted, is still valid. Interestingly the margins have decreased as the sample size for this data set was only 36 subjects compared to the 180 subjects in data set 2.
+Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC applied to the data set 3. Firstly we can see that the pattern we inferred for $\text{DIC}_1$ above is not applicable here. Similar to the previous data set $\text{DIC}_6$ does not reveal any meaningful pattern. We can also see that the pattern of $\text{DIC}_5$ that we noted above is also not applicable here. However for $\text{DIC}_3$ and $\text{DIC}_4$ one can still see that the pattern of DIC decreasing by big magnitude till the right number of components are fitted is still valid. The magnitudes of the DIC have decreased as the sample size for this data set was only 36 subjects compared to the 180 subjects in data set 2.
 
 \begin{table}[!htb]
 \centering
@@ -173,7 +182,7 @@ Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC's a
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3fused_3ppg} shows the results of applying various DIC's to data set 4. So far we have observed that $\text{DIC}_3$ and $\text{DIC}_4$ can be used to detect the number of components. Since the components in this data set are fused, and the subjects count is moderately high the results following are interesting to analyze. Firstly, we can see that $\text{DIC}_4$ still follows the pattern we have discussed so far, but with $\text{DIC}_5$ it is a bit difficult to justify. i.e. even if the components are fused, $\text{DIC}_4$ may work well.
+Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DIC to data set 4. So far we have observed that $\text{DIC}_3$ and $\text{DIC}_4$ can be used to detect the number of components. Since the components in this data set are fused, and the subjects count is moderately high the results following are interesting to analyze. Firstly, we can see that $\text{DIC}_4$ still follows the pattern we have discussed so far, but with $\text{DIC}_5$ it is a bit difficult to justify. i.e. even if the components are fused, $\text{DIC}_4$ may work well.\\
  
 \begin{table}[!htb]
 \centering

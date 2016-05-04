@@ -4,7 +4,7 @@ extractRandomComp = function(viaReg=F){
   if(viaReg==T){
     reg=lm(weight~gender+by+age+time,data=ds)
     temp = temp-(as.numeric(ds$gender)-1)*reg$coefficients[2]
-    temp = temp-(as.numeric(ds$by)-1)*reg$coefficients[3]
+    #temp = temp-(as.numeric(ds$by)-1)*reg$coefficients[3]
     temp = temp-ds$age*reg$coefficients[4]
     #temp = temp-ds$time*reg$coefficients[4]
   }else{
