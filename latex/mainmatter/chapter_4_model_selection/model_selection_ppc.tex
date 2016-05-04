@@ -1,6 +1,0 @@
-
-\section{Posterior predictive checks}
-\label{sec : ppc}
-
-The idea of the posterior predictive checks is to evaluate the model fit using simulations from the posterior predictive distribution(PPD) $p(\boldsymbol{\tilde{y}}|\boldsymbol{y}$. As an informal check one could sample 1000 values from the PPD 20 times and make 20 histograms to show the density. If the histograms do not match with the histogram of the original sample one could say that the model did not fit the data well.\\ 
-A formal way to do this is using Posterior predictive p-values(PPP) or Bayesian p-values. In the frequentist paradigm after fitting a model based on parameter $\hat{\theta}$ one could test the model using test statistic. Let us represent that test statistic value for original sample to be $T(\boldsymbol{y})$. Now based on the sampling distribution of $T(\boldsymbol{\tilde{y}})$ we could check the probability $P(T(\boldsymbol{\tilde{y}}) > T(\boldsymbol{y})$. In the bayesian paradigm the parameter $\theta$ has a posterior distribution and so we find the same probability like before albeit averaged over the entire posterior $p(\theta|\boldsymbol{y})$. A small PPP value indicates bad fit of model to the data. For a complete interpretation of this p-value we refer the readers to \citet{gelman_understanding_2012}.
