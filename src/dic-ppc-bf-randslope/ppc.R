@@ -1,4 +1,4 @@
-ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='mvtnorm') %dopar%{
+ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='rbind', .packages='MASS') %dopar%{
   
   ncomponents = attributes(mcmcfit)$ncomponents
   nsubjects = attributes(mcmcfit)$nsubjects
@@ -17,30 +17,38 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='mvtnorm') %dopa
   sigma = getSigma(mcmcfit, mcmcIterNum = k)
   
   #Only first data point
-  tIndex = 10
-  sampleFixedPart = ppFixedPart = matrix(nrow=nsubjects, ncol=nrep)
-  total = 0
+  ppRandomPart = matrix(nrow=0, ncol=nrep)
+  
+  totalSample = 0
   for(j in 1:nsubjects){
-    fixedPartXBeta = betaBy * (as.numeric(dswide[j, "by"])-1) + 
+    fixedPartXBeta = betaBy * (as.numeric(dswide[j, "by"])-1) +
       betaGender * (as.numeric(dswide[j, "gender"])-1) + betaAge*dswide[j, "age"]
     
-    #randomPartXBeta = randmu[[allocations[j]]][1] + randmu[[allocations[j]]][2]*time
-    randomPartXBeta = randComp[j, 1] + randComp[j, 2]*time
-    
-    op = rmvnorm(1, mean=fixedPartXBeta + randomPartXBeta, sigma = diag(nrep)*errSd^2)
-    total = total + sum((op-mean(op))^2)
+    sampleRandomPart = dswide_y[j,] - fixedPartXBeta
+    sampleRandomPart = sampleRandomPart - mean(sampleRandomPart)
+    totalSample = totalSample + sum(sampleRandomPart^2)
   }
-
-  return(total/(nsubjects*nrep))
+  totalSample = totalSample/(nsubjects*nrep)
+  
+  totalPp = 0
+  for(j in 1:ncomponents){
+    numObs=round(eta[j]*10000)
+    if(numObs>0){
+      newObsRandPart = matrix(mvrnorm(n=numObs, randmu[[j]], randSigma[[j]]), ncol=2)
+      
+      for(m in 1:numObs){
+        newObs = mvrnorm(n=1, newObsRandPart[m, 1] + newObsRandPart[m, 2]*time, diag(nrep)*errSd^2)
+        newObs = newObs - mean(newObs)
+        totalPp =totalPp + sum(newObs^2)
+      }
+    }
+  }
+  totalPp = totalPp/(10000*nrep)
+  
+  return(c(totalSample, totalPp))
 }
 
-#calculating observed
-total=0
-for(j in 1:nsubjects){
-  total = total + sum((dswide_y[j,]-mean(dswide_y[j,]))^2)
-}
-total = total/(nsubjects*nrep)
 
-plot(density(ppcCheck))
+plot(density(ppcCheck[,2]))
 abline(v = total)
 HPDinterval(mcmc(ppcCheck))
