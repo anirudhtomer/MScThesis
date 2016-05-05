@@ -1,14 +1,10 @@
 ############ extracting random components to plot them ##############
 extractRandomComp = function(){
   temp = ds$Hb
-  reg=lm(Hb~Age*Season + TSPD*Donate+ TSPD*Season + 
-           donationLast2Years*TSPD + donationLast2Years*Donate + 
-           donationLast2Years*Season + I(donationLast2Years^2),data=ds)
-  #reg=lm(Hb~Age+Donate + Season+TSPD + donationLast2Years,data=ds)
-  temp = temp-ds$firstAge*reg$coefficients[2]
-  temp = temp-(as.numeric(ds$Season)-1)*reg$coefficients[3]
-  temp = temp-ds$TSPD*reg$coefficients[4]
-  temp = temp-ds$Hb.PD*reg$coefficients[5]
+  reg=lm(Hb~Age*Donate + TSPD*Donate + donationLast2Years*Donate
+         +  donationLast2Years*TSPD + I(Age^2),data=ds)
+  
+  temp = reg$residuals
   
   randIntercept = numeric()
   randSlope = numeric()
@@ -18,7 +14,7 @@ extractRandomComp = function(){
     startIndex = prevEnd + 1
     endIndex = prevEnd + length(timePerSubject[[paste(i)]])
     
-    reg=lm(temp[startIndex:endIndex]~I(donationLast2YearsPerSubject[[paste(i)]]/10))   
+    reg=lm(temp[startIndex:endIndex]~I(donationLast2YearsPerSubject[[paste(i)]]))   
     randIntercept[k] = reg$coefficients[1]
     randSlope[k] = reg$coefficients[2]
     k=k+1
@@ -30,7 +26,7 @@ extractRandomComp = function(){
 
 randomComp=extractRandomComp()
 randomCompDf = data.frame(randomComp[complete.cases(randomComp)==TRUE,])
-qplot(x=randIntercept, y=randSlope, data=randomCompDf)
+qplot(x=randIntercept, y=randSlope, data=randomCompDf, ylim=c(-10,10))
 var(randomCompDf)
 #plot(density(extractRandomComp()[,1]))
 

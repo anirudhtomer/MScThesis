@@ -21,3 +21,10 @@ plot(density(var2))
 plot(density(cov))
 
 meanSplaash1 = c(mean(splaash1[,1]),mean(splaash1[,2]))
+
+corrrr=c()
+for(i in 1:500){
+  temp=solve(rWishart(n=1,df=2, diag(2))[,,1])
+  corrrr[i] = temp[1,1]
+}
+plot(density(corrrr))

@@ -97,7 +97,7 @@ The choice of parametrization has an effect on the rate of convergence of the ch
 
 \subsection{Starting values}
 \label{subsec : choice_starting_values}
-The choice of starting values is important in mixtures especially when the components are not well separated. In the R package bayesmix \citep{gruen_bayesmix:_2015} the authors use $\frac 1 {k+1}, \frac 2 {k+1}, ..., \frac 2 {k+1}$ quantiles of the sample data. In the Bayesian heterogenity model we first extract the random component from the data as described in section \ref{subsec : ds_description} and then calculate the sample quantiles. We found out that it resulted into chains with an improved convergence. We also calcluate starting values for the fixed effects using OLS.
+The choice of starting values is important in mixtures especially when the components are not well separated. In the R package bayesmix \citep{gruen_bayesmix:_2015} the authors use $\frac 1 {k+1}, \frac 2 {k+1}, ..., \frac 2 {k+1}$ quantiles of the sample data. In the Bayesian heterogenity model we first extract the random component from the data as described in section \ref{subsec : ds_description} and then calculate the sample quantiles. We found out that it resulted into chains with an improved convergence. We also calcluate starting values for the fixed effects $\boldsymbol{\beta}$ using OLS, as they are unbiased and consistent [pg. 50]\citep{verbeke_linear_2009}.
 
 \subsection{Choice of priors}
 \label{subsec : choice_priors}

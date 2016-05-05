@@ -23,10 +23,11 @@ for(i in unique(blood_donor$Id)){
 
 ds = blood_donor[!(blood_donor$Id %in% rejectIdList),]
 
+#remove rows with volume 10
 #Process the selected blood donors
 uniqueIds = unique(ds$Id)
 
-randomSample = sample(1:1595, size = 200, replace = F)
+randomSample = sample(1:1595, size = 250, replace = F)
 uniqueIds = uniqueIds[randomSample]
 
 ds = ds[ds$Id %in% uniqueIds, ]
@@ -36,6 +37,7 @@ agePerSubject = list()
 donationLast2YearsPerSubject = list()
 nsubjects = length(uniqueIds)
 nrepPerSubject = rep(0, nsubjects)
+tspdpersubject = list()
 
 for(i in 1:nsubjects){
   id = uniqueIds[i]
@@ -56,9 +58,10 @@ for(i in 1:nsubjects){
       donationLast2years[j] = sum(temp$Donate[(j-1):k])
     }
   }
-  ds[ds$Id==id,]$donationLast2Years = donationLast2years/100
+  ds[ds$Id==id,]$donationLast2Years = donationLast2years/10
   
-  donationLast2YearsPerSubject[[paste(id)]] = donationLast2years
+  donationLast2YearsPerSubject[[paste(id)]] = donationLast2years/10
+  tspdpersubject[[paste(id)]] = temp$TSPD
 }
 
 ds$TSPDdonate = ds$TSPD*ds$Donate
@@ -68,6 +71,7 @@ ds$donateLast2TSPD = ds$TSPD*ds$donationLast2Years
 ds$donateLast2Donate = ds$Donate*ds$donationLast2Years
 ds$donateLast2Season = (as.numeric(ds$Season)-1)*ds$donationLast2Years
 ds$donateLast2Square = ds$donationLast2Years^2
+
 
 numHb = table(ds$Id)
 cumsumHb = c(0, cumsum(numHb))
