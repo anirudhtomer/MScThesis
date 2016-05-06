@@ -311,6 +311,7 @@ Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the var
 Table \ref{table : ds_5fused_dic} shows the results of applying DIC to the various models fitted for data set 7. Based on figure \ref{fig : ds_5fused_randplot} one might only choose 3 components in this mixture. The pattern of $\text{DIC}_4$ decreasing by a large margin till the right number of components (5 in this case) are fitted is visible here as well. Although again the pattern for $\text{DIC}_3$ is a bit difficult to justify despite the large sample size.
 
 \subsection{Marginal likelihood}
+\label{subsec : marginal_likelihood_simulation}
 We implemented Chib's approximation mentioned in section \ref{sec : marginal_likelihood}. Table \ref{table : marginal_likelihood_results} shows the results of $\log{\hat{m}(\boldsymbol{y})}$ for the various data sets and the models fitted for them. One can see that there is no obvious pattern visible in these results to conclude the efficacy of Bayes factor in selection of a model. We had observed so far that given our data sets, the results of overfitting was label switching. However fitting 1 and 2 components did not have label switching and the chains had good convergence as well. However even if we take the cases where we had large number of observations and the components were well separated such as data set 6, we can see marginal likelihood prefers fitting 1 component over 2. Also the results of marginal likelihood for 3, 4 and 5 components for data set 6, are more or less the same. It is important to note that there is a higher margin of error in these results as the MCMC iterations were done multiple times for each data set and each component. However as we have already shown even for data sets where these chances were very less, marginal likelihood doesn't help choosing the right model.
 
 \begin{table}[!htb]
@@ -330,5 +331,60 @@ Data set 7 & -3397 & -3379 & -3373 & -3380 & -2749 & $\infty$ & $\infty$ & -3416
 \end{tabular}
 \end{table}
 
+\subsection{Posterior predictive check (PPC)}
+\label{subsec : ppc_simulation}
+We implemented the PPC's outlined in section \ref{sec : ppc}. Since the PPC we are using exploits unidentifiability due to empty components, it works irrespective of how fused the components of the data set are, or the number of subjects in the data set. Thus we found the results to be consistent across the various data sets. We will thus only discuss fitting various number of components to the mixture of 5 well separated components of data set 6. Figure \ref{fig : ppc_5wellsep8comp} to \ref{fig : ppc_5wellsep1comp} show the distribution of the test statistic \ref{eq : ppc_test_statistic} for the various models we fitted to data 6. It can be seen that the distribution is postively skewed whenever overfitting is present. On the other hand the distribution of the test statistic is more or less the same in cases of underfitting. It is to be noted that this is despite the fact that we used a mixed predictive approach.\\
 
+\begin{figure}[!htb]
+\centering
+\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep8comp.png}
+        \caption{\label{fig : ppc_5wellsep8comp}8 components fitted for data set 6}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep7comp.png}
+          \caption{\label{fig : ppc_5wellsep7comp}7 components fitted for data set 6}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep6comp.png}
+          \caption{\label{fig : ppc_5wellsep6comp}6 components fitted for data set 6}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep5comp.png}
+          \caption{\label{fig : ppc_5wellsep5comp}5 components fitted for data set 6}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep4comp.png}
+          \caption{\label{fig : ppc_5wellsep4comp}4 components fitted for data set 6}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep3comp.png}
+          \caption{\label{fig : ppc_5wellsep3comp}3 components fitted for data set 6}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep2comp.png}
+          \caption{\label{fig : ppc_5wellsep2comp}2 components fitted for data set 6}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep1comp.png}
+          \caption{\label{fig : ppc_5wellsep1comp}1 component fitted for data set 6}
+	\end{subfigure}
+	\caption{PDF function of $T(\boldsymbol{\tilde{r}})$ estimated using KDE. The red line shows the value of the test statistic $T(\boldsymbol{r})$ based on the observed data.}
+	\label{fig : ppc_5wellsepcomp}    
+\end{figure}
 
+One can observe a more severe impact of overfitting if they use indepedent inverse gamma priors for the variance components of $G_k$ and uniform prior $U(-1,1)$ for correlation. To show the resulting distribution of the test statistic, we had to log transform it as otherwise the values were too large to be plotted in a single graph. We took the case of data set 2 and overfitted it by using 4 components in the mixture. One can see that the corresponding test statistic inflates by a big margin as we described in section \ref{sec : ppc}. Interestingly when we fit the right number of components the test statistic is not inflated, but we still get to see that the model is not well fitting. We further checked our posteriors for variance covariance matrices and found them to be underestimating the original variance covariance of the random effects from the simulated data set. Thus proves that the test statistic can be used to detect bad fitting models, however differentiating among models with less number of components may not be possible.
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/indpGammaPrior_ppc_3wellsep4comp.png}
+        \caption{\label{fig : ppc_3wellsep3comp_indp_gammaprior}4 components fitted for data set 2. log scale is used.}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/indpGammaPrior_ppc_3wellsep3comp.png}
+        \caption{\label{fig : ppc_3wellsep3comp_indp_gammaprior}3 components fitted for data set 2}
+	\end{subfigure}
+	\caption{PDF function of $T(\boldsymbol{\tilde{r}})$ estimated using KDE. The red line shows the value of the test statistic $T(\boldsymbol{r})$ based on the observed data. Indepdent gamma priors for precision and uniform prior for correlation is used.}
+	\label{fig : ppc_3wellsep4comp_indp_gammaprior}
+\end{figure}
