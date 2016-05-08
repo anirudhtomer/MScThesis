@@ -58,9 +58,9 @@ for(i in 1:nsubjects){
       donationLast2years[j] = sum(temp$Donate[(j-1):k])
     }
   }
-  ds[ds$Id==id,]$donationLast2Years = donationLast2years/10
+  ds[ds$Id==id,]$donationLast2Years = donationLast2years/100
   
-  donationLast2YearsPerSubject[[paste(id)]] = donationLast2years/10
+  donationLast2YearsPerSubject[[paste(id)]] = donationLast2years/100
   tspdpersubject[[paste(id)]] = temp$TSPD
 }
 
@@ -71,7 +71,6 @@ ds$donateLast2TSPD = ds$TSPD*ds$donationLast2Years
 ds$donateLast2Donate = ds$Donate*ds$donationLast2Years
 ds$donateLast2Season = (as.numeric(ds$Season)-1)*ds$donationLast2Years
 ds$donateLast2Square = ds$donationLast2Years^2
-
 
 numHb = table(ds$Id)
 cumsumHb = c(0, cumsum(numHb))

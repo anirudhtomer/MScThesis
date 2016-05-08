@@ -39,9 +39,9 @@ runJagsModel = function(datanodes, initialValues, stochasticNodes,jagsmodel, nco
              model.file=jagsmodel, jags.module=NULL)
 }
 
-fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3){
+fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, ncomp=3, dirichParmHyper=1){
   
-  dirichParm = rep(1, ncomp)
+  dirichParm = rep(dirichParmHyper, ncomp)
   randComp=extractRandomComp()
   quantiles = seq(1/(ncomp+1),ncomp/(ncomp+1),length.out = ncomp)
   randIntQuantiles = quantile(randComp[!is.na(randComp[,1]),1], probs = quantiles)
@@ -50,9 +50,9 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
   
   datanodes = list("dsHb"=ds$Hb,"dsDonate"=as.numeric(ds$Donate), "dsAge"=ds$Age, "dsfirstAge"=ds$firstAge,
                    "dsSeason"=as.numeric(ds$Season)-1,"dsTSPD"=ds$TSPD, "dsDonationLast2Years"=ds$donationLast2Years,
-                   "dsAgeSeason"=ds$ageSeason, "dsTSPDDonate"=ds$TSPDdonate, "dsTSPDSeason"=ds$TSPDSeason,
+                   "betaTSPDSquare"=ds$TSPD^2, "dsTSPDSeason"=ds$TSPDSeason,
                    "dsDonateLast2TSPD"=ds$donateLast2TSPD, "dsDonateLast2Donate"=ds$donateLast2Donate, 
-                   "dsDonateLast2Season"=ds$donateLast2Season,"dsDonateLast2Square"=ds$donateLast2Square,
+                   "dsDonateLast2Square"=ds$donateLast2Square,
                    "nsubjects"=nsubjects,"numHb"=numHb, "cumsumHb"=cumsumHb, "gammaShapeRate"=gammaShapeRate, "betaMu"=betaMu,
                    "betaTau"=betaTau, "betaMuMult"=rep(betaMu,2),"ncomponents"=ncomp, "betaTauMult"=diag(2),
                    "dirichParm"=dirichParm, "wishartPriorScale"=wishartPriorScale, "wishartPriorDf"=wishartPriorDf)
@@ -64,8 +64,8 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
                        "randmu_unordered"=cbind(randIntQuantiles, randSlopeQuantiles))
   
   stochasticNodes = c("betaAge","betaSeason", "betaDonate", "betaTSPD", 
-                      "betaAgeSeason", "betaTSPDDonate", "betaTSPDSeason",
-                      "betaDonateLast2TSPD", "betaDonateLast2Donate", "betaDonateLast2Season", "betaDonateLast2Square",
+                      "betaTSPDSquare", "betaTSPDSeason",
+                      "betaDonateLast2TSPD", "betaDonateLast2Donate", "betaDonateLast2Square",
                       "errPrecision", "randSigma","randPrecision",
                       "randmu", "randomComp", "Eta", "S", "precisionIntercept","precisionSlope", "rho")
   

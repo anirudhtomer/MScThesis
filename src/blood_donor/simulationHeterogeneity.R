@@ -22,27 +22,25 @@ source("DIC_functions.R")
 source("bf.R")
 
 numchains = 1
-niter = 100000
+niter = 150000
 nthin=100
 nburnin=10000
 
 ncomponents=3
 if(ncomponents==1){
-  fit = fitModel(niter, nthin, 0, jagsmodel = singleModel, nchains = numchains, ncomponents)  
+  fit = fitModel(niter, nthin, 0, jagsmodel = singleModel, nchains = numchains, ncomponents, 1)  
   mcmcfit = as.mcmc(fit)
   colnames(mcmcfit[[1]])[match("Eta",colnames(mcmcfit[[1]]))] = "Eta[1]"
   colnames(mcmcfit[[1]])[match("precision1",colnames(mcmcfit[[1]]))] = "precision1[1]"
   colnames(mcmcfit[[1]])[match("precision2",colnames(mcmcfit[[1]]))] = "precision2[1]"
   colnames(mcmcfit[[1]])[match("rho",colnames(mcmcfit[[1]]))] = "rho[1]"
 }else{
-  fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents)
+  fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
   mcmcfit = as.mcmc(fit)
 }
 
 attributes(mcmcfit)$ncomponents = ncomponents
 attributes(mcmcfit)$nsubjects = nsubjects
-attributes(mcmcfit)$nrep = nrep
-attributes(mcmcfit)$time = time
 getRandSigma(mcmcfit)
 
 beep(sound=8)
@@ -50,10 +48,82 @@ beep(sound=8)
 mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
 mcmcLen = nrow(mcmcfit[[1]])
 attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
-ggsobject = ggs(mcmcfit)
+ggsobject = ggs(mcmcfit_2comp)
 
 attributes(mcmcfit)
-#save.image("F:/docs/Dropbox/MSc Stats/Thesis/MScThesis/latex/code/dic-ppc-randslope/.RData")
+
+ncomponents=1
+fit = fitModel(niter, nthin, 0, jagsmodel = singleModel, nchains = numchains, ncomponents, 1)  
+mcmcfit_1comp = as.mcmc(fit)
+attributes(mcmcfit_1comp)$ncomponents = 1
+attributes(mcmcfit_1comp)$nsubjects = nsubjects
+attributes(mcmcfit_1comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
+colnames(mcmcfit_1comp[[1]])[match("Eta",colnames(mcmcfit_1comp[[1]]))] = "Eta[1]"
+colnames(mcmcfit_1comp[[1]])[match("precision1",colnames(mcmcfit_1comp[[1]]))] = "precision1[1]"
+colnames(mcmcfit_1comp[[1]])[match("precision2",colnames(mcmcfit_1comp[[1]]))] = "precision2[1]"
+colnames(mcmcfit_1comp[[1]])[match("rho",colnames(mcmcfit_1comp[[1]]))] = "rho[1]"
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
+
+ncomponents=2
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
+mcmcfit_2comp = as.mcmc(fit)
+attributes(mcmcfit_2comp)$ncomponents = 2
+attributes(mcmcfit_2comp)$nsubjects = nsubjects
+attributes(mcmcfit_2comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
+
+ncomponents=3
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
+mcmcfit_3comp = as.mcmc(fit)
+attributes(mcmcfit_3comp)$ncomponents = 3
+attributes(mcmcfit_3comp)$nsubjects = nsubjects
+attributes(mcmcfit_3comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
+
+ncomponents=4
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
+mcmcfit_4comp = as.mcmc(fit)
+attributes(mcmcfit_4comp)$ncomponents = 4
+attributes(mcmcfit_4comp)$nsubjects = nsubjects
+attributes(mcmcfit_4comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
+
+ncomponents=5
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 1)
+mcmcfit_5comp_dirich1 = as.mcmc(fit)
+attributes(mcmcfit_5comp_dirich1)$ncomponents = 5
+attributes(mcmcfit_5comp_dirich1)$nsubjects = nsubjects
+attributes(mcmcfit_5comp_dirich1)$INTERCEPT_SCALE = INTERCEPT_SCALE
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
+
+ncomponents=6
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
+mcmcfit_6comp = as.mcmc(fit)
+attributes(mcmcfit_6comp)$ncomponents = 6
+attributes(mcmcfit_6comp)$nsubjects = nsubjects
+attributes(mcmcfit_6comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
+
+mcmcfit = mcmcfit_4comp
+mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
+mcmcLen = nrow(mcmcfit[[1]])
+attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
+dic4comp = list(calculateDIC1(mcmcfit), calculateDIC2(mcmcfit), calculateDIC3(mcmcfit), calculateDIC4(mcmcfit), calculateDIC5(mcmcfit), calculateDIC7(mcmcfit))
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
+
+mcmcfit = mcmcfit_5comp_dirich1
+mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
+mcmcLen = nrow(mcmcfit[[1]])
+attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
+dic5comp = list(calculateDIC1(mcmcfit), calculateDIC2(mcmcfit), calculateDIC3(mcmcfit), calculateDIC4(mcmcfit), calculateDIC5(mcmcfit), calculateDIC7(mcmcfit))
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
+
+mcmcfit = mcmcfit_6comp
+mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
+mcmcLen = nrow(mcmcfit[[1]])
+attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
+dic6comp = list(calculateDIC1(mcmcfit), calculateDIC2(mcmcfit), calculateDIC3(mcmcfit), calculateDIC4(mcmcfit), calculateDIC5(mcmcfit), calculateDIC7(mcmcfit))
+save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
 
 calculateDIC1(mcmcfit)
 calculateDIC2(mcmcfit)

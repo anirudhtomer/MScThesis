@@ -6,13 +6,11 @@ model = function(){
       mu[cumsumHb[i]+j]<- betaDonate*dsDonate[cumsumHb[i]+j] + betaAge*dsAge[cumsumHb[i]+j] + 
         betaSeason*dsSeason[cumsumHb[i]+j] + betaTSPD*dsTSPD[cumsumHb[i]+j] +
         randomComp[i,1]*0.1 + randomComp[i,2]*(dsDonationLast2Years[cumsumHb[i]+j]) + 
-        betaAgeSeason*dsAgeSeason[cumsumHb[i]+j] + 
-        betaTSPDDonate*dsTSPDDonate[cumsumHb[i]+j] +
+        betaTSPDSquare*dsTSPDSquare[cumsumHb[i]+j] +
         betaTSPDSeason*dsTSPDSeason[cumsumHb[i]+j] +
         
         betaDonateLast2TSPD*dsDonateLast2TSPD[cumsumHb[i]+j] +
         betaDonateLast2Donate*dsDonateLast2Donate[cumsumHb[i]+j] +
-        betaDonateLast2Season*dsDonateLast2Season[cumsumHb[i]+j] +
         betaDonateLast2Square*dsDonateLast2Square[cumsumHb[i]+j]
     }
     
@@ -44,12 +42,11 @@ model = function(){
   betaSeason~dnorm(betaMu,betaTau)
   betaTSPD~dnorm(betaMu,betaTau)
   
-  betaAgeSeason~dnorm(betaMu,betaTau)
-  betaTSPDDonate~dnorm(betaMu,betaTau)
+  betaTSPDSquare~dnorm(betaMu,betaTau)
   betaTSPDSeason~dnorm(betaMu,betaTau)
+  
   betaDonateLast2TSPD~dnorm(betaMu,betaTau)
   betaDonateLast2Donate~dnorm(betaMu,betaTau)
-  betaDonateLast2Season~dnorm(betaMu,betaTau)
   betaDonateLast2Square~dnorm(betaMu,betaTau)
   
   Eta~ddirch(dirichParm[])
@@ -63,14 +60,13 @@ singleModel = function(){
       mu[cumsumHb[i]+j]<- betaDonate*dsDonate[cumsumHb[i]+j] + betaAge*dsAge[cumsumHb[i]+j] + 
         betaSeason*dsSeason[cumsumHb[i]+j] + betaTSPD*dsTSPD[cumsumHb[i]+j] +
         randomComp[i,1]*0.1 + randomComp[i,2]*(dsDonationLast2Years[cumsumHb[i]+j]) + 
-        
-        betaAgeSeason*dsAgeSeason[cumsumHb[i]+j] + 
-        betaTSPDDonate*dsTSPDDonate[cumsumHb[i]+j] +
-        betaTSPDSeason*dsTSPDSeason[cumsumHb[i]+j] +
+        #betaAgeSeason*dsAgeSeason[cumsumHb[i]+j] + 
+        #  betaTSPDDonate*dsTSPDDonate[cumsumHb[i]+j] +
+        #   betaTSPDSeason*dsTSPDSeason[cumsumHb[i]+j] +
         
         betaDonateLast2TSPD*dsDonateLast2TSPD[cumsumHb[i]+j] +
         betaDonateLast2Donate*dsDonateLast2Donate[cumsumHb[i]+j] +
-        betaDonateLast2Season*dsDonateLast2Season[cumsumHb[i]+j] +
+        #  betaDonateLast2Season*dsDonateLast2Season[cumsumHb[i]+j] +
         betaDonateLast2Square*dsDonateLast2Square[cumsumHb[i]+j]
     }
     
