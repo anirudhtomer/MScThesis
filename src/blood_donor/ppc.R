@@ -11,36 +11,32 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='MASS') %dopar%{
   randComp = getRandomComp(mcmcfit, mcmcIterNum = k)
   errSd = sqrt(1/mcmcfit[[1]][k, "errPrecision"])
   
-  betaAge = mcmcfit[[1]][k,"betaAge"]
-  betaDonate = mcmcfit[[1]][k,"betaDonate"]
-  betaSeason = mcmcfit[[1]][k,"betaSeason"]
-  betaTSPD = mcmcfit[[1]][k,"betaTSPD"]
-  betaDonateLast2TSPD = mcmcfit[[1]][k,"betaDonateLast2TSPD"]
-  betaDonateLast2Donate = mcmcfit[[1]][k,"betaDonateLast2Donate"]
-  betaDonateLast2Square = mcmcfit[[1]][k,"betaDonateLast2Square"]
+  bloodDonorId = unique(dsall$Id)
   
   nrep = 15
   totalPp = 0
+  totalEntries = 0
   for(j in 1:ncomponents){
     numObs=round(eta[j]*10000)
     if(numObs>0){
       newObsRandPart = matrix(mvrnorm(n=numObs, randmu[[j]], randSigma[[j]]), ncol=2)
       
       for(m in 1:numObs){
-        donationLast2years = round(rnorm(nrep, mean = sample(1:10, size = 1), sd = 1))
-        donationLast2years[donationLast2years<0] = 0
-        donationLast2years = donationLast2years/100
-        newObs = mvrnorm(n=1, newObsRandPart[m, 1]*INTERCEPT_SCALE + newObsRandPart[m, 2]*donationLast2years, diag(nrep)*errSd^2)
+        tempId = bloodDonorId[sample((1:length(bloodDonorId)), size = 1)]
+        tempdonationsLast2years = dsall[dsall$Id == tempId, "donationLast2Years"]
+        nrep = length(tempdonationsLast2years)
+        totalEntries = totalEntries + nrep
+        
+        newObs = mvrnorm(n=1, newObsRandPart[m, 1]*INTERCEPT_SCALE + newObsRandPart[m, 2]*tempdonationsLast2years, diag(nrep)*errSd^2)
         newObs = newObs - mean(newObs)
-        totalPp =totalPp + sum(newObs^2)
+        totalPp = totalPp + sum(newObs^2)
       }
     }
   }
-  totalPp = totalPp/(10000*nrep)
+  totalPp = totalPp/totalEntries
   
   return(totalPp)
 }
-
 
 
 temp = c()
@@ -51,17 +47,11 @@ betaAge = mcmcfit[[1]][i,"betaAge"]
 betaDonate = mcmcfit[[1]][i,"betaDonate"]
 betaSeason = mcmcfit[[1]][i,"betaSeason"]
 betaTSPD = mcmcfit[[1]][i,"betaTSPD"]
+# betaTSPDSquare = mcmcfit[[1]][i,"betaTSPDSquare"]
+# betaTSPDSeason = mcmcfit[[1]][i,"betaTSPDSeason"]
 betaDonateLast2TSPD = mcmcfit[[1]][i,"betaDonateLast2TSPD"]
 betaDonateLast2Donate = mcmcfit[[1]][i,"betaDonateLast2Donate"]
 betaDonateLast2Square = mcmcfit[[1]][i,"betaDonateLast2Square"]
-
-betaAge = -0.08576
-betaDonate = 0.1546
-betaSeason = -0.08014
-betaTSPD =-0.03641
-betaDonateLast2TSPD = 0.01964
-betaDonateLast2Donate = 4.6887
-betaDonateLast2Square = -52.7956
 
 totalSample = c()
 for(j in 1:nsubjects){
@@ -73,6 +63,8 @@ for(j in 1:nsubjects){
     betaDonateLast2TSPD*ds$donateLast2TSPD[startIndex:endIndex] +
     betaDonateLast2Donate*ds$donateLast2Donate[startIndex:endIndex] +
     betaDonateLast2Square*ds$donateLast2Square[startIndex:endIndex]
+    # betaTSPDSquare*ds$TSPD[startIndex:endIndex]*ds$TSPD[startIndex:endIndex] +
+    # betaTSPDSeason*ds$TSPDSeason[startIndex:endIndex]
   
   sampleRandomPart = ds$Hb[startIndex:endIndex] - fixedPartMean
   sampleRandomPart = sampleRandomPart - mean(sampleRandomPart)
@@ -82,7 +74,6 @@ totalSample = sum(totalSample)/sum(numHb)
 temp[i] = totalSample
 }
 
-qplot(ppcCheck_5comp, geom=c("density"), xlab="Test statistic", ylab="PDF function estimated using KDE") + geom_vline(xintercept=totalSample, color="red")
+resultDf = data.frame("Test.statistic"=c(ppcCheck, temp), "Type"=c(rep("Posterior Predictive", length(ppcCheck)), rep("Sample", length(temp))))
 
-plot(density(ppcCheck))
-lines(density(temp))
+qplot(Test.statistic, geom=c("density"), data=resultDf, xlab="Test statistic", ylab="PDF function estimated using KDE", color=Type)

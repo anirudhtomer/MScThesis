@@ -27,7 +27,7 @@ ds = blood_donor[!(blood_donor$Id %in% rejectIdList),]
 #Process the selected blood donors
 uniqueIds = unique(ds$Id)
 
-randomSample = sample(1:1595, size = 250, replace = F)
+randomSample = sample(1:1595, size = 1595, replace = F)
 uniqueIds = uniqueIds[randomSample]
 
 ds = ds[ds$Id %in% uniqueIds, ]

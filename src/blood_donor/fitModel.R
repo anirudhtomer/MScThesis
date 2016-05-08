@@ -50,7 +50,7 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
   
   datanodes = list("dsHb"=ds$Hb,"dsDonate"=as.numeric(ds$Donate), "dsAge"=ds$Age, "dsfirstAge"=ds$firstAge,
                    "dsSeason"=as.numeric(ds$Season)-1,"dsTSPD"=ds$TSPD, "dsDonationLast2Years"=ds$donationLast2Years,
-                   "betaTSPDSquare"=ds$TSPD^2, "dsTSPDSeason"=ds$TSPDSeason,
+                   #"dsTSPDSquare"=ds$TSPD^2, "dsTSPDSeason"=ds$TSPDSeason,
                    "dsDonateLast2TSPD"=ds$donateLast2TSPD, "dsDonateLast2Donate"=ds$donateLast2Donate, 
                    "dsDonateLast2Square"=ds$donateLast2Square,
                    "nsubjects"=nsubjects,"numHb"=numHb, "cumsumHb"=cumsumHb, "gammaShapeRate"=gammaShapeRate, "betaMu"=betaMu,
@@ -64,7 +64,7 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
                        "randmu_unordered"=cbind(randIntQuantiles, randSlopeQuantiles))
   
   stochasticNodes = c("betaAge","betaSeason", "betaDonate", "betaTSPD", 
-                      "betaTSPDSquare", "betaTSPDSeason",
+                      #"betaTSPDSquare", "betaTSPDSeason",
                       "betaDonateLast2TSPD", "betaDonateLast2Donate", "betaDonateLast2Square",
                       "errPrecision", "randSigma","randPrecision",
                       "randmu", "randomComp", "Eta", "S", "precisionIntercept","precisionSlope", "rho")

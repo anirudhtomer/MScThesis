@@ -66,7 +66,7 @@ We next fitted the same model with Bayesian approach, although we also fitted mi
 	\label{fig : rough_idea_blood_donor}
 \end{figure}
 
-To do the Bayesian analysis we ran 150000 iterations with a thinning of 100 and burn-in of 25000 iterations. For chains with higher number of components we used 200000 iterations with a thinning of 150. For each of the resulting MCMC chains we calculated the various definitions of definitions given in section \ref{sec : dic}, the results of which are presented in Table \ref{table : dic_blood_donor}. We know that $\text{DIC}_4$ is the most reliable of the DIC's and so we will begin with it. It seems that there are not more than 2-3 components. The difference between DIC of mixture of 1 component and of 2 components is much larger than that between 2 and 3 components. To verfiy this we used posterior predictive checks. As shown in Figure \ref{fig : ppc_blood_donor_3comp} to \ref{fig : ppc_blood_donor_5comp}, it is clear that 3 or more components are an overfit. Thus we will stick to the choice of 2 components.\\
+To do the Bayesian analysis we ran 150000 iterations with a thinning of 100 and burn-in of 25000 iterations. For chains with higher number of components we used 200000 iterations with a thinning of 150. For each of the resulting MCMC chains we calculated the various definitions of definitions given in section \ref{sec : dic}, the results of which are presented in Table \ref{table : dic_blood_donor}. We know that $\text{DIC}_4$ is the most reliable of the DIC's and so we will begin with it. It seems that there are not more than 2-3 components. The difference between DIC of mixture of 1 component and of 2 components is much larger than that between 2 and 3 components. To verfiy this we used posterior predictive checks. However instead of randomly generating number of donations in last 2 years we sampled them from the subjects which were not considered for analysis due to computational restrictions. As shown in Figure \ref{fig : ppc_blood_donor_3comp} to \ref{fig : ppc_blood_donor_5comp}, it is clear that 3 or more components are an overfit. Secondly we can see that the posterior preddistribution of the test statistic i Thus we will stick to the choice of 2 components.\\
 
 % Please add the following required packages to your document preamble:
 % \usepackage{booktabs}
@@ -114,11 +114,80 @@ To do the Bayesian analysis we ran 150000 iterations with a thinning of 100 and 
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/ppc_5comp.png}	
-          \caption{\label{fig : ppc_blood_donor_5comp}5 components fitted for blood donor data set}
+          \caption{\label{fig : ppc_blood_donor_5comp}5 components fitted}
 	\end{subfigure}
 	
-	\caption{PDF function of $T(\boldsymbol{\tilde{r}})$ estimated using KDE. The red line shows the value of the test statistic $T(\boldsymbol{r})$ based on the observed data.}
+	\caption{PDF function of $T(\boldsymbol{\tilde{r}})$ estimated using KDE for blood donor data set. The red line shows the value of the test statistic $T(\boldsymbol{r})$ based on the observed data.}
 	\label{fig : ppc_blood_donor}    
 \end{figure} 
 
-For the 2 comp
+\subsection{Parameter estimates}
+For the 2 components we will now present the summary of the parameter estimates. Firstly in Figure \ref{fig : eta_blood_donor} we can see that the two components are equal in weight distribution. However the posterior of the weights is bimodal for both of them. Although this is usually a sign of label switching....hmm but my means don't seem to be having label switching. need to check this.
+
+\begin{figure}[!htb]
+\centering
+\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/eta1.png}
+        \caption{\label{fig : eta_blood_donor_1} Weight for the first component $\eta_1$}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/eta2.png}	
+          \caption{\label{fig : eta_blood_donor_2}Weight for the second component $\eta_2$}
+	\end{subfigure}	
+	\caption{Weight distribution for the components of the mixture of random effects.}
+	\label{fig : eta_blood_donor}    
+\end{figure} 
+
+\begin{figure}[!htb]
+\centering
+\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/b11.png}
+        \caption{\label{fig : mu_blood_donor_11} Intercept location for the first component $b_{1, \text{intecept}}$}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/b12.png}	
+          \caption{\label{fig : mu_blood_donor_12}Slope location for the first component $b_{1, \text{slope}}$}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/b21.png}	
+          \caption{\label{fig : mu_blood_donor_21}Intercept location for the second component $b_{2, \text{intecept}}$}
+	\end{subfigure}	
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/b22.png}	
+          \caption{\label{fig : mu_blood_donor_22}Slope location for the second component $b_{2, \text{slope}}$}
+	\end{subfigure}	
+	\caption{The location parameters for the components of the mixture of random effects.}
+	\label{fig : mu_blood_donor}    
+\end{figure} 
+
+\begin{figure}[!htb]
+\centering
+\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G11_1.png}
+        \caption{\label{fig : cov_blood_donor_11_1} Intercept variance for the first component}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G12_1.png}	
+          \caption{\label{fig : cov_blood_donor_12_1} Covariance between intercept and slope for the first component}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G22_1.png}	
+          \caption{\label{fig : cov_blood_donor_22_1}Slope variance for the first component}
+	\end{subfigure}	
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G11_2.png}
+        \caption{\label{fig : cov_blood_donor_11_2} Intercept variance for the second component}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G12_2.png}	
+          \caption{\label{fig : cov_blood_donor_12_2} Covariance between intercept and slope for the second component}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G22_2.png}	
+          \caption{\label{fig : cov_blood_donor_22_2}Slope variance for the second component}
+	\end{subfigure}	
+
+
+	\caption{The variance covariance parameters for the components of the mixture of random effects.}
+	\label{fig : cov_blood_donor}    
+\end{figure} 

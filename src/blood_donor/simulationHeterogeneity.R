@@ -21,10 +21,10 @@ source("../common/extractFuncRandSlopeConditional.R")
 source("DIC_functions.R")
 source("bf.R")
 
-numchains = 1
-niter = 150000
-nthin=100
-nburnin=10000
+numchains= 1
+niter = 300000
+nthin=200
+nburnin=70000
 
 ncomponents=3
 if(ncomponents==1){
@@ -48,28 +48,28 @@ beep(sound=8)
 mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
 mcmcLen = nrow(mcmcfit[[1]])
 attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
-ggsobject = ggs(mcmcfit_2comp)
+ggsobject = ggs(mcmcfit)
 
 attributes(mcmcfit)
 
 ncomponents=1
 fit = fitModel(niter, nthin, 0, jagsmodel = singleModel, nchains = numchains, ncomponents, 1)  
-mcmcfit_1comp = as.mcmc(fit)
-attributes(mcmcfit_1comp)$ncomponents = 1
-attributes(mcmcfit_1comp)$nsubjects = nsubjects
-attributes(mcmcfit_1comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
-colnames(mcmcfit_1comp[[1]])[match("Eta",colnames(mcmcfit_1comp[[1]]))] = "Eta[1]"
-colnames(mcmcfit_1comp[[1]])[match("precision1",colnames(mcmcfit_1comp[[1]]))] = "precision1[1]"
-colnames(mcmcfit_1comp[[1]])[match("precision2",colnames(mcmcfit_1comp[[1]]))] = "precision2[1]"
-colnames(mcmcfit_1comp[[1]])[match("rho",colnames(mcmcfit_1comp[[1]]))] = "rho[1]"
+mcmcfit_1comp_morecov = as.mcmc(fit)
+attributes(mcmcfit_1comp_morecov)$ncomponents = 1
+attributes(mcmcfit_1comp_morecov)$nsubjects = nsubjects
+attributes(mcmcfit_1comp_morecov)$INTERCEPT_SCALE = INTERCEPT_SCALE
+colnames(mcmcfit_1comp_morecov[[1]])[match("Eta",colnames(mcmcfit_1comp_morecov[[1]]))] = "Eta[1]"
+colnames(mcmcfit_1comp_morecov[[1]])[match("precision1",colnames(mcmcfit_1comp_morecov[[1]]))] = "precision1[1]"
+colnames(mcmcfit_1comp_morecov[[1]])[match("precision2",colnames(mcmcfit_1comp_morecov[[1]]))] = "precision2[1]"
+colnames(mcmcfit_1comp_morecov[[1]])[match("rho",colnames(mcmcfit_1comp_morecov[[1]]))] = "rho[1]"
 save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
 
 ncomponents=2
-fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
-mcmcfit_2comp = as.mcmc(fit)
-attributes(mcmcfit_2comp)$ncomponents = 2
-attributes(mcmcfit_2comp)$nsubjects = nsubjects
-attributes(mcmcfit_2comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2.7)
+mcmcfit_2comp_dir2dot7 = as.mcmc(fit)
+attributes(mcmcfit_2comp_dir2dot7)$ncomponents = 2
+attributes(mcmcfit_2comp_dir2dot7)$nsubjects = nsubjects
+attributes(mcmcfit_2comp_dir2dot7)$INTERCEPT_SCALE = INTERCEPT_SCALE
 save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
 
 ncomponents=3
@@ -159,8 +159,27 @@ for(k in 1:ncomponents){
   readline()
 }
 
+install.packages("latex2exp")
+library(latex2exp)
+
+qplot(mcmcfit[[1]][, "randmu[1,1]"], geom="density", xlab=TeX("b_{1,intercept}^C"), ylab="Density")
+qplot(mcmcfit[[1]][, "randmu[1,2]"], geom="density", xlab=TeX("b_{1,slope}^C"), ylab="Density")
+qplot(mcmcfit[[1]][, "randmu[2,1]"], geom="density", xlab=TeX("b_{2,intercept}^C"), ylab="Density")
+qplot(mcmcfit[[1]][, "randmu[2,2]"], geom="density", xlab=TeX("b_{2,slope}^C"), ylab="Density")
+
+qplot(mcmcfit[[1]][, "Eta[1]"], geom="histogram", xlab=TeX("$\\eta_1$"), ylab="Density")
+qplot(mcmcfit[[1]][, "Eta[2]"], geom="histogram", xlab=TeX("$\\eta_2$"), ylab="Density")
+
+qplot(mcmcfit[[1]][, "randSigma[1,1,1]"], geom="density", xlab=TeX("$G_{1, var(intercept)}$"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[1,2,1]"], geom="density", xlab=TeX("G_{1,Cov(intercept, slope)}"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[2,2,1]"], geom="density", xlab=TeX("G_{1,var(slope)}"), ylab="Density")
+
+qplot(mcmcfit[[1]][, "randSigma[1,1,2]"], geom="density", xlab=TeX("$G_{2, var(intercept)}$"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[1,2,2]"], geom="density", xlab=TeX("G_{2,Cov(intercept, slope)}"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[2,2,2]"], geom="density",  xlab=TeX("G_{2,var(slope)}"), ylab="Density")
+
 #Compare the whole chain with the last part...similar to geweke
-ggs_compare_partial(ggsobject, "randmu", rug = T)
+ggs_compare_partial(ggsobject, "randmu")
 
 ggs_running(ggsobject, "beta")
 ggs_running(ggsobject, "Precision")
