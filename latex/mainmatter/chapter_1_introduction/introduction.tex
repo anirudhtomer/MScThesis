@@ -36,7 +36,7 @@ While Maximum Likelihood based methods such as the EM algorithm could be used to
 
 $$ p(\boldsymbol{y}|\boldsymbol{\mu}, \boldsymbol{\sigma^2}, \boldsymbol{\eta}) = \prod_{i=1}^{N} (\sum_{k=1}^{K} f_N(y_i; \mu_k, \sigma^2_k) \eta_k)$$
 
-is unbounded and has many spurious nodes \citep{kiefer_consistency_1956,day_estimating_1969}. A Bayesian approach however, handles this problem elegantly using priors for parameters ($\boldsymbol{\mu}, \boldsymbol{\sigma^2}$), as shown by \citet[pg. 176]{fruhwirth-schnatter_finite_2013}.
+is unbounded and has many spurious nodes near the boundary of the parameter space for variance($\sigma^2_k$) of the components \citep{kiefer_consistency_1956,day_estimating_1969}. A Bayesian approach however, handles this problem elegantly using priors for parameters of the component densities. For e.g. \citet[pg. 176]{fruhwirth-schnatter_finite_2013} combined the likelihood with the prior $p(\mu_k, \sigma^2_k) \propto p(\sigma^2_k), \sigma^2_k\sim \text{Inv-Gamma}(1,4)$, and showed that it lead to a joint posterior density $p(\mu, \sigma^2 | \boldsymbol{y})$ of parameters in which $\sigma^2_k$ was bounded away from 0. Thus all the spurious nodes near the boundary of the parameter space for $\sigma^2_k$ were cut out, whereas they were apparent for the surface of the likelihood function.
 
 \subsection{Applications of mixture distributions}
 Mixture models have found usage in a variety of domains. Some of the examples are:
