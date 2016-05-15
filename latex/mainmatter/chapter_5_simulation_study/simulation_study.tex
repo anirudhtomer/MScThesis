@@ -3,14 +3,14 @@
 \chapter{Simulation study}
 \label{ch : simulation_study}
 
-In this chapter we will share results from the simulation study we performed to check the efficacy of the model selection criteria described in Chapter \ref{ch : model_selection}. We implemented the Bayesian heterogeneity model using the R package R2jags \citep{su_r2jags:_2015} and analyzed the MCMC chains using the R package ggmcmc \citep{marin_ggmcmc:_2016}. For the calculation of marginal likelihood we required the density function of Wishart distribution, which was available in two packages, namely MCMCpack and mixAK. There were inconsistencies in the results from the two implementations for extreme values of the Wishart random variable. We eventually used mixAK \citep{komarek_mixak:_2015} as the MCMCpack package predicted density function value to be $\infty$ in some cases.
+In this chapter we will share results from the simulation study we performed to check the efficacy of the model selection criteria described in Chapter \ref{ch : model_selection}. We implemented the Bayesian heterogeneity model using the R package R2jags \citep{su_r2jags:_2015} and analyzed the MCMC chains using the R package ggmcmc \citep{marin_ggmcmc:_2016}. For the calculation of marginal likelihood we required the density function of Wishart distribution, which was available in two packages, namely MCMCpack and mixAK. There were inconsistencies in the results from the two implementations and we eventually used mixAK \citep{komarek_mixak:_2015} as the MCMCpack package produced density function value to be $\infty$ in some cases.
 
 \section{Data sets for simulation study}
 The data sets we simulated were motivated by the study on predicting Zebu cow's weights in sub Saharan Africa \citep{lesosky_live_2012}. We assumed our response to be the weight of the Zebu cows. The predictors we considered were hypothetical, namely gender of a cattle (Male/Female), birth year of the cattle (1996/1997), age of the cattle at the first measurement and the time at which measurement was taken. The measurements of the cows were done at 10 different equally spaced time intervals. We further added subject specific random intercept and random slope effect to each response so that the repeated measurements for a given cow were correlated. Simultaneously we made sure that these cow specific random effects were mixture distributed. We will refer to the cows as subjects here forth.
 
 \subsection{Description of each data set}
 \label{subsec : ds_description}
-Our aim was to create data sets differing in number of mixture components for random effects, number of subjects, statistical power to detect the fixed effects, separation of mixture components, number of subjects per component. To analyze the efficacy of model selection criteria under these different scenarios we created the multiple data sets. To get a rough idea about the random effects in each of these data sets, we did graphical analysis. For this purpose we first regressed the response $\boldsymbol{y}$ on the 3 predictors age, gender and birth year of cattle using OLS(section \ref{subsec : choice_starting_values}). We then subjectwise regressed the residuals from OLS on the intercept and time of measurement to obtain a rough estimate of the random effect $\tilde{\boldsymbol{b}_i}$ of the $i^\text{th}$ subject. There are two important aspects of this method. Firstly this estimator overestimates the actual size of the random effects as within subject variance is also included. Secondly, if in the mean structure, one misses out on a covariate other than the one which causes the mixture then it could be virtually impossible to decide on the number of components as shown in figure \ref{fig : missing_continuous_covariate_randplot}.
+Our aim was to create data sets differing in number of mixture components for random effects, number of subjects, statistical power to detect the fixed effects, separation of mixture components and number of subjects per component. To analyze the efficacy of model selection criteria under these different scenarios we created multiple data sets. To get a rough idea about the random effects in each of these data sets, we first did a graphical analysis. For this purpose we first regressed the response $\boldsymbol{y}$ on the 3 predictors: age, gender and birth year of cattle using OLS(section \ref{subsec : choice_starting_values}). It is also possible to use linear mixed model for estimating the fixed effects. We then regressed the residuals $y_{ij} - \boldsymbol{x}_{ij}\boldsymbol{\beta}$ on the intercept and time of measurement for every subject separately to obtain a rough estimate $\boldsymbol{\tilde{b}}_i$ of the random effect of subjects. This estimator however overestimates the actual size of the random effects as within subject variance is also included. It is not possible to use Empirical Bayes estimates of the random effects because they may fail to reflect the heterogeneity in the random effects population \citep{verbeke_linear_1996}. Lastly, it is important to note that fitting an incorrect mean structure can lead to a incorrect representation of the random effects distribution as shown in figure \ref{fig : missing_continuous_covariate_randplot}.
 
 \subsubsection{Data set 1: No mixture distribution of random effects}
 \label{subsubsec : ds_simple}
@@ -39,7 +39,7 @@ This data is similar to Data set 2 in all regards except for the number of subje
 
 \subsubsection{Data set 4: 3 fused components for the mixture of random effects}
 \label{subsubsec : ds_3fused_10ppg}
-In this data set we simulated the random effects from a mixture distribution which had 3 fused components. For e.g. if one sees the plot of the rough estimates of random effect values for this data set (figure \ref{fig : ds_3wellsep3ppg_randplot}) then it is likely that they select 1 or 2 components.
+In this data set we simulated the random effects from a mixture distribution which had 3 fused components. For e.g. if one sees the plot of the rough estimates of random effect values for this data set (figure \ref{fig : ds_3fused10ppg_randplot}) then it is not clear if there are more than 2 components.
 
 \begin{figure}[!htb]
 \centering
@@ -61,7 +61,7 @@ This data is similar to Data set 4 in all regards except for the number of subje
 
 \subsubsection{Data set 6: 5 well separated components}
 \label{subsubsec : ds_5wellsep}
-In this data set we simulated the random effects from a mixture distribution which had 5 well separated components. However this time we generated unequal number of subjects for every component. It is important to note that while we generated equal number of components per group earlier, depending upon how many components we model we might still deal with the problem of nearly empty components. The plot of the rough estimates of random effect values for this data set is shown in figure \ref{fig : ds_5wellsep_randplot}.
+In this data set we simulated the random effects from a mixture distribution which had 5 well separated components. However this time we generated unequal number of subjects for every component. The plot of the rough estimates of random effect values for this data set is shown in figure \ref{fig : ds_5wellsep_randplot}.
 
 \begin{figure}[!htb]
 \centering
@@ -79,7 +79,7 @@ In this data set we simulated the random effects from a mixture distribution whi
 
 \subsubsection{Data set 7: 5 fused components}
 \label{subsubsec : ds_5fused}
-his data is similar to Data set 6 in all regards except that the number of subjects per component are lesser, and the components are not so well separated. The plot of the rough estimates of random effect values for this data set is shown in figure \ref{fig : ds_5fused_randplot}.
+This data is similar to Data set 6 in all regards except that the number of subjects per component are less, and the components are not so well separated. The plot of the rough estimates of random effect values for this data set is shown in figure \ref{fig : ds_5fused_randplot}.
 
 \begin{figure}[!htb]
 \centering
@@ -97,15 +97,15 @@ his data is similar to Data set 6 in all regards except that the number of subje
 
 
 \subsection{Running MCMC simulations}
-Some of the issues we faced in running MCMC simulations were, label switching across chains, i.e. label 1 corresponding to component 1 in one chain and corresponding to some other component in another chain. This gave inconsistent and incorrect estimates for the various calculations we did. Although we dealt with it using the mechanism given in section \ref{subsec : label_switching_blmm}, it decreased the speed of simulations drastically. To make matters worse we had to use thinning of around 1 per 100 iterations to make sure the resulting chains were not autocorrelated. In light of these reasons and given the time constraints we had to be content with chains of 1300 iterations. Although the following results are based on a single chain and are rounded to the nearest integer, we ran multiple chains and found results to be differing only in the ones's place or by a very small margin.
+We will first discuss some of the issues we while doing the MCMC simulations. The first was label switching across the chains while calculating Bayes factor using Chib's approximation, i.e. label 1 corresponding to component 1 in one chain and corresponding to some other component in another chain. This gave inconsistent and incorrect estimates for the various calculations we did. Although we dealt with it using the mechanisms given in section \ref{subsec : label_switching_blmm}, it decreased the speed of simulations drastically. To make matters worse we had to employ thinning of 1 per 100 iterations and in some cases 1 per 200 iterations to make sure the resulting chains were not autocorrelated. Since we lacked computational resources required to run long chains we had to be content with chains of length 1300 (after thinning). The following results are based on a single chain and are rounded to the nearest integer.
 
 \subsection{Deviance information criteria}
 \label{subsec : dic_simulation_results}
-Table \ref{table : ds_simple_dic} shows the values of the various Deviance information criteria (section \ref{sec : dic}) applied to data set 1. We can see $\text{DIC}_1$ gives misleading results whereas the rest of the DIC remain more or less the same for overfitted models. The value of ${\text{p}_\text{D}}_1$ is negative (-602) when we fitted 3 components. \citet[pg. 161]{lunn_bugs_2012} noted that this can happen if the posterior is multimodal, which as we know can happen due to label switching when models are overfitted. For the same reason \citet{celeux_deviance_2006} suggest using $\text{DIC}_3$ instead of the other two observed data DIC measures.\\
+Table \ref{table : ds_simple_dic} shows the values of the various deviance information criteria (section \ref{sec : dic}) applied to data set 1. We can see that $\text{DIC}_1$ gives misleading results with overfitted models. On the other hand the remaining DIC's are relatively stable. We obtained a negative value (-602) for ${\text{p}_\text{D}}_1$ when we fitted 3 components. \citet[pg. 161]{lunn_bugs_2012} noted that this can happen if the posterior is multi modal. As a remedial measure \citet{celeux_deviance_2006} suggested using $\text{DIC}_3$ instead of the other two observed data DIC measures.\\
 
 \begin{table}[!htb]
 \centering
-\caption{DIC and $\text{p}_\text{D}$ for data set 1.}
+\caption{DIC and $\text{p}_\text{D}$ for data set 1. True number of components = 1}
 \label{table : ds_simple_dic} 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
@@ -126,11 +126,13 @@ Table \ref{table : ds_simple_dic} shows the values of the various Deviance infor
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3wellsep_dic} shows the values of various DIC applied to the data set 2. One of the patterns we inferred out of these results was that for $\text{DIC}_4$ the DIC values decrease continually by a very large margin till the right number of components are fitted, whereas for the overfitted models that the DIC either decreases by a relatively smaller margin or remains more or less the same. The behavior of $\text{DIC}_5$ and $\text{DIC}_3$ is similar to $\text{DIC}_4$, however the magnitude difference in DIC that we observe for $\text{DIC}_4$ is not as much for them. These patterns, however do not seem applicable to $\text{DIC}_1$ and $\text{DIC}_6$. For $\text{DIC}_1$ the pattern is that the values of ${\text{p}_\text{D}}_1$ become negative for 4 or more components, i.e. sign of overfitting as we discussed above.\\
+Table \ref{table : ds_3wellsep_dic} shows the values of various DIC we obtained for data set 2. One of the patterns we observe in these results is that the $\text{DIC}_4$ value decreased continuously till the right number of components were fitted, whereas for the overfitted models it either decreased by a bit or remained more or less the same. A similar pattern is observed for $\text{DIC}_5$ and $\text{DIC}_3$. However it seems that they are not as discerning as $\text{DIC}_4$. $\text{DIC}_1$ and $\text{DIC}_6$ do not seem to have any clear pattern. The last pattern we observe is that ${\text{p}_\text{D}}_1$ becomes negative for 4 or more components which is a sign of multi modal posterior as we discussed above.\\
+
+It is important to note that, while a DIC difference of 10 is usually considered good enough to prefer one model over another, this rule may not be as applicable here. The reason is that we have chains of short length and most of the chains with overfitted components also had high autocorrelation despite a thinning of 1 per 200 iterations.\\
 
 \begin{table}[!htb]
 \centering
-\caption{DIC and $\text{p}_\text{D}$ for data set 2.}
+\caption{DIC and $\text{p}_\text{D}$ for data set 2. True number of components = 3}
 \label{table : ds_3wellsep_dic} 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
@@ -155,11 +157,11 @@ Table \ref{table : ds_3wellsep_dic} shows the values of various DIC applied to t
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC applied to the data set 3. Firstly we can see that the pattern we inferred for $\text{DIC}_1$ above is not applicable here. Similar to the previous data set $\text{DIC}_6$ does not reveal any meaningful pattern. We can also see that the pattern of $\text{DIC}_5$ that we noted above is also not applicable here. However for $\text{DIC}_3$ and $\text{DIC}_4$ one can still see that the pattern of DIC decreasing by big magnitude till the right number of components are fitted is still valid. The magnitudes of the DIC have decreased as the sample size for this data set was only 36 subjects compared to the 180 subjects in data set 2.
+Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC applied to the data set 3. Firstly we can see that the pattern we observed for ${\text{p}_\text{D}}_1$ in data set 2 is not applicable here. Similar to the results for data set 2, $\text{DIC}_6$ does not reveal any meaningful pattern here. We can also see that the pattern of $\text{DIC}_5$ that we noted above is not applicable here. However for $\text{DIC}_3$ and $\text{DIC}_4$ one can again see that the DIC are decreasing by a large amount till the right number of components are fitted. The magnitudes of all of the the DIC have decreased in comparison to DIC for data set 2 because the sample size for this data set is only 36 subjects compared to 180 subjects in the former.
 
 \begin{table}[!htb]
 \centering
-\caption{DIC and $\text{p}_\text{D}$ for data set 3}
+\caption{DIC and $\text{p}_\text{D}$ for data set 3. True number of components = 3}
 \label{table : ds_3wellsep_3ppg_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
@@ -312,7 +314,7 @@ Table \ref{table : ds_5fused_dic} shows the results of applying DIC to the vario
 
 \subsection{Marginal likelihood}
 \label{subsec : marginal_likelihood_simulation}
-We implemented Chib's approximation mentioned in section \ref{sec : marginal_likelihood}. Table \ref{table : marginal_likelihood_results} shows the results of $\log{\hat{m}(\boldsymbol{y})}$ for the various data sets and the models fitted for them. One can see that there is no obvious pattern visible in these results to conclude the efficacy of Bayes factor in selection of a model. We had observed so far that given our data sets, the results of overfitting was label switching. However fitting 1 and 2 components did not have label switching and the chains had good convergence as well. However even if we take the cases where we had large number of observations and the components were well separated such as data set 6, we can see marginal likelihood prefers fitting 1 component over 2. Also the results of marginal likelihood for 3, 4 and 5 components for data set 6, are more or less the same. It is important to note that there is a higher margin of error in these results as the MCMC iterations were done multiple times for each data set and each component. However as we have already shown even for data sets where these chances were very less, marginal likelihood doesn't help choosing the right model.
+We implemented Chib's approximation mentioned in section \ref{sec : marginal_likelihood}. Table \ref{table : marginal_likelihood_results} shows the results of $\log{\hat{m}(\boldsymbol{y})}$ for the various models we fitted to data set 1 to data set 7. One can see that there is no obvious pattern visible in these results to conclude the efficacy of Bayes factor in selection of a model. For e.g. in case of data set 6 we had 5 well separated components in the mixture distribution of random effects. When we fitted 1,2,3,4 and 5 components to this data set we had MCMC chains with good convergence and no multi-modality was observed for the posteriors. However we can see that marginal likelihood preferred fitting 1 component over higher number of components. For data set 3 where we had 3 well separated components but only 36 subjects in total, we can observe that marginal likelihood is almost the same for 1,2 and 3 components, making it difficult to make a choice for the number of components.
 
 \begin{table}[!htb]
 \centering
@@ -333,7 +335,7 @@ Data set 7 & -3397 & -3379 & -3373 & -3380 & -2749 & $\infty$ & $\infty$ & -3416
 
 \subsection{Posterior predictive check (PPC)}
 \label{subsec : ppc_simulation}
-We implemented the PPC's outlined in section \ref{sec : ppc}. Since the PPC we are using exploits unidentifiability due to empty components, it works irrespective of how fused the components of the data set are, or the number of subjects in the data set. Thus we found the results to be consistent across the various data sets. We will thus only discuss fitting various number of components to the mixture of 5 well separated components of data set 6. Figure \ref{fig : ppc_5wellsep8comp} to \ref{fig : ppc_5wellsep1comp} show the distribution of the test statistic \ref{eq : ppc_test_statistic} for the various models we fitted to data 6. It can be seen that the distribution is postively skewed whenever overfitting is present. On the other hand the distribution of the test statistic is more or less the same in cases of underfitting. It is to be noted that this is despite the fact that we used a mixed predictive approach.\\
+We implemented the PPC outlined in section \ref{sec : ppc}. Since the PPC we are using is designed to detect non identifiability due to empty components, it works irrespective of the size of the data set or how well separated the components are. Thus we found the results of PPC to be consistent across the various data sets. Because of this reason, we will only discuss the results of fitting various number of components in data set 6. Figure \ref{fig : ppc_5wellsep8comp} to \ref{fig : ppc_5wellsep1comp} show the distribution of the test statistic \ref{eq : ppc_test_statistic} for the various models we fitted to data 6. It can be seen that the distribution is positively skewed whenever overfitting is present. On the other hand the distribution of the test statistic is more or less the same in cases of underfitting. It is to be noted that this is despite the fact that we used a mixed predictive approach.\\
 
 \begin{figure}[!htb]
 \centering
@@ -373,7 +375,7 @@ We implemented the PPC's outlined in section \ref{sec : ppc}. Since the PPC we a
 	\label{fig : ppc_5wellsepcomp}    
 \end{figure}
 
-One can observe a more severe impact of overfitting if they use indepedent inverse gamma priors for the variance components of $G_k$ and uniform prior $U(-1,1)$ for correlation. To show the resulting distribution of the test statistic, we had to log transform it as otherwise the values were too large to be plotted in a single graph. We took the case of data set 2 and overfitted it by using 4 components in the mixture. One can see that the corresponding test statistic inflates by a big margin as we described in section \ref{sec : ppc}. Interestingly when we fit the right number of components the test statistic is not inflated, but we still get to see that the model is not well fitting. We further checked our posteriors for variance covariance matrices and found them to be underestimating the original variance covariance of the random effects from the simulated data set. Thus proves that the test statistic can be used to detect bad fitting models, however differentiating among models with less number of components may not be possible.
+One can observe a more severe impact of overfitting if they use independent inverse gamma priors for the variance components of $G_k$ and uniform prior $U(-1,1)$ for correlation. To show the resulting distribution of the test statistic, we had to log transform it as otherwise the values were too large to be plotted in a single graph. We took the case of data set 2 and overfitted the mixture of random effects by using 4 components in the mixture. One can see that the corresponding test statistic inflates by a large margin as we described in section \ref{sec : ppc}. Interestingly when we fit the right number of components the test statistic is not inflated, but we can still see that the model is not well fitting. We further checked our posteriors for variance covariance matrices and found them to be underestimating the original variance covariance of the random effects from the simulated data set. This proves that the test statistic can be used to detect bad fitting models, however differentiating among models with less number of components may not be possible.
 
 \begin{figure}[!h]
 	\centering
