@@ -25,7 +25,7 @@ source("DIC_functions.R")
 source("bfWishart.R")
 
 numchains = 1
-niter = 80000
+niter = 20000
 nthin=50
 nburnin=30000
 

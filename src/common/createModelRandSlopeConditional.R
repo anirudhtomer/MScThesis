@@ -20,7 +20,6 @@ model = function(){
   for(k in 1:ncomponents){
     randmu_unordered[k,1]~dnorm(betaMu, betaTau)
     randmu_unordered[k,2]~dnorm(betaMu, betaTau)
-    
     # randSigma[1,1,k]<-1/precisionIntercept[k]
     # randSigma[1,2,k]<-rho[k] / sqrt(precisionIntercept[k] * precisionSlope[k])
     # randSigma[2,1,k]<-rho[k] / sqrt(precisionIntercept[k] * precisionSlope[k])
