@@ -25,9 +25,9 @@ source("DIC_functions.R")
 source("bfWishart.R")
 
 numchains = 1
-niter = 20000
+niter = 80000
 nthin=50
-nburnin=30000
+nburnin=10000
 
 ncomponents=3
 if(ncomponents==1){

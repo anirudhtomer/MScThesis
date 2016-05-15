@@ -49,12 +49,6 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='rbind', .packages='MASS') %dop
   return(c(totalSample, totalPp))
 }
 
-
-qplot(ppcCheck, geom=c("density"), xlab="Test statistic", ylab="PDF function estimated using KDE") + geom_vline(xintercept=totalSample, color="red")
-
-plot(density(ppcCheck))
-lines(density(ppcCheck[,1]), col='red')
-
 ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='MASS') %dopar%{
   
   ncomponents = attributes(mcmcfit)$ncomponents
@@ -69,7 +63,7 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='MASS') %dopar%{
   randComp = getRandomComp(mcmcfit, mcmcIterNum = k)
   betaGender = mcmcfit[[1]][k, "betaGender"]
   betaBy = mcmcfit[[1]][k, "betaBy"]
-  #betaAge = mcmcfit[[1]][k, "betaAge"]
+  betaAge = mcmcfit[[1]][k, "betaAge"]
   errSd = sqrt(1/mcmcfit[[1]][k, "errPrecision"])
   sigma = getSigma(mcmcfit, mcmcIterNum = k)
   
@@ -96,14 +90,18 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='MASS') %dopar%{
 
 betaGender = mcmcfit[[1]][1, "betaGender"]
 betaBy = mcmcfit[[1]][1, "betaBy"]
-#betaAge = mcmcfit[[1]][1, "betaAge"]
+betaAge = mcmcfit[[1]][1, "betaAge"]
 totalSample = c()
 for(j in 1:nsubjects){
   fixedPartXBeta = betaBy * (as.numeric(dswide[j, "by"])-1) +
-    betaGender * (as.numeric(dswide[j, "gender"])-1)# + betaAge*dswide[j, "age"]
+    betaGender * (as.numeric(dswide[j, "gender"])-1) + betaAge*dswide[j, "age"]
   
   sampleRandomPart = dswide_y[j,] - fixedPartXBeta
   sampleRandomPart = sampleRandomPart - mean(sampleRandomPart)
   totalSample[j] = sum(sampleRandomPart^2)
 }
 totalSample = sum(totalSample)/(nsubjects*nrep)
+
+qplot(ppcCheck, geom=c("density"), xlab="Test statistic", ylab="PDF function estimated using KDE") + geom_vline(xintercept=totalSample, color="red")
+plot(density(ppcCheck))
+lines(density(ppcCheck[,1]), col='red')

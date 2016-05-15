@@ -128,7 +128,8 @@ Table \ref{table : ds_simple_dic} shows the values of the various deviance infor
 
 Table \ref{table : ds_3wellsep_dic} shows the values of various DIC we obtained for data set 2. One of the patterns we observe in these results is that the $\text{DIC}_4$ value decreased continuously till the right number of components were fitted, whereas for the overfitted models it either decreased by a bit or remained more or less the same. A similar pattern is observed for $\text{DIC}_5$ and $\text{DIC}_3$. However it seems that they are not as discerning as $\text{DIC}_4$. $\text{DIC}_1$ and $\text{DIC}_6$ do not seem to have any clear pattern. The last pattern we observe is that ${\text{p}_\text{D}}_1$ becomes negative for 4 or more components which is a sign of multi modal posterior as we discussed above.\\
 
-It is important to note that, while a DIC difference of 10 is usually considered good enough to prefer one model over another, this rule may not be as applicable here. The reason is that we have chains of short length and most of the chains with overfitted components also had high autocorrelation despite a thinning of 1 per 200 iterations.\\
+\todo[inline]{Discuss this with Professor Lesaffre.}
+For the DIC difference of 10 which is usually considered good enough to prefer one model over another, this rule may not be as applicable here. Could the reason be that that for chains with overfitted components in the mixture distribution we also get highly autocorrelated parameters despite a thinning of 1 per 200 iterations???\\
 
 \begin{table}[!htb]
 \centering
@@ -373,7 +374,21 @@ We implemented the PPC outlined in section \ref{sec : ppc}. Since the PPC we are
 	\label{fig : ppc_5wellsepcomp}    
 \end{figure}
 
-One can observe a more severe impact of overfitting if they use independent inverse gamma priors for the variance components of $G_k$ and uniform prior $U(-1,1)$ for correlation. To show the resulting distribution of the test statistic, we had to log transform it as otherwise the values were too large to be plotted in a single graph. We took the case of data set 2 and overfitted the mixture of random effects by using 4 components in the mixture. One can see that the corresponding test statistic inflates by a large margin as we described in section \ref{sec : ppc}. Interestingly when we fit the right number of components the test statistic is not inflated, but we can still see that the model is not well fitting. We further checked our posteriors for variance covariance matrices and found them to be underestimating the original variance covariance of the random effects from the simulated data set. This proves that the test statistic can be used to detect bad fitting models, however differentiating among models with less number of components may not be possible.
+\begin{table}[!htb]
+\centering
+\caption{PPP values for the various models fitted to data set 6.}
+\label{table : ppp_value_5welsepcomp}
+\begin{tabular}{@{}rrrrrrrrr@{}}
+\toprule
+\# Components fitted & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\ \midrule
+PPP Value & 0.500 & 0.500 & 0.492 & 0.500 & 0.500 & 0.581 & 0.674 & 0.775 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+We also calculated posterior predictive p-values for the various number of components we fitted to data set 6. They are shown in Table \ref{table : ppp_value_5welsepcomp}. As one can see the PPP values are equal (0.5) for all the underfitted models. Based on the graphical PPC and these PPP values the choice between the underfitted models cannot be made. On the other hand for models with overfitted components, the PPP values increase as overfitting increases.
+\todo[inline]{eh! PPP values. Should I write them as 1-0.775?}
+
+One can observe a more severe impact of overfitting if they use independent inverse gamma priors for the variance components of $G_k$ and uniform prior $U(-1,1)$ for correlation. To show the resulting distribution of the test statistic, we had to log transform it as otherwise the values were too large to be plotted in a single graph. We took the case of data set 2 and overfitted the mixture of random effects by using 4 components in the mixture. One can see that the corresponding test statistic inflates by a large margin as we described in section \ref{sec : ppc}. Interestingly when we fit the right number of components the test statistic is not inflated, but we can still see that the model is not well fitting. We further checked our posteriors for variance covariance matrices and found them to be underestimating the original variance covariance of the random effects from the simulated data set. This proves that the test statistic can be used to detect bad fitting models, however differentiating among models with less number of components may not be possible.\\
 
 \begin{figure}[!h]
 	\centering
