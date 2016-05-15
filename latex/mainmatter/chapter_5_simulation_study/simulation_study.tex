@@ -186,11 +186,11 @@ Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC app
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DIC to data set 4. So far we have observed that $\text{DIC}_3$ and $\text{DIC}_4$ can be used to detect the right number of components. Since the components in this data set are fused, and the subjects count is moderately high, the following results are interesting to analyze. We can see that $\text{DIC}_4$ still follows the pattern we have discussed so far, but with $\text{DIC}_3$ and $\text{DIC}_5$ it is a bit difficult to justify. To further validate the patterns we observed so far, we decided to decrease the number of subjects to 36.\\
+Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DIC to data set 4. So far we have observed that $\text{DIC}_3$ and $\text{DIC}_4$ can be used to detect the right number of components. Since the components in this data set are fused, with the large number of subjects the following results are interesting to analyze. We can see that $\text{DIC}_4$ still follows the pattern we have discussed so far, but with $\text{DIC}_3$ and $\text{DIC}_5$ it is a bit difficult to justify. To further validate the patterns we observed so far, we decided to decrease the number of subjects to 36.\\
  
 \begin{table}[!htb]
 \centering
-\caption{DIC and $\text{p}_\text{D}$ for data set 4}
+\caption{DIC and $\text{p}_\text{D}$ for data set 4. True number of components = 3}
 \label{table : ds_3fused_10ppg_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
@@ -215,13 +215,11 @@ Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DI
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3fused_3ppg_dic} shows the results of DIC for data set 5. At first glance one can see that the pattern we saw so far for $\text{DIC}_4$ doesn't exist anymore. However, the catch here is that these results are based on a dirichlet prior $\text{Dir}(1, 1, ..., 1)$ for the weight distribution. When we fitted 2 or more components we found that the MCMC chains had not converged with this prior. Given the fused data set, even if one fits 2 components there is a risk of unidentifiability due to empty components.\\
-
-We changed the prior for weight distribution to $\text{Dir}(3, 3, ..., 3)$ and fitted models with 2, 3 and 4 components for the mixture. With 2 components we found $\text{DIC}_4 = 2441 ({\text{p}_\text{D}}_4 = 461)$ and $\text{DIC}_3 = 1937 ({\text{p}_\text{D}}_3 = 14)$. For 3 components we obtained $\text{DIC}_4$ = 2352 and for 4 components we obtained $\text{DIC}_4 = 2346$. For 4 components $\text{DIC}_3 = 1925$. In light of these results one can still justify the pattern we have observed for $\text{DIC}_4$ so far but not for $\text{DIC}_3$. An interesting result from this exercise was that the choice of $\text{Dir}(1, 1, ..., 1)$ prior is prone to severe underfitting.
+Table \ref{table : ds_3fused_3ppg_dic} shows the results of DIC for data set 5. At first glance one can see that the pattern we saw so far for $\text{DIC}_4$ doesn't exist anymore. This peculiarity of this data set was that the number of subjects were less and the components were fused. Thus we observed that some of the components remained empty even when we fitted the right number of components. As we discussed in section \ref{subsec : choice_priors} one can use a Dirichlet prior with slightly larger hyperparameters to avoid empty components, although at the risk of becoming too informative. We changed the prior for weight distribution from $\text{Dir}(1, 1, ..., 1)$ to $\text{Dir}(3, 3, ..., 3)$ and fitted models with 2, 3 and 4 components for the mixture. With 2 components we found $\text{DIC}_4 = 2441 ({\text{p}_\text{D}}_4 = 461)$ and $\text{DIC}_3 = 1937 ({\text{p}_\text{D}}_3 = 14)$. For 3 components we obtained $\text{DIC}_4$ = 2352 whereas for 4 components we obtained $\text{DIC}_4 = 2346$ and $\text{DIC}_3 = 1925$. In light of these results one can still justify the pattern we have observed for $\text{DIC}_4$ so far. However it seems that the pattern is not equally clear for $\text{DIC}_3$. An interesting result from this exercise was that the choice of $\text{Dir}(1, 1, ..., 1)$ prior is prone to underfitting when the components are fused and observations are less.
 
 \begin{table}[!htb]
 \centering
-\caption{DIC and $\text{p}_\text{D}$ for data set 5.}
+\caption{DIC and $\text{p}_\text{D}$ for data set 5. True number of components = 3}
 \label{table : ds_3fused_3ppg_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
@@ -246,11 +244,11 @@ We changed the prior for weight distribution to $\text{Dir}(3, 3, ..., 3)$ and f
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the various models fitted for data set 6. The pattern of $\text{DIC}_4$ decreasing by a large margin till the right number of components (5 in this case) are fitted is visible here as well. What is more interesting is that $\text{DIC}_3$ also seem to work well in this case. This is an indication that $\text{DIC}_3$ can used to select the correct model if the components are well separated.\\
+Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the various models fitted for data set 6. The pattern of $\text{DIC}_4$ decreasing by a large amount till the right number of components are fitted is visible here as well. Interestingly, $\text{DIC}_3$ also seem to work well in this case. Based on the results so far it seems that $\text{DIC}_3$ works well only when components are well separated.\\
 
 \begin{table}[!htb]
 \centering
-\caption{DIC and $\text{p}_\text{D}$ for data set 6}
+\caption{DIC and $\text{p}_\text{D}$ for data set 6. True number of components = 5}
 \label{table : ds_5wellsep_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
@@ -281,7 +279,7 @@ Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the var
 
 \begin{table}[!htb]
 \centering
-\caption{DIC and $\text{p}_\text{D}$ for data set 7}
+\caption{DIC and $\text{p}_\text{D}$ for data set 7. True number of components = 5}
 \label{table : ds_5fused_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
@@ -310,7 +308,7 @@ Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the var
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_5fused_dic} shows the results of applying DIC to the various models fitted for data set 7. Based on figure \ref{fig : ds_5fused_randplot} one might only choose 3 components in this mixture. The pattern of $\text{DIC}_4$ decreasing by a large margin till the right number of components (5 in this case) are fitted is visible here as well. Although again the pattern for $\text{DIC}_3$ is a bit difficult to justify despite the large sample size.
+Table \ref{table : ds_5fused_dic} shows the results of applying DIC to the various models fitted for data set 7. Based on figure \ref{fig : ds_5fused_randplot} it is difficult to identify more than 3 components in this mixture. However once again $\text{DIC}_4$ seem to be identifying the right number of components correctly. $\text{DIC}_3$ does not seem to work well in this case, which happens when the components are fused as we observed earlier.
 
 \subsection{Marginal likelihood}
 \label{subsec : marginal_likelihood_simulation}
