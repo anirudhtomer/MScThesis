@@ -3,16 +3,16 @@
 \chapter{Analysis of blood donor data set}
 \label{ch : blood_donor}
  
- In this chapter we will present the analysis of the blood donor data set \citep{nasserinejad_prevalence_2015} using the Bayesian heterogeneity model. The data set consists of 1595 male blood donors who donated blood multiple times over a period of many years. Each time they visited the donation center, the following information was noted down: Season in which blood was donated (Cold/Hot), Volume of blood donated (ml), age at the time of donation (years), a binary indicator Donate (yes/no) specifying if the donor was allowed to donate the blood, Haemoglobin (Hb) of the patient at the time of donation, and the date of visit. \citet{nasserinejad_predicting_2013,nasserinejad_prevalence_2015,nasserinejad_prediction_2016} have analyzed this data set extensively using transition models, mixed models, growth mixture models and latent class mixed effects transition models to predict the Hb level of donors so that they are invited for donation at an optimal time, i.e. when their Hb levels are not too low because of the previous donations and other factors.\\
+ In this chapter we will present the analysis of the blood donor data set \citep{nasserinejad_prevalence_2015} using the Bayesian heterogeneity model. The data set consists of 1595 male blood donors who donated blood multiple times over a period of many years. Each time they visited the donation center, the following information was noted: Season in which blood was donated (Cold/Hot), Volume of blood donated (ml), age at the time of donation (years), a binary indicator Donate (yes/no) specifying if the donor was allowed to donate the blood, Hemoglobin (Hb) of the patient at the time of donation, and the date of visit. \citet{nasserinejad_predicting_2013,nasserinejad_prevalence_2015,nasserinejad_prediction_2016} have analyzed this data set extensively using transition models, mixed models, growth mixture models and latent class mixed effects transition models. The analysis was used to predict the Hb level of donors so that they are invited for donation at an optimal time, i.e. when their Hb levels are not too low because of the previous donations and other factors.\\
 
- For the purpose of this thesis we did not use the entire data set of 1595 patients as Bayesian computation for heterogenity model using the entire data set required a fairly large amount of computational power. Instead we used a simple random sample of the data consisting of 250 subjects.
+ For the purpose of this thesis we did not use the entire data set of 1595 patients as Bayesian computation for heterogeneity model using the entire data set required large amount of computational resources. Instead we used a simple random sample of the data consisting of 250 subjects.
 
 \section{Motivation for analysis with Bayesian heterogeneity model}
- In the analysis using Growth mixture models they found 4 different underlying subpopulations in the data set. Firstly, those who have a relatily stable Hb level over donations. Secondly, those who although have a higher Hb level than those in category 1, but show a relatively slow decline of Hb level over donations. Thirdly, those show a moderately sharp decline in Hb level and lastly those who show a steep decline in Hb levels despite beginning at high initial Hb levels. Because of presence of the different subpopulations, a single methodology to decide the time of next blood donation for subjects from all subpopulations may not be effective. The aim of applying the Bayesian heterogeneity model to this dataset is to provide an alternative modeling framework for such data sets.
+ In the analysis using growth mixture models \citet{nasserinejad_prevalence_2015} found 4 different underlying subpopulations in the data set. Firstly, those which had a relatively stable Hb level over donations. Secondly, those which had a higher Hb level than those in category 1 and showed a slow decline of Hb level over donations. Thirdly, those which showed a moderately sharp decline in Hb level over donations, and lastly those which showed a steep decline in Hb levels despite beginning at high initial Hb levels. Because of the presence of different subpopulations, a single methodology to decide the time of next blood donation for subjects from all subpopulations may not be effective. The aim of applying the Bayesian heterogeneity model to this dataset is to provide an alternative modeling framework for such data sets.
 
 \section{Frequentist analysis}
 \label{sec : frequentist_blood_donor}
-We began with a frequentist analysis of the blood donor data set to select the right mean structure for our models ahead. Firstly, it is important because missing out on a necesary covariate in the mean structure can lead to incorrect estimates of the covariance matrix and secondly the frequentist analysis will provide us with good starting values. Thirdly we can validate our results for the mean structure against the frequentist results. For the random effects structure we considered a model with both random intercept and random slope. For the choice of random slope we selected the number of donations in last 2 years as that was deemed as a suitable variable for random slope by \citet{nasserinejad_prevalence_2015}. We did LR test based on ML and F-tests to select the mean structure and found the following to be suitable.
+We began with a frequentist analysis of the blood donor data set to select the right mean structure for our models ahead. This was necessary because omitting a required covariate in the mean structure can lead to incorrect estimates of the covariance matrix. Secondly, a frequentist analysis provided us good starting values for the various parameters in our model. Thirdly we could check if the Bayesian analysis results are consistent with the frequentist analysis results. For the random effects structure we considered a model with both random intercept and random slope. For the choice of random slope we selected the number of donations in last 2 years as that was deemed as a suitable variable for random slope by \citet{nasserinejad_prevalence_2015}. For selecting the mean structure we did F-tests and likelihood ratio tests based on ML. We found the following mean structure to be suitable.
 
 \begin{equation}
 \label{eq : blood_donor_model}
@@ -24,10 +24,8 @@ We began with a frequentist analysis of the blood donor data set to select the r
 \end{split}
 \end{equation}
 
-where, Age and TSPD have been standardized with mean 0 and variance 1, $\text{\#donationLast2Years}_{ij}$ have been downscaled by a factor of 100 so that the random slope variance scale is upscaled. Similarly the intercept we used was 0.1, thus giving a higher random intercept variance. We will now present the fixed effect and random effect variance estimates of equation above. It is important to note that this model assumes number of components in the mixture distribution of random effects to be 1. 
+where, Age and TSPD have been standardized to have mean 0 and variance 1, $\text{\#donationLast2Years}_{ij}$ have been downscaled by a factor of 100 so that the random slope variance scale is upscaled. Similarly the intercept we used was 0.1, thus upscaling the random intercept variance. We will now present the fixed effect and random effect variance estimates of equation above. It is important to note that this model assumes a single multivariate normal distribution for the distribution of random effects.
 
-% Please add the following required packages to your document preamble:
-% \usepackage{booktabs}
 \begin{table}[!htb]
 \centering
 \caption{Table of frequentist fixed effects estimates for model \ref{eq : blood_donor_model}}
@@ -49,9 +47,9 @@ $\text{\#donationLast2Years}^2$ & -52.796 & 15.237 \\ \bottomrule
 \begin{tabular}{@{}lr@{}}
 \toprule
 Cov Parm & Estimate \\ \midrule
-$G_1[1,1]$ & 19.971 \\
-$G_1[1,2]$ & -14.266 \\
-$G_1[2,2]$ & 40.183 \\
+$G[1,1]$ & 19.971 \\
+$G[1,2]$ & -14.266 \\
+$G[2,2]$ & 40.183 \\
 $\sigma^2$ & 0.201 \\ \bottomrule
 \end{tabular}
 \end{table}
