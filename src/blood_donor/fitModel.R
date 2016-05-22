@@ -11,7 +11,7 @@ initS=function(nfolks, ncomponents){
 betaMu = 0
 betaTau = 0.0001
 gammaShapeRate = 0.0001
-wishartPriorScale = diag(2)*10
+wishartPriorScale = diag(2)
 wishartPriorDf = 3
 
 runJagsModel = function(datanodes, initialValues, stochasticNodes,jagsmodel, ncomp, niter, nthin, nburnin, nchains=1){

@@ -22,7 +22,7 @@ source("DIC_functions.R")
 source("bf.R")
 
 numchains= 1
-niter = 300000
+niter = 1000000
 nthin=200
 nburnin=70000
 
@@ -35,7 +35,7 @@ if(ncomponents==1){
   colnames(mcmcfit[[1]])[match("precision2",colnames(mcmcfit[[1]]))] = "precision2[1]"
   colnames(mcmcfit[[1]])[match("rho",colnames(mcmcfit[[1]]))] = "rho[1]"
 }else{
-  fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
+  fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2.6)
   mcmcfit = as.mcmc(fit)
 }
 
@@ -139,6 +139,7 @@ qplot(y=Hb, x=TSPD,data=ds[1:400,], geom = "line", group=Id)
 ########## Graphical analysis of MCMC fit #########
 heidel.diag(mcmcfit)
 
+ggsobject = ggs(mcmcfit)
 ggs_density(ggsobject, "beta")
 ggs_density(ggsobject, "errPrecision")
 ggs_density(ggsobject, "randSigma")
