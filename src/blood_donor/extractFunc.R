@@ -64,9 +64,9 @@ extractRandomComp = function(){
   return(cbind(randIntercept, randSlope))
 }
 
-randomComp=extractRandomComp()
-randomCompDf = data.frame(randomComp[complete.cases(randomComp)==TRUE,])
-qplot(x=randIntercept, y=randSlope, data=randomCompDf, xlab="Random intercept", ylab="Random slope")
+# randomComp=extractRandomComp()
+# randomCompDf = data.frame(randomComp[complete.cases(randomComp)==TRUE,])
+# qplot(x=randIntercept, y=randSlope, data=randomCompDf, xlab="Random intercept", ylab="Random slope")
 #var(randomCompDf)
 
 

@@ -59,9 +59,9 @@ fitModel = function(niter=10000, nthin=50, nburnin=200, nchains=1, jagsmodel, nc
   
   initialValues = list("betaSeason"=c(reg$coefficients[2]), "betaDonate"=c(reg$coefficients[3]),"betaAge"=c(reg$coefficients[4]),
                        "betaTSPD"=c(reg$coefficients[5]),"betaDonateLast2Years"=c(reg$coefficients[6]),
-                       "errPrecision"=c(1), "Eta"=rep(1/ncomp, ncomp),
+                       "errPrecision"=c(1), "Eta_unordered"=rep(1/ncomp, ncomp),
                        "S"=initS(nsubjects, ncomp),
-                       "randmu_unordered"=cbind(randIntQuantiles, randSlopeQuantiles))
+                       "randmu"=cbind(randIntQuantiles, randSlopeQuantiles))
   
   stochasticNodes = c("betaAge","betaSeason", "betaDonate", "betaTSPD", 
                       #"betaTSPDSquare", "betaTSPDSeason",

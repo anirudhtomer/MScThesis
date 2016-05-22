@@ -15,7 +15,7 @@ registerDoParallel(cores=8)
 ########## OTHER SOURCE CODE FILES ############
 source("datacleaning.R")
 
-source("fitModelRandSlopeConditional.R")
+source("fitModel.R")
 source("createModel.R")
 source("../common/extractFuncRandSlopeConditional.R")
 source("DIC_functions.R")
@@ -23,8 +23,8 @@ source("bf.R")
 
 numchains= 1
 niter = 1000000
-nthin=200
-nburnin=70000
+nthin=100
+nburnin=30000
 
 ncomponents=3
 if(ncomponents==1){
@@ -35,7 +35,7 @@ if(ncomponents==1){
   colnames(mcmcfit[[1]])[match("precision2",colnames(mcmcfit[[1]]))] = "precision2[1]"
   colnames(mcmcfit[[1]])[match("rho",colnames(mcmcfit[[1]]))] = "rho[1]"
 }else{
-  fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2.6)
+  fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2.3)
   mcmcfit = as.mcmc(fit)
 }
 

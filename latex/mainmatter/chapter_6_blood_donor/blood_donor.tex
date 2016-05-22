@@ -3,16 +3,16 @@
 \chapter{Analysis of blood donor data set}
 \label{ch : blood_donor}
  
- In this chapter we are presenting the analysis of the blood donor data set \citep{nasserinejad_prevalence_2015} using the Bayesian heterogeneity model. The data set consists of 1595 male blood donors who donated blood multiple times over a period of many years. On each occasion when they visited the donation center, the following information was noted: Season in which blood was donated (Cold/Hot), Volume of blood donated (ml), age at the time of donation (years), a binary indicator Donate (yes/no) specifying if the donor was allowed to donate the blood, Hemoglobin (Hb) of the patient at the time of donation, and the date of visit. \citet{nasserinejad_predicting_2013,nasserinejad_prevalence_2015,nasserinejad_prediction_2016} have analyzed this data set extensively using transition models, mixed models, growth mixture models and latent class mixed effects transition models. The analysis was used to predict the Hb level of donors so that they are invited for donation at an optimal time, i.e. when their Hb levels are not too low because of the previous donations and other factors.\\
+ In this chapter we have presented the analysis of the blood donor data set \citep{nasserinejad_prevalence_2015} using the Bayesian heterogeneity model. The data set consists of 1595 male blood donors who donated blood multiple times over a period of many years. On each occasion when they visited the donation center, the following information was noted: Season in which blood was donated (Cold/Hot), Volume of blood donated (ml), age at the time of donation (years), a binary indicator Donate (yes/no) specifying if the donor was allowed to donate the blood, Hemoglobin (Hb) of the patient at the time of donation, and the date of visit. Other variables derived from date of visit such as time since previous donation (TSPD), time since previous visit (TSPV) were also present in the data set. \citet{nasserinejad_predicting_2013,nasserinejad_prevalence_2015,nasserinejad_prediction_2016} have analyzed this data set extensively using transition models, mixed models, growth mixture models and latent class mixed effects transition models. The analysis was used to predict the Hb level of donors so that they are invited for donation at an optimal time, i.e. when their Hb levels are not too low because of the previous donations and other factors.\\
 
  For the purpose of this thesis we did not use the entire data set of 1595 patients as Bayesian computation for heterogeneity model using the entire data set required large amount of computational resources. Instead we used a simple random sample of the data consisting of 250 subjects.
 
 \section{Motivation for analysis with Bayesian heterogeneity model}
- In the analysis using growth mixture models \citet{nasserinejad_prevalence_2015} found 4 different underlying subpopulations in the data set. Firstly, those which had a relatively stable Hb level over donations. Secondly, those which had a higher Hb level than those in category 1 and showed a slow decline of Hb level over donations. Thirdly, those which showed a moderately sharp decline in Hb level over donations, and lastly those which showed a steep decline in Hb levels despite beginning at high initial Hb levels. Because of the presence of different subpopulations, a single methodology to decide the time of next blood donation for subjects from all subpopulations may not be effective. The aim of applying the Bayesian heterogeneity model to this dataset is to provide an alternative modeling framework for such data sets.
+ In the analysis using growth mixture models \citet{nasserinejad_prevalence_2015} found 4 different underlying subpopulations in the data set. Firstly, those which had a relatively stable Hb level over donations. Secondly, those which had a higher baseline Hb level than those in category 1 and also showed a slow decline of Hb level over donations. Thirdly, those which showed a moderately sharp decline in Hb level over donations, and lastly those which showed a steep decline in Hb levels despite beginning at high initial Hb levels. Because of the presence of different subpopulations, a single methodology to decide the time of next blood donation for subjects from all subpopulations may not be effective. The aim of applying the Bayesian heterogeneity model to this dataset was to provide an alternative modeling framework for such data sets.
 
 \section{Frequentist analysis}
 \label{sec : frequentist_blood_donor}
-We began with a frequentist analysis of the blood donor data set to select the right mean structure for our models ahead. This was necessary because omitting a required covariate in the mean structure can lead to incorrect estimates of the covariance matrix. Secondly, a frequentist analysis provided us good starting values for the various parameters in our model. Thirdly we could check if the Bayesian analysis results are consistent with the frequentist analysis results. For the random effects structure we considered a model with both random intercept and random slope. For the choice of random slope we selected the number of donations in last 2 years as that was deemed as a suitable variable for random slope by \citet{nasserinejad_prevalence_2015}. For selecting the mean structure we did F-tests and likelihood ratio tests based on ML. We found the following mean structure to be suitable.
+We began with a frequentist analysis of the blood donor data set to select the right mean structure for our models ahead. This was necessary because omitting a required covariate in the mean structure could lead to incorrect estimates of the covariance matrix. Secondly, a frequentist analysis provided us good starting values for the various parameters in our model. Thirdly we also wanted check if the Bayesian analysis results were consistent with the frequentist analysis results. For the random effects structure we considered a model with both random intercept and random slope. For the choice of random slope we selected the variable 'number of donations in last 2 years' because that was deemed as a suitable variable for random slope by \citet{nasserinejad_prevalence_2015}. For selecting the mean structure we did F-tests and likelihood ratio tests based on ML. We found the following mean structure to be suitable.
 
 \begin{equation}
 \label{eq : blood_donor_model}
@@ -24,15 +24,15 @@ We began with a frequentist analysis of the blood donor data set to select the r
 \end{split}
 \end{equation}
 
-where, Age and TSPD have been standardized to have mean 0 and variance 1, $\text{\#donationLast2Years}_{ij}$ have been downscaled by a factor of 100 so that the random slope variance scale is upscaled. Similarly the intercept we used was 0.1, thus upscaling the random intercept variance. We will now present the fixed effect and random effect variance estimates of equation above. It is important to note that this model assumes a single multivariate normal distribution for the distribution of random effects.
+where, Age and TSPD have been standardized to have mean 0 and variance 1, $\text{\#donationLast2Years}_{ij}$ have been downscaled by a factor of 100 so that the random slope variance scale is upscaled. Similarly the intercept we used was 0.1, thus upscaling the random intercept variance. It is important to note that this model assumes a single multivariate normal distribution for the distribution of random effects. Table \ref{table : frequentist_fixed effects} shows the parameter estimates for this model. 
 
 \begin{table}[!htb]
 \centering
-\caption{Table of frequentist fixed effects estimates for model \ref{eq : blood_donor_model}}
+\caption{Frequentist fixed effect estimates and random variance estimates for model \ref{eq : blood_donor_model}. REML was used for obtaining these parameter estimates.}
 \label{table : frequentist_fixed effects}
 \begin{tabular}{@{}lrr@{}}
 \toprule
-Effect ($\beta$) & Estimate & Standard Error \\ \midrule
+Effect ($\beta$) & Mean & Standard Error \\ \midrule
 intercept & 94.121 & 0.429 \\
 Age & -0.086 & 0.026 \\
 \#donationLast2Years & -7.265 & 1.555 \\
@@ -47,15 +47,15 @@ $\text{\#donationLast2Years}^2$ & -52.796 & 15.237 \\ \bottomrule
 \begin{tabular}{@{}lr@{}}
 \toprule
 Cov Parm & Estimate \\ \midrule
-$G[1,1]$ & 19.971 \\
-$G[1,2]$ & -14.266 \\
-$G[2,2]$ & 40.183 \\
+$G[1,1]$ (intercept) & 19.971 \\
+$G[1,2]$ (covariance) & -14.266 \\
+$G[2,2]$ (slope) & 40.183 \\
 $\sigma^2$ & 0.201 \\ \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Bayesian analysis}
-We next fitted the same model with Bayesian approach, although we also fitted mixtures with more number of components in the random effects. We first began with the approach in \ref{subsec : ds_description} to get a rough idea of the number of components. Figure \ref{fig : rough_idea_blood_donor} shows that there could be perhaps 1 component, or if there are more they have small number of subjects. Besides as we know these values overestimate the exact random effects thus if there are more than 1 component, we will have to use a slightly higher value for the hyperparameter of the Dirichlet prior in such case. We used $\text{Dir}(2, 2,...2)$. Firstly in a mixture of only 1 component, i.e. no mixture case had the same mean value for fixed effect and random effect posterior distributions.\\
+We next extended the model in equation \ref{eq : blood_donor_model} for fitting the Bayesian version of the Heterogeneity model proposed by \citet{verbeke_linear_1996}. Since the random component in the Bayesian heterogeneity model follows a mixture distribution we fitted mixtures of 1 to 5 components. We removed the intercept and the fixed effect of number of donations in last 2 years from the model to impose hierarchical centering on the random effects. The next step we took for model fitting was generating a plot of random part of the model in \ref{eq : blood_donor_model} using the approach mentioned in \ref{subsec : ds_description}. The corresponding plot shown in figure \ref{fig : rough_idea_blood_donor} shows that there could be perhaps 1 component, or if there are more then the components are not well separated. We saw in the case of data set 5 (figure \ref{fig : ds_3fused3ppg_randplot}) which also had fused components, that we required a slightly higher value for the hyperparameter of the Dirichlet prior for weight distribution. Thus we tested $\text{Dir}(1, 1,...1)$, $\text{Dir}(2, 2,...2)$ and $\text{Dir}(3, 3,...3)$ for the blood donor data set. From the various simulations we ran we found that $\text{Dir}(2, 2,...2)$ prior gave the same results as Dirichlet priors with slightly higher values of the hyperparameters and so we stuck with it. As for the length of MCMC chains, we ran 500,000 iterations with a thinning of 150 and a burn in of 100,000 iterations.\\
 
 \begin{figure}
 	\centering
@@ -64,7 +64,40 @@ We next fitted the same model with Bayesian approach, although we also fitted mi
 	\label{fig : rough_idea_blood_donor}
 \end{figure}
 
-To do the Bayesian analysis we ran 150000 iterations with a thinning of 100 and burn-in of 25000 iterations. For chains with higher number of components we used 200000 iterations with a thinning of 150. For each of the resulting MCMC chains we calculated the various definitions of definitions given in section \ref{sec : dic}, the results of which are presented in Table \ref{table : dic_blood_donor}. In the simulation study we observed that $\text{DIC}_4$ was the most reliable of the DIC's and so we will discuss it first. It seems that there are not more than 2-3 components. The difference between DIC of mixture of 1 component and of 2 components is much larger than that between 2 and 3 components. To further verify this we used posterior predictive checks. However instead of randomly generating number of donations in last 2 years we sampled them from the subjects which were not considered for analysis due to computational restrictions. As shown in Figure \ref{fig : ppc_blood_donor_3comp} to \ref{fig : ppc_blood_donor_5comp}, it is clear that 3 or more components are an overfit. Secondly we can see that the posterior predictive distribution of the test statistic overlaps the distribution of test statistic with the sample data. Thus we will stick to the choice of 2 components.\\
+The first model we fitted was without any mixture of random effects. The parameter estimates we obtained from this model are shown in table \ref{table : bayesian fixed effects}. It is quite clear from these results that the Bayesian results are almost the same as the frequentist estimates.
+
+\begin{table}[!htb]
+\centering
+\caption{Bayesian fixed effect estimates and random effect estimates for model \ref{eq : blood_donor_model}. The intercept and \#donationLast2Years have been removed for hierarchical centering.}
+\label{table : bayesian fixed effects}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Effect ($\beta$) & Mean & Median & 95\% HPDI \\ \midrule
+Age & -0.086 & -0.086 & -0.135, -0.034\\
+TSPD & -0.037 & -0.037 & -0.068, -0.009 \\
+Season (Hot) & -0.080 & -0.080 & -0.109, -0.048\\
+Donate (TRUE) & 0.157 & 0.157 & 0.083, 0.232 \\
+\#donationLast2Years * TSPD & 0.020 & 0.020 & 0.009, 0.031  \\
+\#donationLast2Years * Donate & 4.694 & 4.715 & 2.492, 6.492 \\
+$\text{\#donationLast2Years}^2$ & -50.247 & -50.449 & -77.843, -21.436 \\ \bottomrule
+\end{tabular}
+
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Cov Parm & Mean & Median & 95\% HPDI \\ \midrule
+$b_{\text{Intercept}}^C$& 94.130 & 94.142 & 93.303, 94.954\\
+$b_{\text{slope}}^C$ & -7.504 & -7.531 & -10.639, -4.531\\
+$G[1,1]$ (intercept) & 20.098 & 19.883 & 15.784, 24.559\\
+$G[1,2]$ (covariance) & -13.989 & -13.771 & -20.879, -7.903\\
+$G[2,2]$ (slope) & 39.396 & 39.061 & 27.895, 53.443\\
+$\sigma^2$ & 0.201 & 0.201 & 0.191, 0.213\\ \bottomrule
+\end{tabular}
+\end{table}
+
+Next we fitted models with 2 to 5 components in the mixture of random effects. In the case of fitting two components to the mixture we applied identifiability constraints on the weights, i.e. $\eta_1 < \eta_2$. Without these constraints we observed label switching and thus the posteriors were bimodal. For 3 or more components however identifiability constraints were not useful and we also obtained empty components. It was interesting that the PPC in case of label switching but non empty components showed good results.....no tails.
+
+
+For each of the resulting MCMC chains we calculated the various definitions of definitions given in section \ref{sec : dic}, the results of which are presented in Table \ref{table : dic_blood_donor}. In the simulation study we observed that $\text{DIC}_4$ was the most reliable of the DIC's and so we will discuss it first. It seems that there are not more than 2-3 components. The difference between DIC of mixture of 1 component and of 2 components is much larger than that between 2 and 3 components. To further verify this we used posterior predictive checks. However instead of randomly generating number of donations in last 2 years we sampled them from the subjects which were not considered for analysis due to computational restrictions. As shown in Figure \ref{fig : ppc_blood_donor_3comp} to \ref{fig : ppc_blood_donor_5comp}, it is clear that 3 or more components are an overfit. Secondly we can see that the posterior predictive distribution of the test statistic overlaps the distribution of test statistic with the sample data. Thus we will stick to the choice of 2 components.\\
 
 \begin{table}[!htb]
 \centering
@@ -74,7 +107,7 @@ To do the Bayesian analysis we ran 150000 iterations with a thinning of 100 and 
 \toprule
 \# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1 comp & 4817 & 4816 & 4818 & 7077 & 7532 & 4353 \\
-2 comp & 4810 & 4804 & 4814 & 7040 & 7492 & 4339 \\
+2 comp & 4808 & 4805 & 4811 & 6956 & 7376 & 4306 \\
 3 comp & 4744 & 4777 & 4814 & 7032 & 7458 & 4344 \\
 4 comp & 4608 & 4723 & 4814 & 7031 & 7360 & 4332 \\
 5 comp & 4461 & 4459 & 4818 & 7031 & 7108 & 4327 \\ \bottomrule
@@ -83,7 +116,7 @@ To do the Bayesian analysis we ran 150000 iterations with a thinning of 100 and 
 \toprule
 \# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1 comp & 13 & 12 & 15 & 13 & 468 & 302 \\
-2 comp & 17 & 11 & 21 & 19 & 471 & 281 \\
+2 comp & 17 & 14 & 19 & 19 & 439 & 247 \\
 3 comp & -48 & -15 & 22 & 25 & 451 & 284 \\
 4 comp & -183 & -67 & 23 & 30 & 360 & 272 \\
 5 comp & -334 & -336 & 23 & 28 & 104 & 269 \\ \bottomrule

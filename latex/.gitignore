@@ -7,4 +7,6 @@
 *.xml
 *.gz
 *.lnk
+*.lot
+*.lof
 thesis-blx.bib
