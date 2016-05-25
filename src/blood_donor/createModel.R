@@ -21,7 +21,7 @@ model = function(){
 
     randmu[k,1]~dnorm(betaMu, betaTau)
     randmu[k,2]~dnorm(betaMu, betaTau)
-    
+
     randPrecision[1:2,1:2,k]~dwish(wishartPriorScale, wishartPriorDf)
     randSigma[1:2,1:2,k]<-inverse(randPrecision[1:2,1:2,k])
     
@@ -29,12 +29,12 @@ model = function(){
     precisionSlope[k]<-randPrecision[2,2,k]
     rho[k]<-randSigma[1,2,k]* sqrt(precisionIntercept[k] * precisionSlope[k])
   }
-  # 
+
   # orderRandMu<-order(randmu_unordered[1:ncomponents,1])
   # for(h in 1:ncomponents){
   #   randmu[h,1:2]<-randmu_unordered[orderRandMu[h],1:2]
   # }
-  
+  # 
   errPrecision~dgamma(gammaShapeRate,gammaShapeRate)
   
   betaDonate~dnorm(betaMu,betaTau)
@@ -57,8 +57,6 @@ singleModel = function(){
       mu[cumsumHb[i]+j]<- betaDonate*dsDonate[cumsumHb[i]+j] + betaAge*dsAge[cumsumHb[i]+j] + 
         betaSeason*dsSeason[cumsumHb[i]+j] + betaTSPD*dsTSPD[cumsumHb[i]+j] +
         randomComp[i,1]*0.1 + randomComp[i,2]*(dsDonationLast2Years[cumsumHb[i]+j]) + 
-        betaTSPDSquare*dsTSPDSquare[cumsumHb[i]+j] +
-        betaTSPDSeason*dsTSPDSeason[cumsumHb[i]+j] +
         
         betaDonateLast2TSPD*dsDonateLast2TSPD[cumsumHb[i]+j] +
         betaDonateLast2Donate*dsDonateLast2Donate[cumsumHb[i]+j] +
@@ -85,9 +83,6 @@ singleModel = function(){
   betaAge~dnorm(betaMu,betaTau)
   betaSeason~dnorm(betaMu,betaTau)
   betaTSPD~dnorm(betaMu,betaTau)
-  
-  betaTSPDSquare~dnorm(betaMu,betaTau)
-  betaTSPDSeason~dnorm(betaMu,betaTau)
   
   betaDonateLast2TSPD~dnorm(betaMu,betaTau)
   betaDonateLast2Donate~dnorm(betaMu,betaTau)

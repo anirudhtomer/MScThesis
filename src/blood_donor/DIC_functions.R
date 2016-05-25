@@ -366,7 +366,7 @@ calculate_E_theta_givenY_Z = function(mcmcfit){
     
     #Eta
     freqPerGroup = sapply(1:ncomponents, function(j){sum(allocations==j)})
-    eta=(1+freqPerGroup)/(ncomponents*1 + nsubjects)
+    eta=(1+freqPerGroup)/(ncomponents*3 + nsubjects)
     
     #randmu and #randSigma
     randmu = rep(list(c(0,0)), ncomponents)

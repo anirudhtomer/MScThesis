@@ -28,11 +28,12 @@ where, Age and TSPD have been standardized to have mean 0 and variance 1, $\text
 
 \begin{table}[!htb]
 \centering
+\captionsetup{justification=centering}
 \caption{Frequentist fixed effect estimates and random variance estimates for model \ref{eq : blood_donor_model}. REML was used for obtaining these parameter estimates.}
 \label{table : frequentist_fixed effects}
 \begin{tabular}{@{}lrr@{}}
 \toprule
-Effect ($\beta$) & Mean & Standard Error \\ \midrule
+Fixed Effects ($\beta$) & Mean & Standard Error \\ \midrule
 intercept & 94.121 & 0.429 \\
 Age & -0.086 & 0.026 \\
 \#donationLast2Years & -7.265 & 1.555 \\
@@ -46,10 +47,10 @@ $\text{\#donationLast2Years}^2$ & -52.796 & 15.237 \\ \bottomrule
 
 \begin{tabular}{@{}lr@{}}
 \toprule
-Cov Parm & Estimate \\ \midrule
-$G[1,1]$ (intercept) & 19.971 \\
-$G[1,2]$ (covariance) & -14.266 \\
-$G[2,2]$ (slope) & 40.183 \\
+Covariance Parameters & Estimate \\ \midrule
+$\sigma^2_\text{Intercept}$ & 19.971 \\
+$\sigma_\text{Intercept, Slope}$ & -14.266 \\
+$\sigma^2_\text{Slope}$ & 40.183 \\
 $\sigma^2$ & 0.201 \\ \bottomrule
 \end{tabular}
 \end{table}
@@ -68,11 +69,12 @@ The first model we fitted was without any mixture of random effects. The paramet
 
 \begin{table}[!htb]
 \centering
+\captionsetup{justification=centering}
 \caption{Bayesian fixed effect estimates and random effect estimates for model \ref{eq : blood_donor_model}. The intercept and \#donationLast2Years have been removed for hierarchical centering.}
 \label{table : bayesian fixed effects}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Effect ($\beta$) & Mean & Median & 95\% HPDI \\ \midrule
+Fixed Effects ($\beta$) & Mean & Median & 95\% HPDI \\ \midrule
 Age & -0.086 & -0.086 & -0.135, -0.034\\
 TSPD & -0.037 & -0.037 & -0.068, -0.009 \\
 Season (Hot) & -0.080 & -0.080 & -0.109, -0.048\\
@@ -84,31 +86,46 @@ $\text{\#donationLast2Years}^2$ & -50.247 & -50.449 & -77.843, -21.436 \\ \botto
 
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Cov Parm & Mean & Median & 95\% HPDI \\ \midrule
+Covariance Parameters & Mean & Median & 95\% HPDI \\ \midrule
 $b_{\text{Intercept}}^C$& 94.130 & 94.142 & 93.303, 94.954\\
 $b_{\text{slope}}^C$ & -7.504 & -7.531 & -10.639, -4.531\\
-$G[1,1]$ (intercept) & 20.098 & 19.883 & 15.784, 24.559\\
-$G[1,2]$ (covariance) & -13.989 & -13.771 & -20.879, -7.903\\
-$G[2,2]$ (slope) & 39.396 & 39.061 & 27.895, 53.443\\
+$\sigma^2_\text{Intercept}$ & 20.098 & 19.883 & 15.784, 24.559\\
+$\sigma_\text{Intercept, Slope}$ & -13.989 & -13.771 & -20.879, -7.903\\
+$\sigma^2_\text{Slope}$ & 39.396 & 39.061 & 27.895, 53.443\\
 $\sigma^2$ & 0.201 & 0.201 & 0.191, 0.213\\ \bottomrule
 \end{tabular}
 \end{table}
 
-Next we fitted models with 2 to 5 components in the mixture of random effects. In the case of fitting two components to the mixture we applied identifiability constraints on the weights, i.e. $\eta_1 < \eta_2$. Without these constraints we observed label switching and thus the posteriors were bimodal. For 3 or more components however identifiability constraints were not useful and we also obtained empty components. It was interesting that the PPC in case of label switching but non empty components showed good results.....no tails.
+Next we fitted models with 2 to 5 components in the mixture of random effects. In the case of fitting two components to the mixture we applied identifiability constraints on the weights, i.e. $\eta_1 < \eta_2$. Without these constraints we observed label switching and thus the posteriors were bimodal. For 3 or more components however identifiability constraints were not useful. For e.g. in the case of fitting 3 components we observed convergence only in some chains when we increased the hyperparameters for the Dirichlet prior (prior for $\boldsymbol{\eta}$) to 13. Since the prior was not informative we discarded the corresponding results. 
 
+Nevertheless for each of the resulting MCMC chains we calculated the various definitions of DIC given in section \ref{sec : dic}, the results of which are presented in Table \ref{table : dic_blood_donor}. In the simulation study we had observed that $\text{DIC}_4$ was the most discerning of the DIC's, especially also when the mixture components were not well separated. In the latter case $\text{DIC}_1$, $\text{DIC}_2$ and $\text{DIC}_3$ were not much discerning and in one example (data set 7) $\text{DIC}_1$ did not select the right model. $\text{DIC}_5$ and $\text{DIC}_6$ also did not select the right model when components were not well separated. Thus for the blood donor data set we primarily relied on $\text{DIC}_4$. We could not consider models with 3 or more components because the corresponding chains did not converge. Looking at the results in Table \ref{table : dic_blood_donor} it seemed that a model with 2 components was preferable over a model with no mixture. The 2 components however were not very clearly supported by $\text{DIC}_3$. To further verify if 2 components are the correct number of components we used posterior predictive checks.\\
 
-For each of the resulting MCMC chains we calculated the various definitions of definitions given in section \ref{sec : dic}, the results of which are presented in Table \ref{table : dic_blood_donor}. In the simulation study we observed that $\text{DIC}_4$ was the most reliable of the DIC's and so we will discuss it first. It seems that there are not more than 2-3 components. The difference between DIC of mixture of 1 component and of 2 components is much larger than that between 2 and 3 components. To further verify this we used posterior predictive checks. However instead of randomly generating number of donations in last 2 years we sampled them from the subjects which were not considered for analysis due to computational restrictions. As shown in Figure \ref{fig : ppc_blood_donor_3comp} to \ref{fig : ppc_blood_donor_5comp}, it is clear that 3 or more components are an overfit. Secondly we can see that the posterior predictive distribution of the test statistic overlaps the distribution of test statistic with the sample data. Thus we will stick to the choice of 2 components.\\
+The PPC which we mentioned in section \ref{subsec : ppc_bhtge} had an interesting property that it worked for overfitted models as well because in overfitted models the chains corresponding to fixed effects converged and only the chains corresponding to parameters of component densities did not. To perform PPC we required a sample of number of donations in last 2 years. Instead of randomly generating them we sampled them from the subjects which were not considered for analysis due to computational restrictions. We then generated random effects from the posterior predictive distribution of random effects. Figure \ref{fig : ppc_blood_donor_3comp} to \ref{fig : ppc_blood_donor_5comp} show the distribution of the test statistic \ref{eq : ppc_test_statistic} for the 5 models we considered. It can be seen that the test statistic has the characteristic skewed distribution due to the posteriors of parameters being almost equal to the priors in case of 3 or more number of components in the mixture (see section \ref{subsec : ppc_bhtge}). Another aspect of the result is that the distribution of the test statistic with posterior predictive data overlaps the distribution of test statistic with the sample data. This shows that the model is well fitted to the data. Based on these results of we will stick to the choice of 2 components in the mixture.\\
 
 \begin{table}[!htb]
 \centering
+\captionsetup{justification=centering}
+\caption{PPP values for the various models fitted to the blood donor data set.}
+\label{table : ppp_value_5welsepcomp}
+\begin{tabular}{@{}rrrrrrrrr@{}}
+\toprule
+\# Components fitted & 1 & 2 & 3 & 4 & 5\\ \midrule
+PPP Value & 0.619 & 0.591 & 0.677 & 0.701 & 0.758\\ \bottomrule
+\end{tabular}
+\end{table}
+0.619, 0.591
+
+\begin{table}[!htb]
+\centering
+\captionsetup{justification=centering}
 \caption{DIC for blood donor data set}
 \label{table : dic_blood_donor}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
+\# Components Fitted & $\text{DIC}_1$ & $\text{DIC}_2$ & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1 comp & 4817 & 4816 & 4818 & 7077 & 7532 & 4353 \\
 2 comp & 4808 & 4805 & 4811 & 6956 & 7376 & 4306 \\
-3 comp & 4744 & 4777 & 4814 & 7032 & 7458 & 4344 \\
+3 comp & 4755 & 4825 & 4838 & 7024 & 7406 & 4360 \\
 4 comp & 4608 & 4723 & 4814 & 7031 & 7360 & 4332 \\
 5 comp & 4461 & 4459 & 4818 & 7031 & 7108 & 4327 \\ \bottomrule
 \end{tabular}
@@ -116,8 +133,8 @@ For each of the resulting MCMC chains we calculated the various definitions of d
 \toprule
 \# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1 comp & 13 & 12 & 15 & 13 & 468 & 302 \\
-2 comp & 17 & 14 & 19 & 19 & 439 & 247 \\
-3 comp & -48 & -15 & 22 & 25 & 451 & 284 \\
+2 comp & 17 & 16 & 19 & 19 & 439 & 247 \\
+3 comp & -55 & -15 & 29 & 5 & 387 & 294 \\
 4 comp & -183 & -67 & 23 & 30 & 360 & 272 \\
 5 comp & -334 & -336 & 23 & 28 & 104 & 269 \\ \bottomrule
 \end{tabular}
@@ -125,25 +142,26 @@ For each of the resulting MCMC chains we calculated the various definitions of d
 
 \begin{figure}[!htb]
 \centering
+\captionsetup{justification=centering}
 \begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/ppc_1comp.png}
-        \caption{\label{fig : ppc_blood_donor_1comp}1 components fitted for blood donor data set}
+        \caption{\label{fig : ppc_blood_donor_1comp}\#Components fitted = 1}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/ppc_2comp.png}	
-          \caption{\label{fig : ppc_blood_donor_2comp}2 components fitted for blood donor data set}
+          \caption{\label{fig : ppc_blood_donor_2comp}\#Components fitted = 2}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/ppc_3comp.png}	
-          \caption{\label{fig : ppc_blood_donor_3comp}3 components fitted for blood donor data set}
+          \caption{\label{fig : ppc_blood_donor_3comp}\#Components fitted = 3}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/ppc_4comp.png}	
-          \caption{\label{fig : ppc_blood_donor_4comp}4 components fitted for blood donor data set}
+          \caption{\label{fig : ppc_blood_donor_4comp}\#Components fitted = 4}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/ppc_5comp.png}	
-          \caption{\label{fig : ppc_blood_donor_5comp}5 components fitted}
+          \caption{\label{fig : ppc_blood_donor_5comp}\#Components fitted = 5}
 	\end{subfigure}
 	
 	\caption{PDF function of $T(\boldsymbol{\tilde{r}})$ estimated using KDE for blood donor data set. The red line shows the value of the test statistic $T(\boldsymbol{r})$ based on the observed data.}
@@ -151,72 +169,123 @@ For each of the resulting MCMC chains we calculated the various definitions of d
 \end{figure} 
 
 \subsection{Parameter estimates}
-For the 2 components we will now present the summary of the parameter estimates. Firstly in Figure \ref{fig : eta_blood_donor} we can see that the two components are equal in weight distribution. However the posterior of the weights is bimodal for both of them. Although this is usually a sign of label switching....hmm but my means don't seem to be having label switching. need to check this.
+Table \ref{table : bhtge_blooddonor_2comp} shows the parameter estimates for the component densities of the mixture of random effects. Further, figure \ref{fig : eta_blood_donor} to figure \ref{fig : cov_blood_donor} show the posterior densities of the weight distribution $\boldsymbol{\eta}$, location parameters $\boldsymbol{b^C}$ and covariance parameters $\sigma^2_\text{Intercept}$, $\sigma^2_\text{Slope}$, $\sigma_\text{Intercept, Slope}$ which form the covariance matrix $G$. If we consider the mean of the posterior distribution then we can see that the weight distribution ratio is 1:3. Secondly the can see that the location parameters for slope have a slight overlap but that is not the case with random intercept. The first component corresponds to the group for which the baseline random component of Hemoglobin is low and and the second component corresponds to the group for which the baseline random component of Hemoglobin is higher. However for the second group the slope is more negative suggesting that relative to group 1 an average subject from group 2 has a more rapid decrease in Hemoglobin levels with frequent donations. 
+Lastly, within group 2 a person who begins with a higher baseline Hemoglobin level is likely to have a more rapid decrease in Hemoglobin levels with donations. However within group 1 such intra subject difference cannot be generalized because 95\% HPDI for the correlation between random intercept and random slope is [-0.847, 0.980].
+
+\begin{table}[!htb]
+\centering
+\captionsetup{justification=centering}
+\caption{Bayesian parameter estimates for the 2 components in the mixture of random effects in the Bayesian heterogeneity model for Blood donor data set.}
+\label{table : bhtge_blooddonor_2comp}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Fixed Effects ($\beta$) & Mean & Median & 95\% HPDI \\ \midrule
+Age &  -0.07 & -0.07 & -0.118, -0.024\\
+TSPD & -0.038 & -0.038 & -0.066, -0.009\\
+Season (Hot) & -0.081 & -0.081 & -0.113, -0.05\\
+Donate (TRUE) & 0.160 & 0.159 & 0.091, 0.234\\
+\#donationLast2Years * TSPD & 0.020 & 0.020 & 0.008, 0.030\\
+\#donationLast2Years * Donate & 4.738 & 4.746 & 2.812, 6.733\\
+$\text{\#donationLast2Years}^2$  & -48.360 & -48.256 & -76.647, -18.457\\ \bottomrule
+\end{tabular}
+
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Component Parameters & Mean & Median & 95\% HPDI \\ \midrule
+$\eta_1$ & 0.275 & 0.265 & 0.137, 0.484\\
+$\eta_2$ & 0.725 & 0.735 & 0.516, 0.863\\
+
+$b_\text{Intercept-1}^C$ & 90.213 & 90.191 & 88.657, 91.67\\
+$b_\text{Slope-1}^C$ & -4.835 & -4.896 & -8.626, -0.827\\
+
+$b_\text{Intercept-2}^C$ & 95.645 & 95.578 & 94.246, 97.339\\
+$b_\text{Slope-2}^C$ & -8.676 & -8.627 & -12.365, -5.386\\
+
+$\sigma^2_\text{Intercept-1}$ & 2.108 & 1.562 & 0.067, 5.65\\
+$\sigma_{\text{Intercept-1}, \text{Slope-1}}$ & 0.538 & 0.245 & -2.571, 5.403\\
+$\rho_{\text{Intercept-1}, \text{Slope-1}}$ & 0.202 & 0.334 & -0.847, 0.980\\
+$\sigma^2_\text{Slope-1}$ & 1.975 & 0.927 & 0.069, 7.579\\
+
+$\sigma^2_\text{Intercept-2}$ & 18.176 & 18.146 & 11.677, 25.416\\
+$\sigma_{\text{Intercept-2}, \text{Slope-2}}$ & -14.542 & -14.441 & -24.496, -5.069\\
+$\rho_{\text{Intercept-2}, \text{Slope-2}}$ & -0.479 & -0.492 & -0.69, -0.252\\
+$\sigma^2_\text{Slope-2}$ & 49.437 & 48.584 & 31.177, 72.200\\ \bottomrule
+\end{tabular}
+
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Variance Parameters & Mean & Median & 95\% HPDI \\ \midrule
+$\sigma^2$ & 0.202 & 0.202 & 0.192, 0.212\\ \bottomrule
+\end{tabular}
+
+\end{table}
 
 \begin{figure}[!htb]
 \centering
+\captionsetup{justification=centering}
 \begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/eta1.png}
-        \caption{\label{fig : eta_blood_donor_1} Weight for the first component $\eta_1$}
+        \caption{\label{fig : eta_blood_donor_1} Posterior $p(\eta_1|\boldsymbol{y})$}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/eta2.png}	
-          \caption{\label{fig : eta_blood_donor_2}Weight for the second component $\eta_2$}
+          \caption{\label{fig : eta_blood_donor_2}Posterior $p(\eta_2|\boldsymbol{y})$}
 	\end{subfigure}	
-	\caption{Weight distribution for the components of the mixture of random effects.}
+	\caption{Posterior densities of the weight distribution for the components of the mixture of random effects for the blood donor data set.}
 	\label{fig : eta_blood_donor}    
 \end{figure} 
 
 \begin{figure}[!htb]
 \centering
+\captionsetup{justification=centering}
 \begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/b11.png}
-        \caption{\label{fig : mu_blood_donor_11} Intercept location for the first component $b_{1, \text{intecept}}$}
+        \caption{\label{fig : mu_blood_donor_11}Posterior $p(b_\text{Intercept-1}^C|\boldsymbol{y})$}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/b12.png}	
-          \caption{\label{fig : mu_blood_donor_12}Slope location for the first component $b_{1, \text{slope}}$}
+          \caption{\label{fig : mu_blood_donor_12}Posterior $p(b_\text{Slope-1}^C|\boldsymbol{y})$}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/b21.png}	
-          \caption{\label{fig : mu_blood_donor_21}Intercept location for the second component $b_{2, \text{intecept}}$}
+          \caption{\label{fig : mu_blood_donor_21}Posterior $p(b_\text{Intercept-2}^C|\boldsymbol{y})$}
 	\end{subfigure}	
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/b22.png}	
-          \caption{\label{fig : mu_blood_donor_22}Slope location for the second component $b_{2, \text{slope}}$}
+          \caption{\label{fig : mu_blood_donor_22}Posterior $p(b_\text{Slope-2}^C|\boldsymbol{y})$}
 	\end{subfigure}	
-	\caption{The location parameters for the components of the mixture of random effects.}
+	\caption{Posterior densities of the location parameters for the components of the mixture of random effects for the blood donor data set.}
 	\label{fig : mu_blood_donor}    
 \end{figure} 
 
 \begin{figure}[!htb]
 \centering
+\captionsetup{justification=centering}
 \begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G11_1.png}
-        \caption{\label{fig : cov_blood_donor_11_1} Intercept variance for the first component}
+        \caption{\label{fig : cov_blood_donor_11_1}Posterior $p(\sigma^2_\text{Intercept-1}| \boldsymbol{y})$}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G12_1.png}	
-          \caption{\label{fig : cov_blood_donor_12_1} Covariance between intercept and slope for the first component}
+          \caption{\label{fig : cov_blood_donor_12_1}Posterior $p(\sigma_{\text{Intercept-1}, \text{Slope-1}} | \boldsymbol{y})$}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G22_1.png}	
-          \caption{\label{fig : cov_blood_donor_22_1}Slope variance for the first component}
+          \caption{\label{fig : cov_blood_donor_22_1}Posterior $p(\sigma^2_\text{Slope-1}| \boldsymbol{y})$}
 	\end{subfigure}	
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G11_2.png}
-        \caption{\label{fig : cov_blood_donor_11_2} Intercept variance for the second component}
+        \caption{\label{fig : cov_blood_donor_11_2}Posterior $p(\sigma^2_\text{Intercept-2}| \boldsymbol{y})$}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G12_2.png}	
-          \caption{\label{fig : cov_blood_donor_12_2} Covariance between intercept and slope for the second component}
+          \caption{\label{fig : cov_blood_donor_12_2}Posterior $p(\sigma_{\text{Intercept-2}, \text{Slope-2}} | \boldsymbol{y})$}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_6_blood_donor/G22_2.png}	
-          \caption{\label{fig : cov_blood_donor_22_2}Slope variance for the second component}
+          \caption{\label{fig : cov_blood_donor_22_2}Posterior $p(\sigma^2_\text{Slope-2}| \boldsymbol{y})$}
 	\end{subfigure}	
 
-
-	\caption{The variance covariance parameters for the components of the mixture of random effects.}
+	\caption{Posterior densities of the variance covariance parameters for the components of the mixture of random effects for the blood donor data set.}
 	\label{fig : cov_blood_donor}    
 \end{figure} 

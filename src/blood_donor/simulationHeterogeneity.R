@@ -23,8 +23,8 @@ source("bf.R")
 
 numchains= 1
 niter = 1000000
-nthin=100
-nburnin=30000
+nthin=200
+nburnin=700000
 
 ncomponents=3
 if(ncomponents==1){
@@ -73,7 +73,7 @@ attributes(mcmcfit_2comp_dir2dot7)$INTERCEPT_SCALE = INTERCEPT_SCALE
 save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
 
 ncomponents=3
-fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 0.5)
 mcmcfit_3comp = as.mcmc(fit)
 attributes(mcmcfit_3comp)$ncomponents = 3
 attributes(mcmcfit_3comp)$nsubjects = nsubjects
@@ -81,7 +81,7 @@ attributes(mcmcfit_3comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
 save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
 
 ncomponents=4
-fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 2)
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 0.5)
 mcmcfit_4comp = as.mcmc(fit)
 attributes(mcmcfit_4comp)$ncomponents = 4
 attributes(mcmcfit_4comp)$nsubjects = nsubjects
@@ -89,7 +89,7 @@ attributes(mcmcfit_4comp)$INTERCEPT_SCALE = INTERCEPT_SCALE
 save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/src/blood_donor/.RData")
 
 ncomponents=5
-fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 1)
+fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents, 3)
 mcmcfit_5comp_dirich1 = as.mcmc(fit)
 attributes(mcmcfit_5comp_dirich1)$ncomponents = 5
 attributes(mcmcfit_5comp_dirich1)$nsubjects = nsubjects
@@ -139,7 +139,7 @@ qplot(y=Hb, x=TSPD,data=ds[1:400,], geom = "line", group=Id)
 ########## Graphical analysis of MCMC fit #########
 heidel.diag(mcmcfit)
 
-ggsobject = ggs(mcmcfit)
+ggsobject = ggs(mcmcfit_3comp)
 ggs_density(ggsobject, "beta")
 ggs_density(ggsobject, "errPrecision")
 ggs_density(ggsobject, "randSigma")
@@ -163,21 +163,21 @@ for(k in 1:ncomponents){
 install.packages("latex2exp")
 library(latex2exp)
 
-qplot(mcmcfit[[1]][, "randmu[1,1]"], geom="density", xlab=TeX("b_{1,intercept}^C"), ylab="Density")
-qplot(mcmcfit[[1]][, "randmu[1,2]"], geom="density", xlab=TeX("b_{1,slope}^C"), ylab="Density")
-qplot(mcmcfit[[1]][, "randmu[2,1]"], geom="density", xlab=TeX("b_{2,intercept}^C"), ylab="Density")
-qplot(mcmcfit[[1]][, "randmu[2,2]"], geom="density", xlab=TeX("b_{2,slope}^C"), ylab="Density")
+qplot(mcmcfit[[1]][, "randmu[1,1]"], geom="density", xlab=TeX("b_{Intercept-1}^C | y"), ylab="Density")
+qplot(mcmcfit[[1]][, "randmu[1,2]"], geom="density", xlab=TeX("b_{Slope-1}^C | y"), ylab="Density")
+qplot(mcmcfit[[1]][, "randmu[2,1]"], geom="density", xlab=TeX("b_{Intercept-2}^C | y"), ylab="Density")
+qplot(mcmcfit[[1]][, "randmu[2,2]"], geom="density", xlab=TeX("b_{Slope-2}^C | y"), ylab="Density")
 
-qplot(mcmcfit[[1]][, "Eta[1]"], geom="histogram", xlab=TeX("$\\eta_1$"), ylab="Density")
-qplot(mcmcfit[[1]][, "Eta[2]"], geom="histogram", xlab=TeX("$\\eta_2$"), ylab="Density")
+qplot(mcmcfit[[1]][, "Eta[1]"], geom="density", xlab=TeX("$\\eta_1 | y$"), ylab="Density")
+qplot(mcmcfit[[1]][, "Eta[2]"], geom="density", xlab=TeX("$\\eta_2 | y$"), ylab="Density")
 
-qplot(mcmcfit[[1]][, "randSigma[1,1,1]"], geom="density", xlab=TeX("$G_{1, var(intercept)}$"), ylab="Density")
-qplot(mcmcfit[[1]][, "randSigma[1,2,1]"], geom="density", xlab=TeX("G_{1,Cov(intercept, slope)}"), ylab="Density")
-qplot(mcmcfit[[1]][, "randSigma[2,2,1]"], geom="density", xlab=TeX("G_{1,var(slope)}"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[1,1,1]"], geom="density", xlab=TeX("$\\sigma^2_{Intercept-1}$"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[1,2,1]"], geom="density", xlab=TeX("$\\sigma_{Intercept-1, Slope-1}$"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[2,2,1]"], geom="density", xlab=TeX("$\\sigma^2_{Slope-1}$"), ylab="Density")
 
-qplot(mcmcfit[[1]][, "randSigma[1,1,2]"], geom="density", xlab=TeX("$G_{2, var(intercept)}$"), ylab="Density")
-qplot(mcmcfit[[1]][, "randSigma[1,2,2]"], geom="density", xlab=TeX("G_{2,Cov(intercept, slope)}"), ylab="Density")
-qplot(mcmcfit[[1]][, "randSigma[2,2,2]"], geom="density",  xlab=TeX("G_{2,var(slope)}"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[1,1,2]"], geom="density", xlab=TeX("$\\sigma^2_{Intercept-2}$"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[1,2,2]"], geom="density", xlab=TeX("$\\sigma_{Intercept-2, Slope-2}$"), ylab="Density")
+qplot(mcmcfit[[1]][, "randSigma[2,2,2]"], geom="density",  xlab=TeX("$\\sigma^2_{Slope-2}$"), ylab="Density")
 
 #Compare the whole chain with the last part...similar to geweke
 ggs_compare_partial(ggsobject, "randmu")
@@ -235,3 +235,10 @@ xylims = c(100,200)
 qplot(y=y, x=x, data=mcmcfitdf, color=pairId, facets = row~col, ylim = xylims, xlim=xylims) + 
   geom_abline(intercept = 0, slope = 1) 
 
+temp=function(ddd){
+  m1 = round(mean(ddd),3); 
+  med1 = round(median(ddd),3); 
+  med3 = c(round(HPDinterval(mcmc(ddd)),3))
+  
+  print(paste(" &",m1,"&", med1, "&", med3[1], ",", med3[2], sep=" "))
+}

@@ -55,8 +55,8 @@ extractRandomComp = function(){
     endIndex = prevEnd + length(timePerSubject[[paste(i)]])
     
     reg=lm(temp[startIndex:endIndex]~0+I(rep(0.1,endIndex-startIndex+1)) + I(donationLast2YearsPerSubject[[paste(i)]]))   
-    randIntercept[k] = reg$coefficients[1]
-    randSlope[k] = reg$coefficients[2]
+    randIntercept[k] = reg$coefficients[1]+94.2506
+    randSlope[k] = reg$coefficients[2]-13.05771
     k=k+1
     
     prevEnd = endIndex
@@ -66,7 +66,9 @@ extractRandomComp = function(){
 
 # randomComp=extractRandomComp()
 # randomCompDf = data.frame(randomComp[complete.cases(randomComp)==TRUE,])
-# qplot(x=randIntercept, y=randSlope, data=randomCompDf, xlab="Random intercept", ylab="Random slope")
+# qplot(x=randIntercept, y=randSlope, data=randomCompDf, xlab="Random intercept", ylab="Random slope") + 
+#   scale_x_continuous(breaks = round(seq(80, 110, by = 5),0)) +
+#   scale_y_continuous(breaks = round(seq(-110, 110, by = 20),0))
 #var(randomCompDf)
 
 

@@ -41,7 +41,7 @@ Based on equation \ref{eq : obs_data_likelihood} we will now extend the definiti
 \end{equation}
 
 where 
-$\boldsymbol{\theta}_p$ and $\boldsymbol{\bar{\theta}}_p$ are as defined in section \ref{sec : dic}. One of the problems with $\text{DIC}_1$ is that in case of label switching, one may obtain a negative $\text{p}_\text{D}$. In our simulation study we encountered this problem as well (section \ref{subsec : dic_simulation_results}). The reason is that when label switching happens, mean of the posteriors may take a value which lies somewhere in between the various modes. On the other hand, in such a scenario a posterior mode is going to take a value from only one of the modal regions. Thus the next definition of DIC is formed by replacing posterior mean with posterior mode in the calculation of $D(\boldsymbol{\bar{\theta}}_p)$. 
+$\boldsymbol{\theta}_p$ and $\boldsymbol{\bar{\theta}}_p$ are as defined in section \ref{sec : dic}. One of the problems with $\text{DIC}_1$ is that in case of label switching, one may obtain a negative $\text{p}_\text{D}$. In our simulation study we encountered this problem as well (section \ref{subsec : dic_simulation_results}). The reason is that when label switching happens, mean of the posteriors may take a value which lies somewhere in between the various modes. On the other hand, in such a scenario a posterior mode is going to take a value from only one of the modal regions. Thus the next definition of DIC is formed by replacing posterior mean with posterior mode in the calculation of $D(\boldsymbol{\bar{\theta}}_p)$.
 
 \begin{equation}
 \label{eq : DIC2}

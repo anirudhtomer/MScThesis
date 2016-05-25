@@ -38,7 +38,6 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='MASS') %dopar%{
   return(totalPp)
 }
 
-
 temp = c()
 for(i in 1:nrow(mcmcfit[[1]])){
 randComp = getRandomComp(mcmcfit, mcmcIterNum = i)
@@ -76,4 +75,5 @@ temp[i] = totalSample
 
 resultDf = data.frame("Test.statistic"=c(ppcCheck, temp), "Type"=c(rep("Posterior Predictive", length(ppcCheck)), rep("Sample", length(temp))))
 
-qplot(Test.statistic, geom=c("density"), data=resultDf, xlab="Test statistic", ylab="PDF function estimated using KDE", color=Type)
+qplot(Test.statistic, geom=c("density"), data=resultDf, xlab="Test statistic", ylab="PDF function estimated using KDE", color=Type) + 
+  scale_x_continuous(breaks = seq(0, 3, by = 0.25))
