@@ -102,6 +102,18 @@ sapply(list(dic1,dic2,dic3,dic4,dic5,dic7), FUN = function(x){pd[length(pd)+1]<<
 write.csv(x=data.frame(pd, dic), file = "C:/Users/Anirudh/Desktop/temp.csv", row.names = F)
 
 
+par(mfrow=c(1,2))
+stdMeans = foreach(j=1:attributes(mcmcfit_simple1comp)$nsubjects, .combine='rbind') %dopar%{
+  intercept = mcmcfit_simple1comp[[1]][, paste("randomComp[", j,",1]", sep="")]
+  slope = mcmcfit_simple1comp[[1]][, paste("randomComp[", j,",2]", sep="")]
+  #c(mean(intercept), mean(slope))
+  c(mean(intercept/sqrt(var(intercept))), mean(slope/sqrt(var(slope))))
+}
+plot(density(stdMeans[,1]))
+plot(density(stdMeans[,2]))
+par(mfrow=c(1,1))
+
+
 ##############
 
 beep(sound=8)

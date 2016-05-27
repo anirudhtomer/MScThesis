@@ -49,7 +49,7 @@ extractRandomComp = function(){
   randIntercept = numeric()
   randSlope = numeric()
   prevEnd = 0
-  k=0
+  k=1
   for(i in unique(ds$Id)){
     startIndex = prevEnd + 1
     endIndex = prevEnd + length(timePerSubject[[paste(i)]])
@@ -66,7 +66,7 @@ extractRandomComp = function(){
 
 # randomComp=extractRandomComp()
 # randomCompDf = data.frame(randomComp[complete.cases(randomComp)==TRUE,])
-# qplot(x=randIntercept, y=randSlope, data=randomCompDf, xlab="Random intercept", ylab="Random slope") + 
+# qplot(x=randIntercept, y=randSlope, data=randomCompDf, xlab="Random intercept", ylab="Random slope", color=factor(getAllocations(mcmcfit_2comp))) +
 #   scale_x_continuous(breaks = round(seq(80, 110, by = 5),0)) +
 #   scale_y_continuous(breaks = round(seq(-110, 110, by = 20),0))
 #var(randomCompDf)
