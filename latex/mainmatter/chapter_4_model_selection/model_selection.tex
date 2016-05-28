@@ -7,16 +7,16 @@ In practice the right number of components in a mixture distribution are not kno
 \section{Deviance information criteria}
 \label{sec : dic}
 
-The Deviance information criteria or DIC was first proposed by \citet{spiegelhalter_bayesian_2002} for Bayesian model selection. The motivation for DIC is similar to frequentist AIC/BIC criteria in the sense that DIC also penalizes more elaborate models using a penalty component. If $p(\boldsymbol{\theta}_p) = p(\boldsymbol{\theta}|\boldsymbol{y})$ corresponds to the posterior distribution of parameters $\boldsymbol{\theta}$, then the definition for DIC is given by 
+The Deviance information criteria or DIC was first proposed by \citet{spiegelhalter_bayesian_2002} for Bayesian model selection. The motivation for DIC is similar to frequentist AIC/BIC criteria in the sense that DIC also penalizes more elaborate models using a penalty component. The definition for DIC is given by 
 
-$$\text{DIC} = -2\log{p(\boldsymbol{y}|\boldsymbol{\bar{\theta}}_p)} + 2\text{p}_\text{D}$$
+$$\text{DIC} = -2\log{p(\boldsymbol{y}|\boldsymbol{\bar{\theta}})} + 2\text{p}_\text{D}$$
 
-where $\boldsymbol{\bar{\theta}}_p = \text{E}(\boldsymbol{\theta}_p)$ is the posterior mean of the parameters. The penalty for model complexity is given by 
-$\text{p}_\text{D} = -2\text{E}_{\boldsymbol{\theta}_p}(\log{p(\boldsymbol{y}|\boldsymbol{\theta}_p)}) + \log{p(\boldsymbol{y}|\boldsymbol{\bar{\theta}}_p)})$. It can also be written as,
+where $\boldsymbol{\bar{\theta}} = \int \boldsymbol{\theta} p(\boldsymbol{\theta}|\boldsymbol{y}) \diff\boldsymbol{\theta}$ is the posterior mean of the parameters. The penalty for model complexity is given by 
+$\text{p}_\text{D} = -2\text{E}_{\boldsymbol{\theta}|\boldsymbol{y}}(\log{p(\boldsymbol{y}|\boldsymbol{\theta})} + \log{p(\boldsymbol{y}|\boldsymbol{\bar{\theta}})})$. It can also be written as,
 
 $$\text{p}_\text{D}=\overline{D(\boldsymbol{\theta})} - D(\boldsymbol{\bar{\theta}})$$
 
-where $\overline{D(\boldsymbol{\theta})}$ is the posterior mean of Bayesian deviance $D(\boldsymbol{\theta})$, and $D(\boldsymbol{\bar{\theta}})$ is the Bayesian deviance evaluated at the posterior mean of the parameters. Bayesian deviance is defined as $D(\boldsymbol{\theta}) = -2\log{p(\boldsymbol{y}|\boldsymbol{\theta})} + 2\log{f(\boldsymbol{y})}$. We do not discuss the term $f(\boldsymbol{y})$ because it cancels out in the expression for $\text{p}_\text{D}$. For consistency of notation, here onwards we will use $\overline{D(\boldsymbol{\theta}_p)}$ and $D(\boldsymbol{\bar{\theta}_p)}$ in the expression for $\text{p}_\text{D}$.
+where $\overline{D(\boldsymbol{\theta})}$ is the posterior mean of Bayesian deviance $D(\boldsymbol{\theta})$, and $D(\boldsymbol{\bar{\theta}})$ is the Bayesian deviance evaluated at the posterior mean of the parameters. Bayesian deviance is defined as $D(\boldsymbol{\theta}) = -2\log{p(\boldsymbol{y}|\boldsymbol{\theta})} + 2\log{f(\boldsymbol{y})}$. We do not discuss the term $f(\boldsymbol{y})$ because it cancels out in the expression for $\text{p}_\text{D}$.
 
 \subsection{DIC for missing data models}
 \label{subsec : DIC_missing_data_models}
@@ -30,48 +30,47 @@ Let us denote the set of all the unknown parameters in the Bayesian heterogeneit
 
 \begin{equation}
 \label{eq : obs_data_likelihood}
-f(\boldsymbol{y}|\boldsymbol{\theta}) = \prod_{i=1}^n \sum_{k=1}^K f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta} + \boldsymbol{Z}_i \boldsymbol{b}_k^C, \boldsymbol{Z}_{i} G_k \boldsymbol{Z}_{i}^T+ R_i) \eta_k
+p(\boldsymbol{y}|\boldsymbol{\theta}) = \prod_{i=1}^n \sum_{k=1}^K f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta} + \boldsymbol{Z}_i \boldsymbol{b}_k^C, \boldsymbol{Z}_{i} G_k \boldsymbol{Z}_{i}^T+ R_i) \eta_k
 \end{equation}
  
-Based on equation \ref{eq : obs_data_likelihood} we will now extend the definition of the various definitions of DIC proposed by \citet{celeux_deviance_2006}. The first one is the classical definition for DIC, as shown below.
+where $f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta} + \boldsymbol{Z}_i \boldsymbol{b}_k^C, \boldsymbol{Z}_{i} G_k \boldsymbol{Z}_{i}^T+ R_i)$ denotes the density of the normal $N(\boldsymbol{X}_i\boldsymbol{\beta} + \boldsymbol{Z}_i \boldsymbol{b}_k^C, \boldsymbol{Z}_{i} G_k \boldsymbol{Z}_{i}^T+ R_i)$ distribution. Based on equation \ref{eq : obs_data_likelihood} we extended the various definitions of DIC proposed by \citet{celeux_deviance_2006}. The first one is the classical definition for DIC, as shown below.
 
 \begin{equation}
 \label{eq : DIC1}
-\text{DIC}_1 = -4\text{E}_{\boldsymbol{\theta}_p} (\log{p(\boldsymbol{y}|\boldsymbol{\theta}_p)}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\bar{\theta}}_p)})
+\text{DIC}_1 = -4\text{E}_{\boldsymbol{\theta}|\boldsymbol{y}} (\log{p(\boldsymbol{y}|\boldsymbol{\theta})}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\bar{\theta}})})
 \end{equation}
 
-where 
-$\boldsymbol{\theta}_p$ and $\boldsymbol{\bar{\theta}}_p$ are as defined in section \ref{sec : dic}. One of the problems with $\text{DIC}_1$ is that in case of label switching, one may obtain a negative $\text{p}_\text{D}$. In our simulation study we encountered this problem as well (section \ref{subsec : dic_simulation_results}). The reason is that when label switching happens, mean of the posteriors may take a value which lies somewhere in between the various modes. On the other hand, in such a scenario a posterior mode is going to take a value from only one of the modal regions. Thus the next definition of DIC is formed by replacing posterior mean with posterior mode in the calculation of $D(\boldsymbol{\bar{\theta}}_p)$.
+One of the problems with $\text{DIC}_1$ is that in case of label switching, one may obtain a negative $\text{p}_\text{D}$. In our simulation study we encountered this problem as well (section \ref{subsec : dic_simulation_results}). The reason is that when label switching happens, the mean of the posteriors may take a value which lies somewhere in between the various modes. On the other hand, in such a scenario a posterior mode will belong to only one of the modal regions. Thus the next definition of DIC is formed by replacing posterior mean with the posterior mode in the calculation of $D(\boldsymbol{\bar{\theta}})$.
 
 \begin{equation}
 \label{eq : DIC2}
-\text{DIC}_2 = -4\text{E}_{\boldsymbol{\theta}_p} (\log{p(\boldsymbol{y}|\boldsymbol{\theta}_p)}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\hat{\theta}}_p)})
+\text{DIC}_2 = -4\text{E}_{\boldsymbol{\theta}|\boldsymbol{y}} (\log{p(\boldsymbol{y}|\boldsymbol{\theta})}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\hat{\theta}}_M)})
 \end{equation}
 
 where
-$\boldsymbol{\hat{\theta}_p} = \argmax_{\boldsymbol{\theta}}p(\boldsymbol{\theta}|\boldsymbol{y})$. \citet{celeux_deviance_2006} further suggest that for models where non identifiability of parameters is endemic, as in the case of mixtures usually, one should use the following estimator for the approximation of the density $p(\boldsymbol{y}|\boldsymbol{\theta})$,
+$\boldsymbol{\hat{\theta}_M} = \argmax_{\boldsymbol{\theta}}p(\boldsymbol{\theta}|\boldsymbol{y})$ is the posterior mode of the parameters. \citet{celeux_deviance_2006} further suggest that for models where non identifiability of parameters is endemic, as in the case of mixtures, one should use the following MCMC estimator for the approximation of $p(\boldsymbol{y}|\boldsymbol{\theta})$,
 
-$$\hat{f}_{\boldsymbol{\theta}}(\boldsymbol{y}) = \prod_{i=1}^n \hat{f}_{\boldsymbol{\theta}}(\boldsymbol{y}_i) = \prod_{i=1}^n \frac 1 m \sum_{l=1}^m \sum_{k=1}^K f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta}^{(l)} + \boldsymbol{Z}_i {\boldsymbol{b}_k^C}^{(l)}, \boldsymbol{Z}_{i} G_k^{(l)} \boldsymbol{Z}_{i}^T+ R_i^{(l)}) \eta_k^{(l)}$$
+$$\hat{p}(\boldsymbol{y}) = \prod_{i=1}^n \hat{p}(\boldsymbol{y}_i) = \prod_{i=1}^n \frac 1 m \sum_{l=1}^m \sum_{k=1}^K f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta}^{(l)} + \boldsymbol{Z}_i {\boldsymbol{b}_k^C}^{(l)}, \boldsymbol{Z}_{i} G_k^{(l)} \boldsymbol{Z}_{i}^T+ R_i^{(l)}) \eta_k^{(l)}$$
 
-where $\boldsymbol{\beta}^{(l)}, {\boldsymbol{b}_k^C}^{(l)}, G_k^{(l)}, R_i^{(l)}, \eta_k^{(l)}$ are the samples from the $l^{\text{th}}$ MCMC iteration of a chain of length $m$.  The estimator is also called the MCMC predictive density estimator, and gives us the next definition of DIC.
+where $\boldsymbol{\beta}^{(l)}, {\boldsymbol{b}_k^C}^{(l)}, G_k^{(l)}, R_i^{(l)}, \eta_k^{(l)}$ are the samples from the $l^{\text{th}}$ MCMC iteration of a chain of length $m$, and $\hat{p}(\boldsymbol{y})$ is the MCMC estimator for $p(\boldsymbol{y}|\boldsymbol{\theta})$. The estimator is also called the MCMC predictive density estimator, and gives us the next definition of DIC.
 
 \begin{equation}
 \label{eq : DIC3}
-\text{DIC}_3 =-4\text{E}_{\boldsymbol{\theta}_p} (\log{p(\boldsymbol{y}|\boldsymbol{\theta}_p)}) + 2\log{\hat{f}_{\boldsymbol{\theta}}(\boldsymbol{y})}
+\text{DIC}_3 =-4\text{E}_{\boldsymbol{\theta}|\boldsymbol{y}} (\log{p(\boldsymbol{y}|\boldsymbol{\theta})}) + 2\log{\hat{p}(\boldsymbol{y})}
 \end{equation}
 
-The benefit of using $\text{DIC}_3$ is that $\text{p}_\text{D}$ always takes a positive value. While doing the simulation study we found that not only was this claim true, but $\text{p}_\text{D}$ also never took extreme values; even when models were severely overfitted leading to label switching. Lastly, in each of the equations \ref{eq : DIC1}, \ref{eq : DIC2}, \ref{eq : DIC3},  $\text{E}_{\boldsymbol{\theta}_p}(\log{p(\boldsymbol{y}|\boldsymbol{\theta}_p)}) $ can be calculated by using the following approximation.
+The benefit of using $\text{DIC}_3$ is that $\text{p}_\text{D}$ always takes a positive value. While doing the simulation study we found that this claim was not only true, but $\text{p}_\text{D}$ also never took extreme values; even when models were severely overfitted leading to label switching. Lastly, in each of the equations \ref{eq : DIC1}, \ref{eq : DIC2}, \ref{eq : DIC3},  $\text{E}_{\boldsymbol{\theta}|\boldsymbol{y}}(\log{p(\boldsymbol{y}|\boldsymbol{\theta})}) $ can be calculated by using the following approximation.
 
 \begin{equation}
 \label{eq : mean_posterior_deviance_approx}
-\text{E}_{\boldsymbol{\theta}_p}(\log{p(\boldsymbol{y}|\boldsymbol{\theta}_p)})  = \frac 1 m \sum_{l=1}^m\log{p(\boldsymbol{y}|\boldsymbol{\theta}_p^{(l)})}
+\text{E}_{\boldsymbol{\theta}|\boldsymbol{y}}(\log{p(\boldsymbol{y}|\boldsymbol{\theta})})  = \frac 1 m \sum_{l=1}^m\log{p(\boldsymbol{y}|\boldsymbol{\theta}^{(l)})}
 \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Complete Data DIC
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Complete DIC}
-The second class of the DIC is based on the complete data likelihood. The complete data for the $i^\text{th}$ subject in a Bayesian heterogeneity model consists of $(\boldsymbol{y}_i, S_i, \boldsymbol{b}_i)$. For the $i^\text{th}$ subject we will denote the complete data by $\boldsymbol{y}_i^F$ and for the entire data set we will denote it by $\boldsymbol{y}^F$. The following equation shows the complete data likelihood for the Bayesian heterogeneity model.
+The second class of the DIC is based on the complete data likelihood. The complete data for the $i^\text{th}$ subject in a Bayesian heterogeneity model is based on $(\boldsymbol{y}_i, S_i, \boldsymbol{b}_i)$. For the $i^\text{th}$ subject we will denote the complete data by $\boldsymbol{y}_i^F$ and for the entire data set we will denote it by $\boldsymbol{y}^F$. The following equation shows the complete data likelihood for the Bayesian heterogeneity model.
 
 \begin{equation}
 \label{eq : complete_data_likelihood}
@@ -85,21 +84,21 @@ Based on the complete data $\boldsymbol{y}^F$, the complete data DIC is given by
 
 \begin{equation}
 \label{eq : complete_data_dic}
-\text{DIC} = -4\text{E}_{\boldsymbol{\theta}_p}(\log{p(\boldsymbol{y}^F|\boldsymbol{\theta}_p)}) + 
-2\log{p(\boldsymbol{y}^F|\boldsymbol{\bar{\theta}}_p)})
+\text{DIC} = -4\text{E}_{\boldsymbol{\theta}|\boldsymbol{y}^F}(\log{p(\boldsymbol{y}^F|\boldsymbol{\theta})}) + 
+2\log{p(\boldsymbol{y}^F|\boldsymbol{\bar{\theta}})})
 \end{equation}
 
-where $\boldsymbol{\theta}_p$ is same as $\boldsymbol{\theta} | \boldsymbol{y}^F$. Since part of the complete data are not observed, \citet{celeux_deviance_2006} propose integrating the expression in \ref{eq : complete_data_dic} with respect to the missing data $\boldsymbol{y}^M = (\boldsymbol{b}, \boldsymbol{S})$ to obtain the following definition of DIC.
+Since part of the complete data are not observed, \citet{celeux_deviance_2006} propose integrating the expression in \ref{eq : complete_data_dic} with respect to the missing data $(\boldsymbol{b}, \boldsymbol{S})$ to obtain the following definition of DIC.
 
 \begin{equation}
 \label{eq : DIC4}
-\text{DIC}_4 = -4\text{E}_{\boldsymbol{\theta}, \boldsymbol{y}^M|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\theta}_p)}) + 
-2\text{E}_{\boldsymbol{y}^M|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\bar{\theta}}_p)})
+\text{DIC}_4 = -4\text{E}_{\boldsymbol{\theta}, \boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\theta})}) + 
+2\text{E}_{\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\bar{\theta}})})
 \end{equation}
 
-The first part of the formula for $\text{DIC}_4$ is not available in closed form for Bayesian heterogeneity model, however it can still be approximated using the output of Gibbs sampler in the same way as in \ref{eq : mean_posterior_deviance_approx}; though one has to also use the simulated $\boldsymbol{y}^M$ from the MCMC iterations. The motivation for this approximation is that during each iteration of the Gibbs sampler, parameter values are sampled from the conditional distribution of the parameters. i.e. in our case conditional on the other parameters and unobserved data both. We further verified the approximation by comparing the results of $\text{DIC}_4$ calculation done using the closed form solution for a mixture distribution, with the aforementioned approximation, both suggested by \citet{celeux_deviance_2006}. We found both of the results to be differing only in the decimal places.\\
+The first part of $\text{DIC}_4$ is not available in closed form for the Bayesian heterogeneity model, however it can still be approximated using the output of Gibbs sampler in the same way as in equation \ref{eq : mean_posterior_deviance_approx}. The motivation for this approximation is that during each iteration of the Gibbs sampler, parameter values are sampled from the conditional distribution of the parameters. i.e. in our case conditional on the other parameters and unobserved data both. We further verified the approximation by comparing the computed $\text{DIC}_4$ using the closed form solution for a mixture distribution, with the aforementioned approximation, both suggested by \citet{celeux_deviance_2006}. We found that the two computed DIC values differ only in the decimal places.\\
 
-The second part of $\text{DIC}_4$, i.e. $\text{E}_{\boldsymbol{y}^M|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\bar{\theta}}_p)})$, is also not straightforward to compute. While the expectation over unobserved data $\boldsymbol{y}^M$ can be approximated in the same way as in \ref{eq : mean_posterior_deviance_approx}, however for calculating $\boldsymbol{\bar{\theta}}_p$ \citet{celeux_deviance_2006} suggested using the posterior estimates  $(\boldsymbol{y}^M|\boldsymbol{y})$ of the unobserved data. We will now give the formula for the expected values of parameters of interest during the $l^\text{th}$ iteration, i.e. $\boldsymbol{\bar{\beta}}^{(l)}$, $\bar{\sigma^2}^{(l)}$ and $\boldsymbol{\bar{\nu}}^{(l)}$.
+While the second part of $\text{DIC}_4$, i.e. $\text{E}_{\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\bar{\theta}})})$ can also be approximated in the same way as in equation \ref{eq : mean_posterior_deviance_approx}, but the added complexity here is that the posterior mean of the parameters is given by $\boldsymbol{\bar{\theta}} = \int \boldsymbol{\theta} p(\boldsymbol{\theta}|\boldsymbol{y}^F) \diff\boldsymbol{\theta}$. This is because $\text{DIC}_4$ is based on the complete data $\boldsymbol{y}^F$ and the MCMC sampler only returns the posterior density $p(\boldsymbol{\theta}|\boldsymbol{y})$, whereas we require $p(\boldsymbol{\theta}|\boldsymbol{y}^F)$. \citet{celeux_deviance_2006} suggested using the posterior estimates of $\boldsymbol{b}, \boldsymbol{S}$ from $p(\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y})$ to analytically calculate the posterior distribution of parameters $p(\boldsymbol{\theta}|\boldsymbol{y}^F)$, from which the posterior means of the various parameters can be obtained as shown below.
 
 $$\boldsymbol{\bar{\beta}}^{(l)} = (\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T(\boldsymbol{y}-\boldsymbol{Zb^{(l)}})$$
 $$\bar{\sigma^2}^{(l)} = \frac {(\boldsymbol{y}-\boldsymbol{Zb^{(l)}}-\boldsymbol{X}\boldsymbol{\bar{\beta}}^{(l)})^T (\boldsymbol{y}-\boldsymbol{Zb^{(l)}}-\boldsymbol{X}\boldsymbol{\bar{\beta}}^{(l)})} {(\sum_{i=1}^n m_i - p - 1) -2}$$
@@ -108,34 +107,36 @@ $$\bar{G_k^{(l)}} = \frac {\sum_{i=1}^n I(S_i^{(l)}=k) (\boldsymbol{b_i}^{(l)}-\
 {(n_k^{(l)} - 1) - \text{rank}(\bar{\boldsymbol{b}_k^C}^{(l)}) - 1}$$
 $$\bar{\eta}_k^{(l)} = \frac {a_k + n_k^{(l)}} {\sum_{u=1}^K a_u + n}$$
 
-The next definition of DIC under the class of complete data DIC is motivated by the fact that the at times $\text{E}(\boldsymbol{y}^M|\boldsymbol{y})$ takes values outside the support of the joint distribution of $\boldsymbol{b}, \boldsymbol{S}$ \citep{celeux_deviance_2006}. Thus using MAP(maximum a posteriori) as the estimate instead (expression \ref{eq : DIC2}), the following definition of DIC is proposed.
+where, $\boldsymbol{\bar{\beta}}^{(l)}$, $\bar{\sigma^2}^{(l)}$ and $\boldsymbol{\bar{\nu}}^{(l)}$ are the expected values of parameters of interest at the $l^\text{th}$ iteration. These can be further used to approximate $\text{E}_{\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\bar{\theta}})})$.\\
+
+The next definition of DIC under the class of complete data is motivated by the fact that the at times $\text{E}(\boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y})$ takes values outside the support of the joint distribution of $\boldsymbol{b}, \boldsymbol{S}$ \citep{celeux_deviance_2006}. Thus the following definition of DIC is proposed using the posterior mode as the estimate instead.
 
 \begin{equation}
 \label{eq : DIC5}
-\text{DIC}_5 = -4\text{E}_{\boldsymbol{\theta}, \boldsymbol{y}^M|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\theta}_p)}) + 
-2\log{p(\boldsymbol{y}, \boldsymbol{\hat{y}}^M|\boldsymbol{\hat{\theta}})}
+\text{DIC}_5 = -4\text{E}_{\boldsymbol{\theta}, \boldsymbol{b}, \boldsymbol{S}|\boldsymbol{y}}(\log{p(\boldsymbol{y}^F|\boldsymbol{\theta})}) + 
+2\log{p(\boldsymbol{y}, \boldsymbol{\hat{b}}_M, \boldsymbol{\hat{S}}_M|\boldsymbol{\hat{\theta}}_M)}
 \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conditional Data DIC
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Conditional DIC}
-The third class of the DIC is based on the assumption that $\boldsymbol{y}^M$ can be seen as an additional parameter rather than as missing data. We will represent the new posterior parameter space as $\boldsymbol{\theta}^\text{cond} = (\boldsymbol{\theta}, \boldsymbol{y}^M)$. Correspondingly the posterior density of the parameter $\boldsymbol{\theta}^\text{cond}$ is denoted as $p(\boldsymbol{\theta}^\text{cond}_p)$. The following equation shows the conditional data likelihood,
+The third class of the DIC is based on the assumption that $\boldsymbol{b}, \boldsymbol{S}$ can be seen as an additional parameter rather than as missing data. We will represent the new posterior parameter space as $\boldsymbol{\theta}^\text{cond} = (\boldsymbol{\theta}, \boldsymbol{b}, \boldsymbol{S})$. The following equation shows the conditional data likelihood,
 
 \begin{equation}
 \label{eq : conditional_data_likelihood}
-f(\boldsymbol{y}|\boldsymbol{\theta}^\text{cond}) = \prod_{i=1}^n f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta} + \boldsymbol{Z}_i \boldsymbol{b}_i, R_i)
+p(\boldsymbol{y}|\boldsymbol{\theta}^\text{cond}) = \prod_{i=1}^n f_N(\boldsymbol{y}_i; \boldsymbol{X}_i\boldsymbol{\beta} + \boldsymbol{Z}_i \boldsymbol{b}_i, R_i)
 \end{equation}
 
 Based on this conditional likelihood, \citet{celeux_deviance_2006} proposed the following DIC definition.
 
 \begin{equation}
 \label{eq : DIC6}
-\text{DIC}_6 = -4\text{E}_{\boldsymbol{\theta}^\text{cond}_p} (\log{p(\boldsymbol{y}|\boldsymbol{\theta}^\text{cond}_p)}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\hat{\theta}}^\text{cond}_p)})
+\text{DIC}_6 = -4\text{E}_{\boldsymbol{\theta}^\text{cond}} (\log{p(\boldsymbol{y}|\boldsymbol{\theta}^\text{cond})}) + 2\log{p(\boldsymbol{y}|\boldsymbol{\hat{\theta}}^\text{cond}_M)})
 \end{equation}
 
 where
-$\boldsymbol{\hat{\theta}}^\text{cond}_p = \argmax_{\boldsymbol{\theta}^\text{cond}}p(\boldsymbol{\theta}^\text{cond}|\boldsymbol{y})$, and $\text{E}_{\boldsymbol{\theta}^\text{cond}_p} (\log{p(\boldsymbol{y}|\boldsymbol{\theta}_p)})$ can be approximated as done in equation \ref{eq : mean_posterior_deviance_approx}.
+$\boldsymbol{\hat{\theta}}^\text{cond}_M = \argmax_{\boldsymbol{\theta}^\text{cond}}p(\boldsymbol{\theta}^\text{cond}|\boldsymbol{y})$, and $\text{E}_{\boldsymbol{\theta}^\text{cond}} (\log{p(\boldsymbol{y}|\boldsymbol{\theta})})$ can be approximated as done in equation \ref{eq : mean_posterior_deviance_approx}.
 
 \section{Marginal Likelihood}
 \label{sec : marginal_likelihood}
@@ -147,11 +148,11 @@ The marginal likelihood of the data represents the probability of data given the
 p(\boldsymbol{y}|M) = \int p(\boldsymbol{y}|\boldsymbol{\theta}, M) p(\boldsymbol{\theta}|M) \diff \boldsymbol{\theta}
 \end{equation}
 
-Given two competing models for the data, $M_1$ and $M_2$, one can further use \ref{eq : marginal_likelihood} to calculate the odds of model $M_1$ against the model $M_2$ given the data. These odds are called the Posterior odds and can be written as,
+Given two competing models for the data, $M_1$ and $M_2$, one can further use expression \ref{eq : marginal_likelihood} to calculate the odds of model $M_1$ against the model $M_2$ given the data. These odds are called the Posterior odds and can be written as,
 
 $$\frac {p(M_1|\boldsymbol{y})}{p(M_2|\boldsymbol{y})} = \frac {p(\boldsymbol{y}|M_1) p(M_1)} {p(\boldsymbol{y}|M_2) p(M_2)}$$
 
-where $\frac {p(M_1)}{p(M_2)}$ is called prior odds, and $\frac {p(\boldsymbol{y}|M_1)} {p(\boldsymbol{y}|M_2)}$ is called the Bayes Factor. Since we have the same prior belief in each of these models, prior odds is equal to 1. Marginal likelihood is a relative measure of model fit and unless prior odds are not equal to 1, marginal likelihood will be equal to Bayes Factor. To calculate the Bayes Factor we will use the method proposed by \citet{chib_marginal_1995}. Chib's idea is that one can rewrite the Bayes rule in equation \ref{eq : bayes_rule} to get the marginal likelihood formula as
+where $\frac {p(M_1)}{p(M_2)}$ is called prior odds, and $\frac {p(\boldsymbol{y}|M_1)} {p(\boldsymbol{y}|M_2)}$ is called the Bayes Factor. Since we have the same prior belief in each of these models, prior odds is equal to 1. Marginal likelihood is a relative measure of model fit and unless prior odds are not equal to 1, the marginal likelihood will be equal to Bayes Factor. To calculate the Bayes Factor we will use the method proposed by \citet{chib_marginal_1995}. Chib's idea is that one can rewrite the Bayes rule in equation \ref{eq : bayes_rule} to get the marginal likelihood formula as
 
 \begin{equation}
 \label{eq : chib_trick}
@@ -168,7 +169,7 @@ $\boldsymbol{\theta}^*=(\boldsymbol{\beta}^*, {\sigma^2}^*, \boldsymbol{\nu}^*)$
 
 Note that we have dropped the model indicator $M$ from equation \ref{eq : chib_approx} for readability. We will now show calculations for determining the marginal likelihood value using Chib's approximation.\\ 
 
-Firstly $\log{L(\boldsymbol{\theta}^*|\boldsymbol{y})} = f(\boldsymbol{y}|\boldsymbol{\theta}^*)$ can be easily determined using the formula given in equation \ref{eq : obs_data_likelihood}. The calculation of $\log{p(\boldsymbol{\theta}^*)}$ is also straightforward because we take independent priors for the parameters in our model, the details of which are given in section \ref{subsec : choice_priors}. Assuming that the parameters of component densities of the mixture distribution of random effects are independent, one can use the following to calculate $\log{p(\boldsymbol{\theta}^*|\boldsymbol{y})}$.
+Firstly $\log{L(\boldsymbol{\theta}^*|\boldsymbol{y})} = p(\boldsymbol{y}|\boldsymbol{\theta}^*)$ can be easily determined using the formula given in equation \ref{eq : obs_data_likelihood}. The calculation of $\log{p(\boldsymbol{\theta}^*)}$ is also straightforward because we take independent priors for the parameters in our model, the details of which are given in section \ref{subsec : choice_priors}. Assuming that the parameters of component densities of the mixture distribution of random effects are independent, one can use the following to calculate $\log{p(\boldsymbol{\theta}^*|\boldsymbol{y})}$.
 
 \begin{multline}
 \log{p(\boldsymbol{\theta}^*|\boldsymbol{y})} = 
@@ -179,7 +180,7 @@ Firstly $\log{L(\boldsymbol{\theta}^*|\boldsymbol{y})} = f(\boldsymbol{y}|\bolds
 \log{p({\boldsymbol{\eta}}^*|G_k^*, {\boldsymbol{b}_k^C}^*, {\sigma^2}^*,{\boldsymbol{\beta}}^*, \boldsymbol{y})}
 \end{multline}
 
-An interesting problem one faces in such an expansion is that the posteriors may not be available as a well known density. For e.g. one can choose independent inverse gamma priors for variance parameters of random effects and a uniform prior for correlation. However the posterior density of parameters in such a case will not be well known. While one may try to approximate it with a known density, however Chib's approximation procedure requires doing it multiple times, making it practically infeasible. An obvious alternative is to choose conjugate priors in such a situation. However as we mentioned in section \ref{subsec : choice_priors} the joint conjugate prior in the case of unknown mean and covariance matrix is a Normal-inverse-Wishart prior and the joint posterior is a Normal-inverse-Wishart posterior. Although it is common to use independent priors for mean and covariance matrix in practice while using BUGS family of software, the problem of posterior being from an unknown family remains the same. \citet{chib_marginal_1995} suggested using the Rao-Blackwellization method to solve this problem. For e.g. the Rao-Blackwellized estimate of $p(G_k^*|\boldsymbol{y})$ is given by,
+An interesting problem one faces in such an expansion is that the posteriors may not be available as a well known density. For e.g. one can choose independent inverse gamma priors for variance parameters of random effects and a uniform prior for correlation. However the posterior density of parameters in such a case will not be well known. While one may try to approximate it with a known density, however Chib's approximation procedure requires doing it multiple times, making it practically infeasible. An obvious alternative is to choose conjugate priors in such a situation. As we mentioned in section \ref{subsec : choice_priors} the joint conjugate prior in the case of unknown mean and covariance matrix is a Normal-inverse-Wishart prior. Although it is common to use independent priors for mean and covariance matrix in practice while using BUGS family of software, the problem of posterior being from an unknown family remains the same. \citet{chib_marginal_1995} suggested using the Rao-Blackwellization method to solve this problem. For e.g. the Rao-Blackwellized estimate of $p(G_k^*|\boldsymbol{y})$ is given by,
 
 \begin{equation}
 \label{eq : rao_blackwellization_wishart}
@@ -229,7 +230,7 @@ Using these values an estimate of $\log{p(\boldsymbol{\theta}^*|\boldsymbol{y})}
 \label{sec : ppc}
 The motivation behind a posterior predictive check is to evaluate the model fit using simulations from the posterior predictive distribution(PPD) $p(\boldsymbol{\tilde{y}}|\boldsymbol{y})$. For a simple model such as $y_i = \mu + \varepsilon_i, \varepsilon_i \sim N(0, \sigma^2)$, one can perform an informal check by sampling 1000(say) values from the PPD 20(say) times and compare the histogram of the original sample with the histogram of the data sampled from PPD. If the histograms do not match then one can say that the model does not fit the data well.\\
 
-In context of mixture distributions \citet{fruhwirth-schnatter_finite_2013} suggest that one should first sample allocation vector $\boldsymbol{\tilde{S}}$ based on the posterior density of the weight distribution $p(\boldsymbol{\eta}|\boldsymbol{y})$ and then generate samples from $p(\boldsymbol{\tilde{y}}|\boldsymbol{\tilde{S}}, \boldsymbol{\theta}_p)$. A similar approach can be followed in hierarchical models by first generating new random effects $\boldsymbol{\tilde{b}}$. This was termed as the Mixed predictive approach by \citet{marshall_approximate_2003}. Although they suggested a cross validation method where $\boldsymbol{\tilde{b}}|\boldsymbol{y_{(i)}}$ were used, we did not follow this approach as it required a significant amount of computational resources. As an alternative of mixed predictive approach, one can use the posterior allocations $\boldsymbol{b}|\boldsymbol{y}$ instead of $\boldsymbol{\tilde{b}}$. However the problem with this approach is that it leads to a more conservative posterior predictive check \citep{congdon_applied_2010}.\\
+In context of mixture distributions \citet{fruhwirth-schnatter_finite_2013} suggest that one should first sample allocation vector $\boldsymbol{\tilde{S}}$ based on the posterior density of the weight distribution $p(\boldsymbol{\eta}|\boldsymbol{y})$ and then generate samples $\boldsymbol{\tilde{y}}$ from $p(\boldsymbol{\tilde{y}}|\boldsymbol{\tilde{S}}, \boldsymbol{\theta})$. A similar approach can be followed in hierarchical models by first generating new random effects $\boldsymbol{\tilde{b}}$. This was termed as the mixed predictive approach by \citet{marshall_approximate_2003}. As an alternative of mixed predictive approach, one can use the posterior allocations $\boldsymbol{b}|\boldsymbol{y}$ instead of $\boldsymbol{\tilde{b}}$. However the problem with this approach is that it leads to a more conservative posterior predictive check \citep{congdon_applied_2010}.\\
 
 \subsection{PPC for the Bayesian heterogeneity model}
 \label{subsec : ppc_bhtge}
