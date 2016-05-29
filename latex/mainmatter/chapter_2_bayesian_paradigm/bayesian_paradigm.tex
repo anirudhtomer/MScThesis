@@ -2,7 +2,7 @@
 
 \chapter{Bayesian paradigm}
 \label{ch : bayesian_paradigm}
-In this chapter we have introduced the basics of the Bayesian paradigm. i.e. Bayes rule and Bayesian summary measures. 
+In this chapter we introduce the basics of the Bayesian paradigm. i.e. Bayes rule and Bayesian summary measures. 
 
 \section{The Bayesian motivation: A toy example}
 What primarily differentiates the Bayesian paradigm from frequentist paradigm is that the parameters $\theta$ are random variables rather than being a constant. The distribution of parameters based on the data is called the posterior distribution and can be represented as $p(\theta|y)$. Whereas the initial distribution of parameters is called the prior distribution, represented by $p(\theta)$. To further signify the ideological differences between the Bayesian paradigm and frequentist paradigm we are presenting an example next.\\
@@ -51,4 +51,4 @@ $$p(\tilde{y}|y) = \int p(\tilde{y}|\theta) p(\theta|y) \diff\theta$$
 The point and interval summary measures for PPD are similar to the ones for posterior distribution of parameters $p(\theta|y)$. We will also discuss Bayesian model selection in the forthcoming chapters.
 
 \section{Bayesian software}
-Various Bayesian software tools such as BUGS, STAN, PROC MCMC in SAS etc. are used for running the MCMC procedures mentioned above. For the purpose of this thesis we used JAGS is strongly related to BUGS (Bayesian inference Using Gibbs Sampling) family. We also used the R package R2jags to execute JAGS code via R.
+Various Bayesian software tools such as BUGS, STAN, PROC MCMC in SAS etc. are used for running the MCMC procedures mentioned above. For the purpose of this thesis we used JAGS, which is strongly related to BUGS (Bayesian inference Using Gibbs Sampling) family. We also used the R package R2jags to execute JAGS code via R.

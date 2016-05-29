@@ -3,7 +3,7 @@
 \chapter{Introduction}
 \label{ch : introduction}
 
-In this chapter we have introduced the concept of a mixture distribution and the challenges involved in estimation of parameters of a mixture distribution. We have also highlighted the benefits of using a Bayesian approach for parameter estimation. Lastly we have presented the goal of this master thesis, in which a mixture distribution plays the central role.
+In this chapter we introduce the concept of a mixture distribution and the challenges involved in estimation of parameters of a mixture distribution. We also highlight the benefits of using a Bayesian approach for parameter estimation. Lastly we present the goal of this master thesis, in which a mixture distribution plays the central role.
 
 \section{Mixture distribution}
 \label{sec : mixture_distribution}
@@ -33,7 +33,7 @@ The vector of the weights $\boldsymbol{\eta} = (\eta_1, \eta_2, \ldots, \eta_K)^
 \label{subsec : challenges_mixture_density}
 The primary challenge while modeling a mixture density for a random variable is that the number of mixture components ($K$), weight distribution ($\boldsymbol{\eta}$) and the corresponding parameters for component densities are rarely known in advance. Secondly, from a sample of $N$ observations $y_1, y_2, \ldots, y_N$ sampled from the mixture density $p(y)$ one may not know which observation belongs to which component density. Formally, an allocation vector $\boldsymbol{S} = (S_1, S_2, \ldots, S_N)^T$ represents the allocation of observations to mixture components. i.e. $S_i = k$ represents that $i^\text{th}$ observation belongs to $k^\text{th}$ component density. Estimating the allocation vector is in fact solving the clustering problem, albeit using parametric methods in our case.\\
 
-While Maximum likelihood (ML) based methods such as the EM algorithm could be used to deal with the challenges mentioned above, there are certain downsides to them. Firstly it is well known that 95\% confidence intervals of ML estimates are based on asymptotic normality of the estimators. Thus in case of small sample size, or small mixture weights the results will not be correct \citep[pg. 35]{fruhwirth-schnatter_finite_2013}. A Bayesian approach however is immune to these issues as the posterior distribution of parameters is allowed to be non-normal. For univariate and multivariate GMM the likelihood function is given by,
+While Maximum likelihood (ML) based methods such as the EM algorithm can be used to deal with the challenges mentioned above, there are certain downsides to them. Firstly it is well known that 95\% confidence intervals of ML estimates are based on asymptotic normality of the estimators. Thus in case of small sample size, or small mixture weights the results will not be correct \citep[pg. 35]{fruhwirth-schnatter_finite_2013}. A Bayesian approach however is immune to these issues as the posterior distribution of parameters is allowed to be non-normal. For univariate and multivariate GMM the likelihood function is given by,
 
 $$ p(\boldsymbol{y}|\boldsymbol{\mu}, \boldsymbol{\sigma^2}, \boldsymbol{\eta}) = \prod_{i=1}^{N} \sum_{k=1}^{K} f_N(y_i; \mu_k, \sigma^2_k) \eta_k$$
 
