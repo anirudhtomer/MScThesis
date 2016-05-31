@@ -25,9 +25,9 @@ source("DIC_functions.R")
 source("bfWishart.R")
 
 numchains = 1
-niter = 80000
-nthin=50
-nburnin=10000
+niter = 60000
+nthin=80
+nburnin=25000
 
 ncomponents=3
 if(ncomponents==1){
@@ -135,7 +135,7 @@ heidel.diag(mcmcfit)
 ggs_density(ggsobject, "beta")
 ggs_density(ggsobject, "errPrecision")
 ggs_density(ggsobject, "randPrecision")
-ggs_density(ggsobject, "randmu")
+ggs_running(ggsobject, "randmu")
 ggs_density(ggsobject, "Eta")
 
 par(mfrow=c(2,2))
