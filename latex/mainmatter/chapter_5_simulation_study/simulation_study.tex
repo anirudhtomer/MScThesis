@@ -10,7 +10,7 @@ The data sets we simulated were motivated by the study on predicting Zebu cow's 
 
 \subsection{Description of each data set}
 \label{subsec : ds_description}
-Our aim was to create data sets differing in number of mixture components for random effects, number of subjects, statistical power to detect the fixed effects, separation of mixture components and number of subjects per component. To analyze the efficacy of model selection criteria under these different scenarios we created multiple data sets. To get a rough idea about the random effects in each of these data sets, we first did a graphical analysis. For this purpose we first regressed the response $\boldsymbol{y}$ on the 3 predictors: age, gender and birth year of cattle using OLS(section \ref{subsec : choice_starting_values}). It is also possible to use linear mixed model for estimating the fixed effects. We then regressed the residuals $y_{ij} - \boldsymbol{x}_{ij}\boldsymbol{\hat{\beta}}$ on the intercept and time of measurement for every subject separately to obtain a rough estimate $\boldsymbol{\hat{b}}_i$ of the random effect of subjects. This estimator however overestimates the actual size of the random effects because the within subject variance is also included in it. It is not possible to use Empirical Bayes estimates of the random effects because they may fail to reflect the heterogeneity in the random effects population \citep{verbeke_linear_1996}. Lastly, it is important to note that fitting an incorrect mean structure can lead to a incorrect representation of the random effects distribution. For e.g. we did not include age in the mean structure for data set 2, which is discussed ahead, and the corresponding plot (figure \ref{fig : missing_continuous_covariate_randplot}) for random effects did not indicate any components in the mixture. 
+Our aim was to create data sets differing in number of mixture components for random effects, number of subjects, separation of mixture components and number of subjects per component. To analyze the efficacy of model selection criteria under these different scenarios we created multiple data sets. To get a rough idea about the random effects in each of these data sets, we first did a graphical analysis. For this purpose we first regressed the response $\boldsymbol{y}$ on the 3 predictors: age, gender and birth year of cattle using OLS (section \ref{subsec : choice_starting_values}). It is also possible to use a LMM for estimating the fixed effects. We then regressed the residuals $y_{ij} - \boldsymbol{x}_{ij}\boldsymbol{\hat{\beta}}$ on the intercept and time of measurement for every subject separately to obtain a rough estimate $\boldsymbol{\hat{b}}_i$ of the random effect of subjects. This estimator however overestimates the actual size of the random effects because the within subject variance is also included in it. It is not possible to use Empirical Bayes estimates of the random effects because they may fail to reflect the heterogeneity in the random effects population \citep{verbeke_linear_1996}. Lastly, it is important to note that fitting an incorrect mean structure can lead to a incorrect representation of the random effects distribution. For e.g. we did not include age in the mean structure for data set 2, which is described ahead, and the corresponding plot (figure \ref{fig : missing_continuous_covariate_randplot}) for random effects did not indicate any components in the mixture. 
 
 \subsubsection{Data set 1: No mixture distribution of random effects}
 \label{subsubsec : ds_simple}
@@ -101,9 +101,9 @@ This data is similar to Data set 6 in all regards except that the number of subj
 
 
 \subsection{Running MCMC simulations}
-We first discuss some of the issues we encountered while doing the MCMC simulations. The first one was label switching across the chains while calculating marginal likelihood using Chib's approximation; i.e. label 1 corresponding to component 1 in one chain and corresponding to some other component in another chain. This gave inconsistent and incorrect estimates for the various calculations we did. Although we dealt with it using the mechanisms given in section \ref{subsec : label_switching_blmm}, mechanisms such as applying an identifiability constraint decreased the speed of simulations drastically. The second issue was high autocorrelation in the chains. We tried various strategies for it. For e.g. using a marginal model was helpful and so was hierarchical centering.\\
+We first discuss some of the issues we encountered while doing the MCMC simulations. The first one was label switching across the chains while calculating marginal likelihood using Chib's approximation; i.e. label 1 corresponding to component 1 in one chain and corresponding to some other component in another chain. This gave inconsistent and incorrect estimates for the various calculations we did. Although we dealt with it using the mechanisms given in section \ref{subsec : label_switching_blmm}, mechanisms such as applying an ordering constraint decreased the speed of simulations drastically. The second issue was high autocorrelation in the chains which we were able to mitigate by using hierarchical centering. Using a marginal model also mitigated the issue. However for models with overfitting mixtures, neither hierarchical centering nor using marginal model decreased the high autocorrelation.\\
 
-However despite these taking these measures we had to employ a thinning of 1 per 100 iterations and in some cases 1 per 200 iterations to make sure the resulting chains were not autocorrelated. Since we lacked computational resources required to run longer chains we had to be content with chains of length 1300 (after thinning). Lastly, we observed that in models where mixture of random effects were fitted with more components than needed, there was very high autocorrelation in the chain which could not be reduced despite high thinning. The convergence tests for such chains showed that the chains did not converge for the parameters of some (this varied from model to model) of the component densities. The parameters corresponding to fixed effects converged in such chains though. Since some of the chains were not converged, it made little sense to compare DIC and marginal likelihood based on such models with models for which the chains converged. Thus we have not presented DIC and marginal likelihood for overfitted models.
+Despite these taking the aforementioned measures we had to employ a thinning of 1 per 100 iterations and in some cases 1 per 200 iterations to make sure the resulting chains were not autocorrelated. Since we lacked computational resources required to run longer chains we had to be content with chains of length 1300 (after thinning). Lastly, we observed that in models where mixture of random effects were fitted with more components than needed, there was very high autocorrelation in the chain which could not be reduced despite high thinning. The convergence tests for such chains showed that the chains did not converge for the parameters of some (this varied from model to model) of the component densities. The chain corresponding to fixed effect parameters showed no sign of non convergence though. Since some of the chains were not converged, it made little sense to compare DIC and marginal likelihood based on such models with models for which the chains converged. Thus we have not presented DIC and marginal likelihood for overfitted models.
 
 \subsection{Deviance information criteria}
 \label{subsec : dic_simulation_results}
@@ -116,14 +116,14 @@ The Deviance information criteria results are based on a single chain and have b
 \label{table : ds_simple_dic} 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
+\# Components Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1      & 4143 & 4144 & 4143 & 5160 & 4402 & 3483 \\
 \bottomrule
 \end{tabular}
 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
+\# Components Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1      & 9    & 9    & 9    & 903  & 145  & 125  \\
 \bottomrule
 \end{tabular}
@@ -138,7 +138,7 @@ Table \ref{table : ds_3wellsep_dic} shows the values of various DIC we obtained 
 \label{table : ds_3wellsep_dic} 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
+\# Components Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1 & 9966 & 9959 & 9965 & 12921 & 10531 & 7855 \\
 2 & 9865 & 9849 & 9864 & 12498 & 10458 & 7860 \\
 3 & 9664 & 9665 & 9663 & 11847 & 10244 & 7870 \\
@@ -147,7 +147,7 @@ Table \ref{table : ds_3wellsep_dic} shows the values of various DIC we obtained 
 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
+\# Components Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1 & 9 & 2 & 8 & 2670 & 279 & 269 \\
 2 & 15 & -1 & 14 & 2344 & 304 & 272 \\
 3 & 21 & 21 & 20 & 1933 & 331 & 282 \\
@@ -164,7 +164,7 @@ Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC app
 \label{table : ds_3wellsep_3ppg_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
+\# Components Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1 & 2013 & 2012 & 2012 & 2611 & 2118 & 1570 \\
 2 & 1989 & 1949 & 1987 & 2497 & 2013 & 1562 \\
 3 & 1942 & 1942 & 1940 & 2339 & 2039 & 1571 \\
@@ -173,7 +173,7 @@ Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC app
 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
+\# Components Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1 & 8 & 7 & 7 & 545 & 52 & 45 \\
 2 & 14 & -26 & 12 & 465 & -20 & 35 \\
 3 & 17 & 17 & 15 & 370 & 70 & 46 \\
@@ -181,7 +181,7 @@ Table \ref{table : ds_3wellsep_3ppg_dic} shows the values of the various DIC app
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DIC to data set 4. So far we have observed that $\text{DIC}_1$ to $\text{DIC}_4$ can be used to detect the right number of components. From the table of DIC it is clear that $\text{DIC}_1$ to $\text{DIC}_4$ can still be used to select the right number of components, however $\text{DIC}_6$ chose model 1 over model with higher number of components. $\text{DIC}_5$ has almost the same value for Model with no mixture and model with 3 components in the mixture. Thus once again both $\text{DIC}_5$ and  $\text{DIC}_6$ cannot be considered reliable. To further validate the results, we decided to decrease the number of subjects to 36.\\
+Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DIC to data set 4. So far we have observed that $\text{DIC}_1$ to $\text{DIC}_4$ can be used to detect the right number of components. From the table of DIC it is clear that $\text{DIC}_1$ to $\text{DIC}_4$ can still be used to select the right number of components, however $\text{DIC}_6$ chose model 1 over model with higher number of components. $\text{DIC}_5$ has almost the same value for model with no mixture and model with 3 components in the mixture. Thus once again both $\text{DIC}_5$ and  $\text{DIC}_6$ cannot be considered reliable. To further validate the results, we decided to decrease the number of subjects to 36.\\
  
 \begin{table}[!htb]
 \centering
@@ -190,7 +190,7 @@ Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DI
 \label{table : ds_3fused_10ppg_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
+\# Components Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1 & 6568 & 6566 & 6566 & 8454 & 6899 & 5197 \\
 2 & 6531 & 6523 & 6530 & 8263 & 6946 & 5253 \\
 3 & 6497 & 6492 & 6497 & 8017 & 6898 & 5263 \\
@@ -199,7 +199,7 @@ Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DI
 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
+\# Components Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1 & 9 & 8 & 8 & 1694 & 139 & 127 \\
 2 & 14 & 7 & 13 & 1527 & 210 & 182 \\
 3 & 20 & 14 & 19 & 1341 & 222 & 187 \\
@@ -207,7 +207,7 @@ Table \ref{table : ds_3fused_10ppg_dic} shows the results of applying various DI
 \end{tabular}
 \end{table}
 
-Table \ref{table : ds_3fused_3ppg_dic} shows the results of calculating DIC for models applied to data set 5. The peculiarity of this data set was that the number of subjects were less and the components were fused. Thus we observed that some of the components remained empty even when we fitted the right number of components, and further the chains did not converge. As we discussed in section \ref{subsec : choice_priors} one could use a Dirichlet prior with slightly bigger hyperparameters to avoid empty components, although at the risk of becoming too informative. For the model with 2 components, we tried various hyperparameter values between 0 and 3 and found that increasing the hyperparameter beyond 2.5 was not necessary as the chains were converged with a $\text{Dir}(2.5, 2.5, ..., 2.5)$ prior on weight distribution. However for a model with 3 components we had to choose a $\text{Dir}(5, 5, ..., 5)$ prior to obtain chains which were converged and had posterior component density parameter values near the actual ones. The most interesting aspect of the results was that for 4 components we could not get converged chains even when we used $\text{Dir}(20, 20, ..., 20)$ prior. We also modeled the data using smaller values for Dirichlet prior hyperparameters; for e.g. $\text{Dir}(0.1, 0.1, ..., 0.1)$ and $\text{Dir}(0.6, 0.6, ..., 0.6)$ prior were tested. However both of these priors performed as worse as the $\text{Dir}(1, 1, ..., 1)$ prior for the current data set. All other DIC's other than $\text{DIC}_5$ and $\text{DIC}_6$ select the right number of components for this data set. $\text{DIC}_4$ is once again the most discerning DIC.\\
+Table \ref{table : ds_3fused_3ppg_dic} shows the results of calculating DIC for models applied to data set 5. The peculiarity of this data set was that the number of subjects were less and the components were fused. Thus we observed that some of the components remained empty even when we fitted the right number of components, and the chains also did not converge for some of the component density parameters. As we discussed in section \ref{subsec : choice_priors} one could use a Dirichlet prior with slightly bigger hyperparameters to avoid empty components, although at the risk of becoming too informative. For the model with 2 components, we tried various hyperparameter values between 0 and 3 and found that increasing the hyperparameter value beyond 2.5 was not necessary as the chains were converged with a $\text{Dir}(2.5, 2.5, ..., 2.5)$ prior on weight distribution. However for a model with 3 components we had to choose a $\text{Dir}(5, 5, ..., 5)$ prior to obtain chains which were converged and had posterior component density parameter values near the actual ones. The most interesting aspect of the results was that for 4 components we could not get converged chains even when we used $\text{Dir}(20, 20, ..., 20)$ prior. We also modeled the data using smaller values for Dirichlet prior hyperparameters; for e.g. $\text{Dir}(0.1, 0.1, ..., 0.1)$ and $\text{Dir}(0.6, 0.6, ..., 0.6)$ prior were tested. However both of these priors performed as worse as the $\text{Dir}(1, 1, ..., 1)$ prior for the current data set. All other DIC's other than $\text{DIC}_5$ and $\text{DIC}_6$ select the right number of components for this data set. $\text{DIC}_4$ is once again the most discerning DIC.\\
 
 \begin{table}[!htb]
 \centering
@@ -216,7 +216,7 @@ Table \ref{table : ds_3fused_3ppg_dic} shows the results of calculating DIC for 
 \label{table : ds_3fused_3ppg_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
+\# Components Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1 & 1944 & 1943 & 1943 & 2500 & 1879 & 1364 \\
 2 & 1934 & 1936 & 1936 & 2438 & 2042 & 1526 \\
 3 & 1921 & 1920 & 1922 & 2350 & 2023 & 1537\\
@@ -225,7 +225,7 @@ Table \ref{table : ds_3fused_3ppg_dic} shows the results of calculating DIC for 
 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
+\# Components Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1 & 9 & 7 & 7 & 510 & -110 & -119 \\
 2 & 11 & 14 & 13 & 460 & 63 & 43 \\
 3 & 16 & 14 & 17 & 396 & 69 & 53 \\
@@ -242,7 +242,7 @@ Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the var
 \label{table : ds_5wellsep_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
+\# Components Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1 & 8982 & 8981 & 8980 & 11847 & 9251 & 6655 \\
 2 & 8829 & 8827 & 8827 & 11327 & 9293 & 6838 \\
 3 & 8745 & 8742 & 8744 & 11036 & 9251 & 6895 \\
@@ -253,7 +253,7 @@ Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the var
 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
+\# Components Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1 & 9 & 9 & 7 & 2591 & -5 & -14 \\
 2 & 14 & 13 & 12 & 2224 & 190 & 169 \\
 3 & 20 & 16 & 19 & 2035 & 250 & 223 \\
@@ -270,7 +270,7 @@ Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the var
 \label{table : ds_5fused_dic}
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
+\# Components Fitted & $\text{DIC}_1$ & $\text{DIC}_2$  & $\text{DIC}_3$  & $\text{DIC}_4$  & $\text{DIC}_5$  & $\text{DIC}_6$  \\ \midrule
 1 & 6708 & 6707 & 6706 & 8819 & 6977 & 5071 \\
 2 & 6606 & 6605 & 6604 & 8443 & 6946 & 5135 \\
 3 & 6539 & 6538 & 6537 & 8178 & 6944 & 5204 \\
@@ -281,7 +281,7 @@ Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the var
 
 \begin{tabular}{@{}rrrrrrr@{}}
 \toprule
-\# Comp Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
+\# Components Fitted & ${\text{p}_\text{D}}_1$ & ${\text{p}_\text{D}}_2$ & ${\text{p}_\text{D}}_3$ & ${\text{p}_\text{D}}_4$ & ${\text{p}_\text{D}}_5$ & ${\text{p}_\text{D}}_6$ \\ \midrule
 1 & 9 & 8 & 7 & 1903 & 61 & 53 \\
 2 & 15 & 14 & 13 & 1636 & 139 & 120 \\
 3 & 21 & 20 & 19 & 1456 & 221 & 185 \\
@@ -293,11 +293,12 @@ Table \ref{table : ds_5wellsep_dic} shows the results of applying DIC to the var
 
 Table \ref{table : ds_5fused_dic} shows the results of applying DIC to the various models fitted for data set 7. Based on figure \ref{fig : ds_5fused_randplot} it is difficult to identify more than 3 components in this mixture. However once again $\text{DIC}_4$ appeared to be identifying the right number of components correctly. $\text{DIC}_2$ and $\text{DIC}_3$ do not seem to discern much among the various models, which as we saw earlier, happens when the components are fused. Interestingly $\text{DIC}_1$ selects the right model only by virtue of a difference of DIC value of 1 between model with 4 components and 5 components.\\
 
+\subsubsection{The rule of thumb for model selection using DIC}
 It is important to note that when components were fused, then even with a very large number of MCMC iterations we observed a variation of 10 to 20 in the same DIC across chains. Thus, although $\text{DIC}_3$ preferred model 5 over model 4 by a DIC difference of 13, it is highly plausible to obtain a difference of -7; i.e. Model 4 having a lower $\text{DIC}_3$ than model 5. In such a case if the classical rule of thumb of DIC difference of 5 to 10 is used to select the models then an incorrect model might get selected.
 
 \subsection{Marginal likelihood}
 \label{subsec : marginal_likelihood_simulation}
-To calculate marginal likelihood for the various models we implemented Chib's approximation described in section \ref{sec : marginal_likelihood}. Table \ref{table : marginal_likelihood_results} shows the results of $\log{\hat{m}(\boldsymbol{y})}$ for the various models we fitted to data set 1 to data set 7. One can see that even among the well converged models there is no obvious pattern visible in these results to conclude the efficacy of marginal likelihood in selection of a model. For e.g. in case of data set 6 there were 5 well separated components in the mixture distribution of random effects. When we fitted 1 to 5 components for this data set we obtained MCMC chains with good convergence. However in table \ref{table : marginal_likelihood_results} we can see that marginal likelihood prefers fitting 4 components over 5 components. For data set 3 where we had 3 well separated components but only 36 subjects in total, we can observe that marginal likelihood incorrectly prefers model with 1 components and not model with 3 components. Thus marginal likelihood using Chib's approximation does not seem to be a very reliable method to choose the correct Bayesian heterogeneity model.
+To calculate marginal likelihood for the various models we implemented Chib's approximation described in section \ref{sec : marginal_likelihood}. Table \ref{table : marginal_likelihood_results} shows the results of $\log{\hat{m}(\boldsymbol{y})}$ for the various models we fitted to data set 1 to data set 7. One can see that even among the  models which showed no sign of non convergence in the chains there is no obvious pattern visible in the results to conclude the efficacy of marginal likelihood in selection of a model. For e.g. in case of data set 6 there were 5 well separated components in the mixture distribution of random effects. When we fitted 1 to 5 components for this data set we obtained MCMC chains with good convergence. However in table \ref{table : marginal_likelihood_results} we can see that marginal likelihood prefers fitting 4 components over 5 components. For data set 3 where we had 3 well separated components but only 36 subjects in total, we can observe that marginal likelihood incorrectly prefers mixture with no component instead of the correct mixture with 3 components. Thus marginal likelihood using Chib's approximation does not seem to be a very reliable method to choose the correct Bayesian heterogeneity model.
 
 \begin{table}[!htb]
 \centering
@@ -326,15 +327,15 @@ We implemented the PPC outlined in section \ref{sec : ppc} and found that it wor
 \captionsetup{justification=centering}
 \begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep8comp.png}
-        \caption{\label{fig : ppc_5wellsep8comp} \# components fitted = 8}
+        \caption{\label{fig : ppc_5wellsep8comp} \# Components fitted = 8}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep7comp.png}
-          \caption{\label{fig : ppc_5wellsep7comp}\# components fitted = 7}
+          \caption{\label{fig : ppc_5wellsep7comp}\# Components fitted = 7}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep6comp.png}
-          \caption{\label{fig : ppc_5wellsep6comp}\# components fitted = 6}
+          \caption{\label{fig : ppc_5wellsep6comp}\# Components fitted = 6}
 	\end{subfigure}
 	
 	\caption{Density function of $T(\boldsymbol{\tilde{r}})$ for overfitted models applied to data set 6. The red line shows the value of the test statistic $T(\boldsymbol{r})$ based on the observed data.}
@@ -346,23 +347,23 @@ We implemented the PPC outlined in section \ref{sec : ppc} and found that it wor
 \captionsetup{justification=centering}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep5comp.png}
-          \caption{\label{fig : ppc_5wellsep5comp}\# components fitted = 5}
+          \caption{\label{fig : ppc_5wellsep5comp}\# Components fitted = 5}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep4comp.png}
-          \caption{\label{fig : ppc_5wellsep4comp}\# components fitted = 4}
+          \caption{\label{fig : ppc_5wellsep4comp}\# Components fitted = 4}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep3comp.png}
-          \caption{\label{fig : ppc_5wellsep3comp}\# components fitted = 3}
+          \caption{\label{fig : ppc_5wellsep3comp}\# Components fitted = 3}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep2comp.png}
-          \caption{\label{fig : ppc_5wellsep2comp}\# components fitted = 2}
+          \caption{\label{fig : ppc_5wellsep2comp}\# Components fitted = 2}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mainmatter/chapter_5_simulation_study/ppc_5wellsep1comp.png}
-          \caption{\label{fig : ppc_5wellsep1comp}\# components fitted = 1}
+          \caption{\label{fig : ppc_5wellsep1comp}\# Components fitted = 1}
 	\end{subfigure}
 	\caption{Density function of $T(\boldsymbol{\tilde{r}})$ for under/rightly fitted models applied to data set 6. The red line shows the value of the test statistic $T(\boldsymbol{r})$ based on the observed data.}
 	\label{fig : ppc_5wellsepcomp_underfitted}    
@@ -382,9 +383,9 @@ PPP Value & 0.500 & 0.500 & 0.492 & 0.500 & 0.500 & 0.581 & 0.674 & 0.775 \\ \bo
 \end{tabular}
 \end{table}
 
-We also calculated posterior predictive p-values for the various number of components we fitted to data set and they are presented in table \ref{table : ppp_value_5welsepcomp}. As one can see the PPP values are equal (0.5) for all the underfitted models. Based on the graphical PPC and these PPP values, it was not possible to choose a model among the correctly fitted and underfitted one. On the other hand for models with overfitted components, the PPP values increase as overfitting increases.\\
+We also calculated posterior predictive p-values for the various number of components we fitted to data set and they are presented in table \ref{table : ppp_value_5welsepcomp}. The PPP values are all equal to 0.5 for the models with underfitted mixtures. Based on the graphical PPC and these PPP values, it was not possible to choose a model among the correctly fitted and underfitted ones. On the other hand, for models with overfitted components the PPP values increase as overfitting increases.\\
 
-We observed a more severe impact of overfitting when we used independent inverse gamma priors for the variance components of $G_k$ and uniform prior $U(-1,1)$ for correlation. To show the resulting distribution of the test statistic, we had to log transform it because otherwise the values were too large to be plotted in a single graph. For data set 2 we overfitted the mixture of random effects by using 4 components in the mixture. As shown in Figure \ref{fig : ppc_3wellsep4comp_indp_gammaprior} the test statistic is inflated by a large margin, which was also discussed in section \ref{sec : ppc}. Interestingly when we fitted the right number of components the test statistic was not inflated, but the model was not fitting well to the data as shown in Figure \ref{fig : ppc_3wellsep3comp_indp_gammaprior}. The PPP-value we observed was 1. To diagnose this problem we checked the posteriors for variance covariance matrices and found them to be underestimating the sample data's variance covariance of the random effects. This indicated that the test statistic can be used to detect an overall bad model fit even when the right number of components are fitted to the mixture distribution of random effects.\\
+We observed a more severe impact of overfitting when we used independent inverse gamma priors for the variance components of $G_k$ and uniform prior $U(-1,1)$ for correlation. To show the resulting distribution of the test statistic, we had to log transform it because otherwise the values were too large to be plotted in a single graph. For data set 2 we overfitted the mixture of random effects by using 4 components in the mixture. As shown in Figure \ref{fig : ppc_3wellsep4comp_indp_gammaprior} the log of the test statistic is inflated by a large margin, which was also discussed in section \ref{sec : ppc}. Interestingly when we fitted the right number of components the test statistic was not inflated, yet from the distribution of the test statistic it was clear that the model was not fitting well to the data (Figure \ref{fig : ppc_3wellsep3comp_indp_gammaprior}). The PPP-value we obtained for this model was equal to 1. To diagnose this problem we checked the posterior distribution of variance covariance matrices of random effects and found that the posterior variances of random effects were underestimating the sample data's variance covariance of the random effects. This shows that the test statistic can not only be be used to detect models with overfitting mixtures, but even an overall bad model fit despite having the right number of components in the mixture, can be detected.\\
 
 \begin{figure}[!htb]
 	\centering
