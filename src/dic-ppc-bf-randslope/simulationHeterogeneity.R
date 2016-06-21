@@ -24,6 +24,10 @@ source("../common/extractFuncRandSlopeConditional.R")
 source("DIC_functions.R")
 source("bfWishart.R")
 
+########## Quick graphical analysis of the simulated mixture distribution #######
+qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)), xlab="Random intercept", ylab="Random slope")
+
+########## Running MCMC simulations ##########
 numchains = 1
 niter = 60000
 nthin=80
@@ -42,55 +46,13 @@ if(ncomponents==1){
   mcmcfit = as.mcmc(fit)
 }
 
-#############################
-
-for (ncomponents in 2:8){
-fit = fitModel(niter, nthin, 0, jagsmodel = model, nchains = numchains, ncomponents)
-mcmcfit = as.mcmc(fit)
 attributes(mcmcfit)$ncomponents = ncomponents
 attributes(mcmcfit)$nsubjects = nsubjects
 attributes(mcmcfit)$nrep = nrep
 attributes(mcmcfit)$time = time
 attributes(mcmcfit)$wishartPriorScale = wishartPriorScale
 
-if(ncomponents==2){
-  mcmcfit_5fused2comp=mcmcfit
-}
-
-if(ncomponents==3){
-  mcmcfit_5fused3comp = mcmcfit 
-}
-
-if(ncomponents==4){
-  mcmcfit_5fused4comp= mcmcfit 
-}
-
-if(ncomponents==5){
-  mcmcfit_5fused5comp=mcmcfit
-}
-
-if(ncomponents==6){
-  mcmcfit_5fused6comp=mcmcfit
-}
-
-if(ncomponents==7){
-  mcmcfit_5fused7comp=mcmcfit
-}
-if(ncomponents==8){
-  mcmcfit_5fused8comp=mcmcfit
-}
-  
-save.image("D:/Dropbox/MSc Stats/Thesis/MScThesis/latex/code/dic-ppc-bf-randslope/wishart.RData")
-}
-
-pd=numeric()
-dic = numeric()
-
-mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
-mcmcLen = nrow(mcmcfit[[1]])
-attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
-nrow(mcmcfit[[1]])
-
+############## Calculating DIC #################
 dic1=calculateDIC1(mcmcfit)
 dic2=calculateDIC2(mcmcfit)
 dic3=calculateDIC3(mcmcfit)
@@ -98,40 +60,13 @@ dic4=calculateDIC4(mcmcfit)
 dic5=calculateDIC5(mcmcfit)
 dic7=calculateDIC7(mcmcfit)
 
-sapply(list(dic1,dic2,dic3,dic4,dic5,dic7), FUN = function(x){pd[length(pd)+1]<<-x$pd; dic[length(dic)+1]<<-x$dic}) 
-write.csv(x=data.frame(pd, dic), file = "C:/Users/Anirudh/Desktop/temp.csv", row.names = F)
+##### Calculating PPC ########
+###### Run the code in ppc.R ###### 
 
-
-par(mfrow=c(1,2))
-stdMeans = foreach(j=1:attributes(mcmcfit_simple1comp)$nsubjects, .combine='rbind') %dopar%{
-  intercept = mcmcfit_simple1comp[[1]][, paste("randomComp[", j,",1]", sep="")]
-  slope = mcmcfit_simple1comp[[1]][, paste("randomComp[", j,",2]", sep="")]
-  #c(mean(intercept), mean(slope))
-  c(mean(intercept/sqrt(var(intercept))), mean(slope/sqrt(var(slope))))
-}
-plot(density(stdMeans[,1]))
-plot(density(stdMeans[,2]))
-par(mfrow=c(1,1))
-
-
-##############
-
-beep(sound=8)
-
-mcmcfit[[1]] = mcmcfit[[1]][((nburnin/nthin+1):(niter/nthin)),]
-mcmcLen = nrow(mcmcfit[[1]])
-attributes(mcmcfit[[1]])$mcpar = c(1, mcmcLen, 1)
-ggsobject = ggs(mcmcfit)
-
-attributes(mcmcfit)
-#save.image("F:/docs/Dropbox/MSc Stats/Thesis/MScThesis/latex/code/dic-ppc-randslope/.RData")
-
-########## Graphical analysis of the simulated mixture distribution #######
-qplot(x=randIntercept, y=randSlope, data=data.frame(extractRandomComp(viaReg = T)), xlab="Random intercept", ylab="Random slope")
+#### Calculating marginal likelihood using Chib's approximation ####
+#### Run bf.R one line and one function at a time ###
 
 ########## Graphical analysis of MCMC fit #########
-heidel.diag(mcmcfit)
-
 ggs_density(ggsobject, "beta")
 ggs_density(ggsobject, "errPrecision")
 ggs_density(ggsobject, "randPrecision")
@@ -152,7 +87,6 @@ for(k in 1:attributes(mcmcfit)$ncomponents){
   readline()
 }
 
-#Compare the whole chain with the last part...similar to geweke
 ggs_compare_partial(ggsobject, "randmu", rug = T)
 
 ggs_running(ggsobject, "beta")
@@ -163,16 +97,6 @@ ggs_running(ggsobject, "randmu")
 ggs_running(ggsobject, "Eta")
 ggs_running(ggsobject, "randSigma")
 
-install.packages("igraph")
-library(igraph)
-plot(running.mean(mcmcfit[[1]][,"randSigma[1,1,1]"], binwidth = 2))
-
-ggs_autocorrelation(ggsobject, "beta")
-ggs_autocorrelation(ggsobject, "Precision")
-ggs_autocorrelation(ggsobject, "randmu")
-ggs_autocorrelation(ggsobject, "Eta")
-
-#dont attempt ggs_pairs on entire object
 ggs_crosscorrelation(ggsobject)
 ggs_pairs(ggsobject, "beta")
 ggs_pairs(ggsobject, "Eta")
@@ -184,7 +108,7 @@ ggs_traceplot(ggsobject, "Precision")
 ggs_traceplot(ggsobject, "randmu")
 ggs_traceplot(ggsobject, "Eta")
 
-########## Mode hunting, works only for 2 or 4 chains ##########
+########## Mode hunting: works only for 2 or 4 chains and when only random intercept is used in the model##########
 mcmcfitdf = data.frame(y= numeric(0), x= numeric(0), 
               pairId = character(0), row = character(0), col=character(0))
 rownum = c("1","1","2","2")
