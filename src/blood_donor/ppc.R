@@ -3,7 +3,7 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='MASS') %dopar%{
   ncomponents = attributes(mcmcfit)$ncomponents
   nsubjects = attributes(mcmcfit)$nsubjects
   INTERCEPT_SCALE = attributes(mcmcfit)$INTERCEPT_SCALE
-
+  
   eta = getEta(mcmcfit, mcmcIterNum = k)
   randmu = getRandMu(mcmcfit, mcmcIterNum = k)
   randSigma = getRandSigma(mcmcfit, mcmcIterNum = k)
@@ -40,37 +40,34 @@ ppcCheck=foreach(k=1:nrow(mcmcfit[[1]]),.combine='c', .packages='MASS') %dopar%{
 
 temp = c()
 for(i in 1:nrow(mcmcfit[[1]])){
-randComp = getRandomComp(mcmcfit, mcmcIterNum = i)
-
-betaAge = mcmcfit[[1]][i,"betaAge"]
-betaDonate = mcmcfit[[1]][i,"betaDonate"]
-betaSeason = mcmcfit[[1]][i,"betaSeason"]
-betaTSPD = mcmcfit[[1]][i,"betaTSPD"]
-# betaTSPDSquare = mcmcfit[[1]][i,"betaTSPDSquare"]
-# betaTSPDSeason = mcmcfit[[1]][i,"betaTSPDSeason"]
-betaDonateLast2TSPD = mcmcfit[[1]][i,"betaDonateLast2TSPD"]
-betaDonateLast2Donate = mcmcfit[[1]][i,"betaDonateLast2Donate"]
-betaDonateLast2Square = mcmcfit[[1]][i,"betaDonateLast2Square"]
-
-totalSample = c()
-for(j in 1:nsubjects){
-  startIndex = cumsumHb[j]+1
-  endIndex = cumsumHb[j]+numHb[j]
+  randComp = getRandomComp(mcmcfit, mcmcIterNum = i)
   
-  fixedPartMean = betaAge*ds$Age[startIndex:endIndex] + betaSeason*(as.numeric(ds$Season[startIndex:endIndex])-1) +
-    betaDonate*(as.numeric(ds$Donate[startIndex:endIndex])) + betaTSPD*ds$TSPD[startIndex:endIndex] +
-    betaDonateLast2TSPD*ds$donateLast2TSPD[startIndex:endIndex] +
-    betaDonateLast2Donate*ds$donateLast2Donate[startIndex:endIndex] +
-    betaDonateLast2Square*ds$donateLast2Square[startIndex:endIndex]
-    # betaTSPDSquare*ds$TSPD[startIndex:endIndex]*ds$TSPD[startIndex:endIndex] +
-    # betaTSPDSeason*ds$TSPDSeason[startIndex:endIndex]
+  betaAge = mcmcfit[[1]][i,"betaAge"]
+  betaDonate = mcmcfit[[1]][i,"betaDonate"]
+  betaSeason = mcmcfit[[1]][i,"betaSeason"]
+  betaTSPD = mcmcfit[[1]][i,"betaTSPD"]
+
+  betaDonateLast2TSPD = mcmcfit[[1]][i,"betaDonateLast2TSPD"]
+  betaDonateLast2Donate = mcmcfit[[1]][i,"betaDonateLast2Donate"]
+  betaDonateLast2Square = mcmcfit[[1]][i,"betaDonateLast2Square"]
   
-  sampleRandomPart = ds$Hb[startIndex:endIndex] - fixedPartMean
-  sampleRandomPart = sampleRandomPart - mean(sampleRandomPart)
-  totalSample[j] = sum(sampleRandomPart^2)
-}
-totalSample = sum(totalSample)/sum(numHb)
-temp[i] = totalSample
+  totalSample = c()
+  for(j in 1:nsubjects){
+    startIndex = cumsumHb[j]+1
+    endIndex = cumsumHb[j]+numHb[j]
+    
+    fixedPartMean = betaAge*ds$Age[startIndex:endIndex] + betaSeason*(as.numeric(ds$Season[startIndex:endIndex])-1) +
+      betaDonate*(as.numeric(ds$Donate[startIndex:endIndex])) + betaTSPD*ds$TSPD[startIndex:endIndex] +
+      betaDonateLast2TSPD*ds$donateLast2TSPD[startIndex:endIndex] +
+      betaDonateLast2Donate*ds$donateLast2Donate[startIndex:endIndex] +
+      betaDonateLast2Square*ds$donateLast2Square[startIndex:endIndex]
+
+    sampleRandomPart = ds$Hb[startIndex:endIndex] - fixedPartMean
+    sampleRandomPart = sampleRandomPart - mean(sampleRandomPart)
+    totalSample[j] = sum(sampleRandomPart^2)
+  }
+  totalSample = sum(totalSample)/sum(numHb)
+  temp[i] = totalSample
 }
 
 resultDf = data.frame("Test.statistic"=c(ppcCheck, temp), "Type"=c(rep("Posterior Predictive", length(ppcCheck)), rep("Sample", length(temp))))
